@@ -1,0 +1,33 @@
+version: "3"
+services:
+
+  everyday-stoic-backend:
+    networks: 
+      - everyday-stoic
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: everyday-stoic-backend
+    security_opt:
+      - seccomp:unconfined
+    env_file: .env
+    ports:
+      - "8080:80"
+    volumes:
+      - "../:/code/"
+
+  everyday-stoic-db:
+    networks:
+      - everyday-stoic
+    container_name: everyday-stoic-db
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-everyday-stoic:/data/db
+    env_file: .env
+
+volumes:
+  mongo-everyday-stoic:
+networks:
+  everyday-stoic:
