@@ -1,3 +1,14 @@
 # python venv
 chainsaw-man/
+
+# python cache folder
 __pycache__/
+
+# elm dependencies folder
+elm-stuff/
+
+# backup files
+*.bak
+
+# scratch files
+scratch*
