@@ -15,8 +15,8 @@ type Msg
     | JournalEntriesReceived (WebData (List MorningJournal))
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : ( Model, Cmd Msg )
+init =
     ( { journalEntries = RemoteData.Loading }, fetchJournalEntries )
 
 
