@@ -4,6 +4,7 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Page.ListJournals as ListJournals
+import Page.NewMorningJournal as NewMorningJournal
 import Route exposing (Route)
 import Url exposing (Url)
 
@@ -34,6 +35,7 @@ type alias Model =
 type Page
     = NotFoundPage
     | ListJournalsPage ListJournals.Model
+    | NewMorningJournalPage NewMorningJournal.Model
 
 
 
@@ -64,6 +66,13 @@ initCurrentPage ( model, existingCmds ) =
                             ListJournals.init
                     in
                     ( ListJournalsPage pageModel, Cmd.map ListJournalsMsg pageCmds )
+
+                Route.NewMorningJournal ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            NewMorningJournal.init model.navKey
+                    in
+                    ( NewMorningJournalPage pageModel, Cmd.map NewMorningJournalMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -76,6 +85,7 @@ initCurrentPage ( model, existingCmds ) =
 
 type Msg
     = ListJournalsMsg ListJournals.Msg
+    | NewMorningJournalMsg NewMorningJournal.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
 
@@ -90,6 +100,15 @@ update msg model =
             in
             ( { model | page = ListJournalsPage updatedPageModel }
             , Cmd.map ListJournalsMsg updatedCmd
+            )
+
+        ( NewMorningJournalMsg subMsg, NewMorningJournalPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    NewMorningJournal.update subMsg pageModel
+            in
+            ( { model | page = NewMorningJournalPage updatedPageModel }
+            , Cmd.map NewMorningJournalMsg updatedCmd
             )
 
         ( LinkClicked urlRequest, _ ) ->
@@ -132,6 +151,10 @@ currentView model =
         ListJournalsPage pageModel ->
             ListJournals.view pageModel
                 |> Html.map ListJournalsMsg
+
+        NewMorningJournalPage pageModel ->
+            NewMorningJournal.view pageModel
+                |> Html.map NewMorningJournalMsg
 
 
 notFoundView : Html msg

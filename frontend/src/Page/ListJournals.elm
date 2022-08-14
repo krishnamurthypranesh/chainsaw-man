@@ -23,7 +23,7 @@ init =
 fetchJournalEntries : Cmd Msg
 fetchJournalEntries =
     Http.get
-        { url = "http://localhost:8080"
+        { url = "http://localhost:8080/journalEntries/"
         , expect =
             morningJournalsListDecoder |> Http.expectJson (RemoteData.fromResult >> JournalEntriesReceived)
         }
@@ -40,5 +40,5 @@ update msg model =
 
 
 view : Model -> Html Msg
-view model =
+view _ =
     div [] [ text "To be implemented..." ]

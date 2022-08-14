@@ -8,6 +8,7 @@ import Url.Parser exposing (..)
 type Route
     = NotFound
     | JournalEntries
+    | NewMorningJournal
 
 
 
@@ -27,8 +28,9 @@ parseUrl url =
 matchRoute : Parser (Route -> a) a
 matchRoute =
     oneOf
-        [ map JournalEntries top
+        [ map NewMorningJournal top -- if no route is found, take the user to the journal creation page
         , map JournalEntries (s "journalEntries")
+        , map NewMorningJournal (s "journalEntry" </> s "morning" </> s "new")
 
         -- add route for home page
         ]
