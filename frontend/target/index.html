@@ -11046,13 +11046,21 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Page$MorningJournal$MorningJournal = F3(
-	function (id, createdAt, amorFati) {
-		return {amorFati: amorFati, createdAt: createdAt, id: id};
+var $author$project$Common$MorningJournal$MorningJournal = F3(
+	function (id, createdAt, content) {
+		return {content: content, createdAt: createdAt, id: id};
 	});
-var $author$project$Page$MorningJournal$AmorFati = F2(
-	function (thankYou, thoughts) {
-		return {thankYou: thankYou, thoughts: thoughts};
+var $author$project$Common$MorningJournal$Content = F3(
+	function (amorFati, premeditatioMalorum, sympatheia) {
+		return {amorFati: amorFati, premeditatioMalorum: premeditatioMalorum, sympatheia: sympatheia};
+	});
+var $author$project$Common$JournalSection$JournalSection = F2(
+	function (title, fields) {
+		return {fields: fields, title: title};
+	});
+var $author$project$Common$JournalField$JournalField = F2(
+	function (field, value) {
+		return {field: field, value: value};
 	});
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
@@ -11062,52 +11070,120 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2($elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var $author$project$Page$MorningJournal$amorFatiDecoder = A3(
+var $author$project$Common$JournalField$journalFieldDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'thoughts',
+	'value',
 	$elm$json$Json$Decode$string,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'thankYou',
+		'field',
 		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Page$MorningJournal$AmorFati)));
-var $author$project$Page$MorningJournal$MorningJournalId = function (a) {
+		$elm$json$Json$Decode$succeed($author$project$Common$JournalField$JournalField)));
+var $author$project$Common$JournalSection$journalSectionDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'fields',
+	$elm$json$Json$Decode$dict($author$project$Common$JournalField$journalFieldDecoder),
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'title',
+		$elm$json$Json$Decode$string,
+		$elm$json$Json$Decode$succeed($author$project$Common$JournalSection$JournalSection)));
+var $author$project$Common$MorningJournal$contentDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'sympatheia',
+	$author$project$Common$JournalSection$journalSectionDecoder,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'premeditatio_malorum',
+		$author$project$Common$JournalSection$journalSectionDecoder,
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'amor_fati',
+			$author$project$Common$JournalSection$journalSectionDecoder,
+			$elm$json$Json$Decode$succeed($author$project$Common$MorningJournal$Content))));
+var $author$project$Common$MorningJournal$MorningJournalId = function (a) {
 	return {$: 'MorningJournalId', a: a};
 };
-var $author$project$Page$MorningJournal$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Page$MorningJournal$MorningJournalId, $elm$json$Json$Decode$string);
-var $author$project$Page$MorningJournal$morningJournalDecoder = A3(
+var $author$project$Common$MorningJournal$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$MorningJournal$MorningJournalId, $elm$json$Json$Decode$string);
+var $author$project$Common$MorningJournal$morningJournalDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'amorFati',
-	$author$project$Page$MorningJournal$amorFatiDecoder,
+	'content',
+	$author$project$Common$MorningJournal$contentDecoder,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 		'created_at',
 		$elm$json$Json$Decode$int,
 		A3(
 			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'id',
-			$author$project$Page$MorningJournal$idDecoder,
-			$elm$json$Json$Decode$succeed($author$project$Page$MorningJournal$MorningJournal))));
-var $author$project$Page$MorningJournal$morningJournalsListDecoder = $elm$json$Json$Decode$list($author$project$Page$MorningJournal$morningJournalDecoder);
+			'_id',
+			$author$project$Common$MorningJournal$idDecoder,
+			$elm$json$Json$Decode$succeed($author$project$Common$MorningJournal$MorningJournal))));
+var $author$project$Common$MorningJournal$morningJournalsListDecoder = $elm$json$Json$Decode$list($author$project$Common$MorningJournal$morningJournalDecoder);
 var $author$project$Page$ListJournals$fetchJournalEntries = $elm$http$Http$get(
 	{
 		expect: A2(
 			$elm$http$Http$expectJson,
 			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListJournals$JournalEntriesReceived),
-			$author$project$Page$MorningJournal$morningJournalsListDecoder),
-		url: 'http://localhost:8080'
+			$author$project$Common$MorningJournal$morningJournalsListDecoder),
+		url: 'http://localhost:8080/journalEntries/'
 	});
 var $author$project$Page$ListJournals$init = _Utils_Tuple2(
 	{journalEntries: $krisajenkins$remotedata$RemoteData$Loading},
 	$author$project$Page$ListJournals$fetchJournalEntries);
-var $author$project$Page$MorningJournal$emptyMorningJournal = function () {
-	var journalId = $author$project$Page$MorningJournal$MorningJournalId('');
+var $author$project$Common$MorningJournal$emptyMorningJournal = function () {
+	var journalId = $author$project$Common$MorningJournal$MorningJournalId('');
 	var createdAt = 0;
-	var amorFati = A2($author$project$Page$MorningJournal$AmorFati, '', '');
-	return A3($author$project$Page$MorningJournal$MorningJournal, journalId, createdAt, amorFati);
+	var content = {
+		amorFati: A2(
+			$author$project$Common$JournalSection$JournalSection,
+			'',
+			$elm$core$Dict$fromList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'thank_you',
+						A2($author$project$Common$JournalField$JournalField, 'thank_you', '')),
+						_Utils_Tuple2(
+						'thoughts',
+						A2($author$project$Common$JournalField$JournalField, 'thoughts', ''))
+					]))),
+		premeditatioMalorum: A2(
+			$author$project$Common$JournalSection$JournalSection,
+			'',
+			$elm$core$Dict$fromList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'vice',
+						A2($author$project$Common$JournalField$JournalField, 'vice', '')),
+						_Utils_Tuple2(
+						'strategy',
+						A2($author$project$Common$JournalField$JournalField, 'strategy', ''))
+					]))),
+		sympatheia: A2(
+			$author$project$Common$JournalSection$JournalSection,
+			'',
+			$elm$core$Dict$fromList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'person',
+						A2($author$project$Common$JournalField$JournalField, 'person', '')),
+						_Utils_Tuple2(
+						'relationship',
+						A2($author$project$Common$JournalField$JournalField, 'relationship', '')),
+						_Utils_Tuple2(
+						'strategy',
+						A2($author$project$Common$JournalField$JournalField, 'strategy', '')),
+						_Utils_Tuple2(
+						'self_growth',
+						A2($author$project$Common$JournalField$JournalField, 'self_growth', ''))
+					])))
+	};
+	return A3($author$project$Common$MorningJournal$MorningJournal, journalId, createdAt, content);
 }();
 var $author$project$Page$NewMorningJournal$initialModel = function (navKey) {
-	var journal = $author$project$Page$MorningJournal$emptyMorningJournal;
+	var journal = $author$project$Common$MorningJournal$emptyMorningJournal;
 	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, navKey: navKey};
 };
 var $author$project$Page$NewMorningJournal$init = function (navKey) {
@@ -11464,10 +11540,276 @@ var $author$project$Page$ListJournals$update = F2(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Error$buildHttpErrorMessage = function (err) {
+	switch (err.$) {
+		case 'Timeout':
+			return 'The request timed out!';
+		case 'BadBody':
+			return 'The response body could not be parsed!';
+		case 'NetworkError':
+			return 'There was an error when trying fetch data from the server';
+		case 'BadStatus':
+			return 'The server sent an SOS and the team is looking into it right now';
+		default:
+			return 'An invalid url was used to make the request';
+	}
+};
+var $author$project$Page$NewMorningJournal$JournalEntryCreated = function (a) {
+	return {$: 'JournalEntryCreated', a: a};
+};
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $elm$json$Json$Encode$dict = F3(
+	function (toKey, toValue, dictionary) {
+		return _Json_wrap(
+			A3(
+				$elm$core$Dict$foldl,
+				F3(
+					function (key, value, obj) {
+						return A3(
+							_Json_addField,
+							toKey(key),
+							toValue(value),
+							obj);
+					}),
+				_Json_emptyObject(_Utils_Tuple0),
+				dictionary));
+	});
+var $author$project$Common$JournalField$journalFieldEncoder = function (journalField) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'field',
+				$elm$json$Json$Encode$string(journalField.field)),
+				_Utils_Tuple2(
+				'value',
+				$elm$json$Json$Encode$string(journalField.value))
+			]));
+};
+var $author$project$Common$JournalSection$journalSectionEncoder = function (section) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'title',
+				$elm$json$Json$Encode$string(section.title)),
+				_Utils_Tuple2(
+				'fields',
+				A3($elm$json$Json$Encode$dict, $elm$core$Basics$identity, $author$project$Common$JournalField$journalFieldEncoder, section.fields))
+			]));
+};
+var $author$project$Common$MorningJournal$newMorningJournalEncoder = function (journal) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'content',
+				$elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'amor_fati',
+							$author$project$Common$JournalSection$journalSectionEncoder(journal.content.amorFati)),
+							_Utils_Tuple2(
+							'premeditatio_malorum',
+							$author$project$Common$JournalSection$journalSectionEncoder(journal.content.premeditatioMalorum)),
+							_Utils_Tuple2(
+							'sympatheia',
+							$author$project$Common$JournalSection$journalSectionEncoder(journal.content.sympatheia))
+						])))
+			]));
+};
+var $elm$http$Http$post = function (r) {
+	return $elm$http$Http$request(
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $author$project$Page$NewMorningJournal$createMorningJournalEntry = function (journal) {
+	return $elm$http$Http$post(
+		{
+			body: $elm$http$Http$jsonBody(
+				$author$project$Common$MorningJournal$newMorningJournalEncoder(journal)),
+			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewMorningJournal$JournalEntryCreated, $author$project$Common$MorningJournal$morningJournalDecoder),
+			url: 'http://localhost:8080/journalEntry/create/'
+		});
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Common$JournalSection$setFieldValue = F3(
+	function (js, fieldName, fieldValue) {
+		var updatedField = function () {
+			var _v1 = A2($elm$core$Dict$get, fieldName, js.fields);
+			if (_v1.$ === 'Nothing') {
+				return A2($author$project$Common$JournalField$JournalField, '', '');
+			} else {
+				var field = _v1.a;
+				return _Utils_update(
+					field,
+					{value: fieldValue});
+			}
+		}();
+		var fieldsUpdated = A3(
+			$elm$core$Dict$update,
+			fieldName,
+			$elm$core$Maybe$map(
+				function (_v0) {
+					return updatedField;
+				}),
+			js.fields);
+		var newJS = _Utils_update(
+			js,
+			{fields: fieldsUpdated});
+		return newJS;
+	});
+var $author$project$Common$MorningJournal$updateJournalContent = F4(
+	function (journal, sectionName, fieldName, fieldValue) {
+		var oldContent = journal.content;
+		switch (sectionName) {
+			case 'amor_fati':
+				return _Utils_update(
+					journal,
+					{
+						content: _Utils_update(
+							oldContent,
+							{
+								amorFati: A3($author$project$Common$JournalSection$setFieldValue, journal.content.amorFati, fieldName, fieldValue)
+							})
+					});
+			case 'premeditatio_malorum':
+				return _Utils_update(
+					journal,
+					{
+						content: _Utils_update(
+							oldContent,
+							{
+								premeditatioMalorum: A3($author$project$Common$JournalSection$setFieldValue, journal.content.premeditatioMalorum, fieldName, fieldValue)
+							})
+					});
+			case 'sympatheia':
+				return _Utils_update(
+					journal,
+					{
+						content: _Utils_update(
+							oldContent,
+							{
+								sympatheia: A3($author$project$Common$JournalSection$setFieldValue, journal.content.sympatheia, fieldName, fieldValue)
+							})
+					});
+			default:
+				return journal;
+		}
+	});
+var $author$project$Page$NewMorningJournal$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'StoreAmorFatiThankYou':
+				var thankYou = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'amor_fati', 'thank_you', thankYou)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StoreAmorFatiThoughts':
+				var thoughts = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'amor_fati', 'thoughts', thoughts)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StorePremeditatioMalorumVice':
+				var vice = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'premeditatio_malorum', 'vice', vice)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StorePremeditatioMalorumStrategy':
+				var strategy = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'premeditatio_malorum', 'strategy', strategy)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StoreSympatheiaPerson':
+				var person = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'person', person)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StoreSympatheiaRelationship':
+				var rel = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'relationship', rel)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StoreSympatheiaStrategy':
+				var strategy = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'strategy', strategy)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'StoreSympatheiaGrowth':
+				var growth = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'self_growth', growth)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'CreateMorningJournalEntry':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Page$NewMorningJournal$createMorningJournalEntry(model.journal));
+			default:
+				if (msg.a.$ === 'Ok') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var error = msg.a.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								createJournalEntryError: $elm$core$Maybe$Just(
+									$author$project$Error$buildHttpErrorMessage(error))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$3:
+		_v0$4:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'ListJournalsMsg':
@@ -11485,7 +11827,24 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$ListJournalsMsg, updatedCmd));
 					} else {
-						break _v0$3;
+						break _v0$4;
+					}
+				case 'NewMorningJournalMsg':
+					if (_v0.b.$ === 'NewMorningJournalPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v2 = A2($author$project$Page$NewMorningJournal$update, subMsg, pageModel);
+						var updatedPageModel = _v2.a;
+						var updatedCmd = _v2.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$NewMorningJournalPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewMorningJournalMsg, updatedCmd));
+					} else {
+						break _v0$4;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -11503,7 +11862,7 @@ var $author$project$Main$update = F2(
 							model,
 							$elm$browser$Browser$Navigation$load(url));
 					}
-				case 'UrlChanged':
+				default:
 					var url = _v0.a.a;
 					var newRoute = $author$project$Route$parseUrl(url);
 					return $author$project$Main$initCurrentPage(
@@ -11512,8 +11871,6 @@ var $author$project$Main$update = F2(
 								model,
 								{route: newRoute}),
 							$elm$core$Platform$Cmd$none));
-				default:
-					break _v0$3;
 			}
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -11542,13 +11899,59 @@ var $author$project$Page$NewMorningJournal$StoreAmorFatiThankYou = function (a) 
 var $author$project$Page$NewMorningJournal$StoreAmorFatiThoughts = function (a) {
 	return {$: 'StoreAmorFatiThoughts', a: a};
 };
+var $author$project$Page$NewMorningJournal$StorePremeditatioMalorumStrategy = function (a) {
+	return {$: 'StorePremeditatioMalorumStrategy', a: a};
+};
+var $author$project$Page$NewMorningJournal$StorePremeditatioMalorumVice = function (a) {
+	return {$: 'StorePremeditatioMalorumVice', a: a};
+};
+var $author$project$Page$NewMorningJournal$StoreSympatheiaGrowth = function (a) {
+	return {$: 'StoreSympatheiaGrowth', a: a};
+};
+var $author$project$Page$NewMorningJournal$StoreSympatheiaPerson = function (a) {
+	return {$: 'StoreSympatheiaPerson', a: a};
+};
+var $author$project$Page$NewMorningJournal$StoreSympatheiaRelationship = function (a) {
+	return {$: 'StoreSympatheiaRelationship', a: a};
+};
+var $author$project$Page$NewMorningJournal$StoreSympatheiaStrategy = function (a) {
+	return {$: 'StoreSympatheiaStrategy', a: a};
+};
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $elm$html$Html$form = _VirtualDom_node('form');
+var $author$project$Common$JournalSection$getField = F2(
+	function (js, fieldName) {
+		var field = function () {
+			var _v0 = A2($elm$core$Dict$get, fieldName, js.fields);
+			if (_v0.$ === 'Nothing') {
+				return A2($author$project$Common$JournalField$JournalField, '', '');
+			} else {
+				var jf = _v0.a;
+				return jf;
+			}
+		}();
+		return field;
+	});
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $author$project$Helpers$stringFromMaybeString = function (maybeString) {
+	if (maybeString.$ === 'Nothing') {
+		return '';
+	} else {
+		var val = maybeString.a;
+		return val;
+	}
+};
 var $author$project$Page$NewMorningJournal$newJournalEntryForm = function (model) {
+	var vice = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'vice');
+	var thoughts = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thoughts');
+	var thankYou = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thank_you');
+	var sympatheiaStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.sympatheia, 'strategy');
+	var sympatheiaGrowth = A2($author$project$Common$JournalSection$getField, model.journal.content.sympatheia, 'self_growth');
+	var relationship = A2($author$project$Common$JournalSection$getField, model.journal.content.sympatheia, 'relationship');
+	var premeditatioMalorumStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'strategy');
+	var person = A2($author$project$Common$JournalSection$getField, model.journal.content.sympatheia, 'person');
 	return A2(
-		$elm$html$Html$form,
+		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
@@ -11586,9 +11989,8 @@ var $author$project$Page$NewMorningJournal$newJournalEntryForm = function (model
 						$elm$html$Html$input,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$placeholder('Say thank you'),
-								$elm$html$Html$Attributes$value(
-								$elm$core$String$fromInt(model.journal.createdAt)),
+								$elm$html$Html$Attributes$placeholder('Say Thank You'),
+								$elm$html$Html$Attributes$value(thankYou.value),
 								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreAmorFatiThankYou)
 							]),
 						_List_Nil),
@@ -11598,8 +12000,108 @@ var $author$project$Page$NewMorningJournal$newJournalEntryForm = function (model
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$placeholder('Amor Fati'),
-								$elm$html$Html$Attributes$value(model.journal.amorFati.thoughts),
+								$elm$html$Html$Attributes$value(thoughts.value),
 								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreAmorFatiThoughts)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Premeditatio Malorum')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you')
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('What\'s a vice you think you might encounter today?'),
+								$elm$html$Html$Attributes$value(vice.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StorePremeditatioMalorumVice)
+							]),
+						_List_Nil),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('How will you handle this vice?'),
+								$elm$html$Html$Attributes$value(premeditatioMalorumStrategy.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StorePremeditatioMalorumStrategy)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Sympatheia')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Revere nature, and look after each other. Life is short—the fruit of this life is a good character and acts for the common good.')
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Sympatheia'),
+								$elm$html$Html$Attributes$value(person.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreSympatheiaPerson)
+							]),
+						_List_Nil),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Sympatheia'),
+								$elm$html$Html$Attributes$value(relationship.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreSympatheiaRelationship)
+							]),
+						_List_Nil),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('How will you help this person today?'),
+								$elm$html$Html$Attributes$value(sympatheiaStrategy.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreSympatheiaStrategy)
+							]),
+						_List_Nil),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('How will you help this person today?'),
+								$elm$html$Html$Attributes$value(sympatheiaGrowth.value),
+								$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreSympatheiaGrowth)
 							]),
 						_List_Nil)
 					])),
@@ -11613,13 +12115,24 @@ var $author$project$Page$NewMorningJournal$newJournalEntryForm = function (model
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$type_('Submit'),
+								$elm$html$Html$Attributes$type_('button'),
 								$elm$html$Html$Events$onClick($author$project$Page$NewMorningJournal$CreateMorningJournalEntry)
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('Save Journal Entry')
 							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('error-notifier')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$author$project$Helpers$stringFromMaybeString(model.createJournalEntryError))
 					]))
 			]));
 };
@@ -11679,7 +12192,7 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Page.MorningJournal.AmorFati":{"args":[],"type":"{ thankYou : String.String, thoughts : String.String }"},"Page.MorningJournal.MorningJournal":{"args":[],"type":"{ id : Page.MorningJournal.MorningJournalId, createdAt : Basics.Int, amorFati : Page.MorningJournal.AmorFati }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournals.Msg"],"NewMorningJournalMsg":["Page.NewMorningJournal.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournals.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Page.MorningJournal.MorningJournal)"]}},"Page.NewMorningJournal.Msg":{"args":[],"tags":{"StoreAmorFatiThankYou":["String.String"],"StoreAmorFatiThoughts":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Page.MorningJournal.MorningJournal"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Page.MorningJournal.MorningJournalId":{"args":[],"tags":{"MorningJournalId":["String.String"]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.MorningJournal.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection, sympatheia : Common.JournalSection.JournalSection }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.MorningJournal.MorningJournal":{"args":[],"type":"{ id : Common.MorningJournal.MorningJournalId, createdAt : Basics.Int, content : Common.MorningJournal.Content }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournals.Msg"],"NewMorningJournalMsg":["Page.NewMorningJournal.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournals.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.MorningJournal.MorningJournal)"]}},"Page.NewMorningJournal.Msg":{"args":[],"tags":{"StoreAmorFatiThankYou":["String.String"],"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"StoreSympatheiaPerson":["String.String"],"StoreSympatheiaRelationship":["String.String"],"StoreSympatheiaStrategy":["String.String"],"StoreSympatheiaGrowth":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.MorningJournal.MorningJournal"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.MorningJournal.MorningJournalId":{"args":[],"tags":{"MorningJournalId":["String.String"]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
 
   var app = Elm.Main.init({ node: document.getElementById("elm") });
 }
