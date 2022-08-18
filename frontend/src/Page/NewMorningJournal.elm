@@ -36,6 +36,8 @@ type Msg
     | StoreSympatheiaRelationship String
     | StoreSympatheiaStrategy String
     | StoreSympatheiaGrowth String
+    | StoreMementoMoriLoss String
+    | StoreMementoMoriDescription String
     | CreateMorningJournalEntry
     | JournalEntryCreated (Result Http.Error MorningJournal.MorningJournal)
 
@@ -66,6 +68,12 @@ update msg model =
 
         StoreSympatheiaGrowth growth ->
             ( { model | journal = MorningJournal.updateJournalContent model.journal "sympatheia" "self_growth" growth }, Cmd.none )
+
+        StoreMementoMoriLoss loss ->
+            ( { model | journal = MorningJournal.updateJournalContent model.journal "mementoMori" "loss" loss }, Cmd.none )
+
+        StoreMementoMoriDescription description ->
+            ( { model | journal = MorningJournal.updateJournalContent model.journal "mementoMori" "description" description }, Cmd.none )
 
         CreateMorningJournalEntry ->
             ( model, createMorningJournalEntry model.journal )
@@ -128,42 +136,129 @@ newJournalEntryForm model =
         sympatheiaGrowth =
             JournalSection.getField model.journal.content.sympatheia "self_growth"
 
+        mementoMoriLoss =
+            JournalSection.getField model.journal.content.mementoMori "loss"
+
+        mementoMoriDescription =
+            JournalSection.getField model.journal.content.mementoMori "description"
+
         -- memento mori
     in
-    div []
-        [ div [ id "amor-fati" ]
-            [ h2 [] [ text "Amor Fati" ]
-            , div [] [ text "Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate" ]
+    div [ class "container" ]
+        [ div [ class "row", id "amor-fati" ]
+            [ h2 [ class "display-2" ] [ text model.journal.content.amorFati.title ]
+            , p [ class "lead" ]
+                [ text "Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate"
+                ]
+            , label [ class "form-label" ] [ text "You've woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!" ]
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "Say Thank You", value thankYou.value, onInput StoreAmorFatiThankYou ] []
+                ]
             , br [] []
-            , div [] [ text "You've woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!" ]
-            , input [ placeholder "Say Thank You", value thankYou.value, onInput StoreAmorFatiThankYou ] []
-            , br [] []
-            , input [ placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
+            , label [ class "form-label" ]
+                [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]
+            , div
+                [ class "input-group mb-3" ]
+                [ input [ placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
+                ]
             ]
-        , div []
-            [ h2 [] [ text "Premeditatio Malorum" ]
-            , div [] [ text "Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you" ]
+        , div [ class "row", id "premeditatio-malorum" ]
+            [ h2 [] [ text model.journal.content.premeditatioMalorum.title ]
+            , p [ class "lead" ] [ text "Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you" ]
+            , label [ class "form-label" ]
+                [ text "What's a vice you think you might encounter today?" ]
+            , div
+                [ class "input-group mb-3" ]
+                [ input [ placeholder "", value vice.value, onInput StorePremeditatioMalorumVice ] []
+                ]
             , br [] []
-            , input [ placeholder "What's a vice you think you might encounter today?", value vice.value, onInput StorePremeditatioMalorumVice ] []
-            , br [] []
-            , input [ placeholder "How will you handle this vice?", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
+            , label [ class "form-label" ]
+                [ text "How will you handle this vice?"
+                ]
+            , div [ class "input-grouop mb-3" ]
+                [ input [ placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
+                ]
             ]
-        , div []
+        , div [ class "row", id "sympatheia" ]
+            -- section header
             [ h2 [] [ text "Sympatheia" ]
-            , div [] [ text "Revere nature, and look after each other. Life is short—the fruit of this life is a good character and acts for the common good." ]
+
+            -- section quote
+            , p [ class "lead" ] [ text "Revere nature, and look after each other. Life is short—the fruit of this life is a good character and acts for the common good." ]
+
+            -- person form label
+            , label [ class "form-label" ]
+                [ figure [ class "text-center" ]
+                    [ blockquote [ class "blockquote" ]
+                        [ p [] [ text "You’ve been made by nature for the purpose of working with others." ]
+                        ]
+                    , figcaption [ class "blockquote-footer" ] [ text "- Marcus Aurelius" ]
+                    ]
+                , br [] []
+                , text "Who is someone you think you will help today?"
+                ]
+
+            -- person form input element
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "Sympatheia", value person.value, onInput StoreSympatheiaPerson ] []
+                ]
             , br [] []
-            , input [ placeholder "Sympatheia", value person.value, onInput StoreSympatheiaPerson ] []
+            , label [ class "form-label" ] [ text "What is your relationship with this person?" ]
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "Sympatheia", value relationship.value, onInput StoreSympatheiaRelationship ] []
+                ]
             , br [] []
-            , input [ placeholder "Sympatheia", value relationship.value, onInput StoreSympatheiaRelationship ] []
+            , label [ class "form-label" ] [ text "How will you help this person today?" ]
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "", value sympatheiaStrategy.value, onInput StoreSympatheiaStrategy ] []
+                ]
             , br [] []
-            , input [ placeholder "How will you help this person today?", value sympatheiaStrategy.value, onInput StoreSympatheiaStrategy ] []
+            , label [ class "form-label" ] [ text "How will you help this person today?" ]
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "", value sympatheiaGrowth.value, onInput StoreSympatheiaGrowth ] []
+                ]
+            ]
+        , div [ class "row", id "memento-mori" ]
+            [ -- section heading
+              h2 []
+                [ text "Memento Mori" ]
+
+            -- section quote
+            , p
+                [ class "lead" ]
+                [ text "One and everyone you love are going to die one day. It sucks, but this is life. But, its not as morbid as you probably made it out to be. Instead of looking at death as a shackle, look at it as a liberator and with this clarity think about what's important to you and how you will go through today" ]
+
+            -- loss group
+            -- loss input label
+            , label [ class "form-label" ] [ text "What's one loss you think you might have today?" ]
             , br [] []
-            , input [ placeholder "How will you help this person today?", value sympatheiaGrowth.value, onInput StoreSympatheiaGrowth ] []
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "", value mementoMoriLoss.value, onInput StoreMementoMoriLoss ] []
+                ]
+            , br [] []
+            , label [ class "form-label" ] [ text "What do you feel about that loss?" ]
+            , div [ class "input-group mb-3" ]
+                [ input [ placeholder "", value mementoMoriDescription.value, onInput StoreMementoMoriDescription ] []
+                ]
             ]
         , br [] []
-        , div [] [ button [ type_ "button", onClick CreateMorningJournalEntry ] [ text "Save Journal Entry" ] ]
-        , div [ class "error-notifier" ] [ text (stringFromMaybeString model.createJournalEntryError) ]
+        , div [ class "row" ]
+            [ button [ type_ "button", onClick CreateMorningJournalEntry, class "btn btn-primary" ] [ text "Save Journal Entry" ]
+            , br [] []
+            , br [] []
+            , buildErrorMessage model.createJournalEntryError
+            ]
         ]
+
+
+buildErrorMessage : Maybe String -> Html Msg
+buildErrorMessage error =
+    case error of
+        Nothing ->
+            div [ class "error-notifier alert alert-danger hidden" ] [ text "" ]
+
+        Just val ->
+            div [ class "alert alert-danger" ] [ text val ]
 
 
 
