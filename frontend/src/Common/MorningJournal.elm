@@ -22,8 +22,6 @@ type MorningJournalId
 type alias Content =
     { amorFati : JournalSection
     , premeditatioMalorum : JournalSection
-    , sympatheia : JournalSection
-    , mementoMori : JournalSection
     }
 
 
@@ -41,8 +39,6 @@ contentDecoder =
     Decode.succeed Content
         |> required "amor_fati" journalSectionDecoder
         |> required "premeditatio_malorum" journalSectionDecoder
-        |> required "sympatheia" journalSectionDecoder
-        |> required "mementoMori" journalSectionDecoder
 
 
 morningJournalDecoder : Decoder MorningJournal
@@ -77,7 +73,6 @@ newMorningJournalEncoder journal =
           , Encode.object
                 [ ( "amor_fati", journalSectionEncoder journal.content.amorFati )
                 , ( "premeditatio_malorum", journalSectionEncoder journal.content.premeditatioMalorum )
-                , ( "sympatheia", journalSectionEncoder journal.content.sympatheia )
                 ]
           )
         ]
@@ -99,11 +94,6 @@ emptyMorningJournal =
                 JournalSection
                     "Premeditatio Malorum"
                     (Dict.fromList [ ( "vice", JournalField "vice" "" ), ( "strategy", JournalField "strategy" "" ) ])
-            , sympatheia =
-                JournalSection
-                    "Sympatheia"
-                    (Dict.fromList [ ( "person", JournalField "person" "" ), ( "relationship", JournalField "relationship" "" ), ( "strategy", JournalField "strategy" "" ), ( "self_growth", JournalField "self_growth" "" ) ])
-            , mementoMori = JournalSection "Memento Mori" (Dict.fromList [ ( "loss", JournalField "loss" "" ), ( "description", JournalField "description" "" ) ])
             }
 
         journalId =
@@ -127,12 +117,6 @@ updateJournalContent journal sectionName fieldName fieldValue =
 
         "premeditatio_malorum" ->
             { journal | content = { oldContent | premeditatioMalorum = setFieldValue journal.content.premeditatioMalorum fieldName fieldValue } }
-
-        "sympatheia" ->
-            { journal | content = { oldContent | sympatheia = setFieldValue journal.content.sympatheia fieldName fieldValue } }
-
-        "mementoMori" ->
-            { journal | content = { oldContent | mementoMori = setFieldValue journal.content.mementoMori fieldName fieldValue } }
 
         _ ->
             journal

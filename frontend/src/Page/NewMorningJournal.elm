@@ -122,27 +122,6 @@ newJournalEntryForm model =
 
         premeditatioMalorumStrategy =
             JournalSection.getField model.journal.content.premeditatioMalorum "strategy"
-
-        -- sympatheia
-        person =
-            JournalSection.getField model.journal.content.sympatheia "person"
-
-        relationship =
-            JournalSection.getField model.journal.content.sympatheia "relationship"
-
-        sympatheiaStrategy =
-            JournalSection.getField model.journal.content.sympatheia "strategy"
-
-        sympatheiaGrowth =
-            JournalSection.getField model.journal.content.sympatheia "self_growth"
-
-        mementoMoriLoss =
-            JournalSection.getField model.journal.content.mementoMori "loss"
-
-        mementoMoriDescription =
-            JournalSection.getField model.journal.content.mementoMori "description"
-
-        -- memento mori
     in
     div [ class "container" ]
         [ div [ class "row", id "amor-fati" ]
@@ -159,7 +138,7 @@ newJournalEntryForm model =
                 [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]
             , div
                 [ class "input-group mb-3" ]
-                [ input [ placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
+                [ textarea [ cols 100, rows 10, placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
                 ]
             ]
         , div [ class "row", id "premeditatio-malorum" ]
@@ -176,69 +155,7 @@ newJournalEntryForm model =
                 [ text "How will you handle this vice?"
                 ]
             , div [ class "input-grouop mb-3" ]
-                [ input [ placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
-                ]
-            ]
-        , div [ class "row", id "sympatheia" ]
-            -- section header
-            [ h2 [] [ text "Sympatheia" ]
-
-            -- section quote
-            , p [ class "lead" ] [ text "Revere nature, and look after each other. Life is short—the fruit of this life is a good character and acts for the common good." ]
-
-            -- person form label
-            , label [ class "form-label" ]
-                [ figure [ class "text-center" ]
-                    [ blockquote [ class "blockquote" ]
-                        [ p [] [ text "You’ve been made by nature for the purpose of working with others." ]
-                        ]
-                    , figcaption [ class "blockquote-footer" ] [ text "- Marcus Aurelius" ]
-                    ]
-                , br [] []
-                , text "Who is someone you think you will help today?"
-                ]
-
-            -- person form input element
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "Sympatheia", value person.value, onInput StoreSympatheiaPerson ] []
-                ]
-            , br [] []
-            , label [ class "form-label" ] [ text "What is your relationship with this person?" ]
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "Sympatheia", value relationship.value, onInput StoreSympatheiaRelationship ] []
-                ]
-            , br [] []
-            , label [ class "form-label" ] [ text "How will you help this person today?" ]
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "", value sympatheiaStrategy.value, onInput StoreSympatheiaStrategy ] []
-                ]
-            , br [] []
-            , label [ class "form-label" ] [ text "How will you help this person today?" ]
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "", value sympatheiaGrowth.value, onInput StoreSympatheiaGrowth ] []
-                ]
-            ]
-        , div [ class "row", id "memento-mori" ]
-            [ -- section heading
-              h2 []
-                [ text "Memento Mori" ]
-
-            -- section quote
-            , p
-                [ class "lead" ]
-                [ text "One and everyone you love are going to die one day. It sucks, but this is life. But, its not as morbid as you probably made it out to be. Instead of looking at death as a shackle, look at it as a liberator and with this clarity think about what's important to you and how you will go through today" ]
-
-            -- loss group
-            -- loss input label
-            , label [ class "form-label" ] [ text "What's one loss you think you might have today?" ]
-            , br [] []
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "", value mementoMoriLoss.value, onInput StoreMementoMoriLoss ] []
-                ]
-            , br [] []
-            , label [ class "form-label" ] [ text "What do you feel about that loss?" ]
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "", value mementoMoriDescription.value, onInput StoreMementoMoriDescription ] []
+                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
                 ]
             ]
         , br [] []
