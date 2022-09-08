@@ -28,16 +28,9 @@ type alias Model =
 
 
 type Msg
-    = StoreAmorFatiThankYou String
-    | StoreAmorFatiThoughts String
+    = StoreAmorFatiThoughts String
     | StorePremeditatioMalorumVice String
     | StorePremeditatioMalorumStrategy String
-    | StoreSympatheiaPerson String
-    | StoreSympatheiaRelationship String
-    | StoreSympatheiaStrategy String
-    | StoreSympatheiaGrowth String
-    | StoreMementoMoriLoss String
-    | StoreMementoMoriDescription String
     | CreateMorningJournalEntry
     | JournalEntryCreated (Result Http.Error MorningJournal.MorningJournal)
 
@@ -45,9 +38,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        StoreAmorFatiThankYou thankYou ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "amor_fati" "thank_you" thankYou }, Cmd.none )
-
         StoreAmorFatiThoughts thoughts ->
             ( { model | journal = MorningJournal.updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
 
@@ -56,24 +46,6 @@ update msg model =
 
         StorePremeditatioMalorumStrategy strategy ->
             ( { model | journal = MorningJournal.updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
-
-        StoreSympatheiaPerson person ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "sympatheia" "person" person }, Cmd.none )
-
-        StoreSympatheiaRelationship rel ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "sympatheia" "relationship" rel }, Cmd.none )
-
-        StoreSympatheiaStrategy strategy ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "sympatheia" "strategy" strategy }, Cmd.none )
-
-        StoreSympatheiaGrowth growth ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "sympatheia" "self_growth" growth }, Cmd.none )
-
-        StoreMementoMoriLoss loss ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "mementoMori" "loss" loss }, Cmd.none )
-
-        StoreMementoMoriDescription description ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "mementoMori" "description" description }, Cmd.none )
 
         CreateMorningJournalEntry ->
             ( model, createMorningJournalEntry model.journal )
@@ -130,9 +102,6 @@ newJournalEntryForm model =
                 [ text "Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate"
                 ]
             , label [ class "form-label" ] [ text "You've woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!" ]
-            , div [ class "input-group mb-3" ]
-                [ input [ placeholder "Say Thank You", value thankYou.value, onInput StoreAmorFatiThankYou ] []
-                ]
             , br [] []
             , label [ class "form-label" ]
                 [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]

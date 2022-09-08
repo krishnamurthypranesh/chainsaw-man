@@ -11664,15 +11664,6 @@ var $author$project$Common$MorningJournal$updateJournalContent = F4(
 var $author$project$Page$NewMorningJournal$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'StoreAmorFatiThankYou':
-				var thankYou = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'amor_fati', 'thank_you', thankYou)
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 'StoreAmorFatiThoughts':
 				var thoughts = msg.a;
 				return _Utils_Tuple2(
@@ -11698,60 +11689,6 @@ var $author$project$Page$NewMorningJournal$update = F2(
 						model,
 						{
 							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'premeditatio_malorum', 'strategy', strategy)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreSympatheiaPerson':
-				var person = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'person', person)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreSympatheiaRelationship':
-				var rel = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'relationship', rel)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreSympatheiaStrategy':
-				var strategy = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'strategy', strategy)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreSympatheiaGrowth':
-				var growth = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'sympatheia', 'self_growth', growth)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreMementoMoriLoss':
-				var loss = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'mementoMori', 'loss', loss)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'StoreMementoMoriDescription':
-				var description = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$MorningJournal$updateJournalContent, model.journal, 'mementoMori', 'description', description)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'CreateMorningJournalEntry':
@@ -11861,9 +11798,6 @@ var $author$project$Page$ListJournals$view = function (_v0) {
 			]));
 };
 var $author$project$Page$NewMorningJournal$CreateMorningJournalEntry = {$: 'CreateMorningJournalEntry'};
-var $author$project$Page$NewMorningJournal$StoreAmorFatiThankYou = function (a) {
-	return {$: 'StoreAmorFatiThankYou', a: a};
-};
 var $author$project$Page$NewMorningJournal$StoreAmorFatiThoughts = function (a) {
 	return {$: 'StoreAmorFatiThoughts', a: a};
 };
@@ -11980,24 +11914,6 @@ var $author$project$Page$NewMorningJournal$newJournalEntryForm = function (model
 						_List_fromArray(
 							[
 								$elm$html$Html$text('You\'ve woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('input-group mb-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$placeholder('Say Thank You'),
-										$elm$html$Html$Attributes$value(thankYou.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewMorningJournal$StoreAmorFatiThankYou)
-									]),
-								_List_Nil)
 							])),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
@@ -12200,4 +12116,4 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.MorningJournal.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.MorningJournal.MorningJournal":{"args":[],"type":"{ id : Common.MorningJournal.MorningJournalId, createdAt : Basics.Int, content : Common.MorningJournal.Content }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournals.Msg"],"NewMorningJournalMsg":["Page.NewMorningJournal.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournals.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.MorningJournal.MorningJournal)"]}},"Page.NewMorningJournal.Msg":{"args":[],"tags":{"StoreAmorFatiThankYou":["String.String"],"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"StoreSympatheiaPerson":["String.String"],"StoreSympatheiaRelationship":["String.String"],"StoreSympatheiaStrategy":["String.String"],"StoreSympatheiaGrowth":["String.String"],"StoreMementoMoriLoss":["String.String"],"StoreMementoMoriDescription":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.MorningJournal.MorningJournal"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.MorningJournal.MorningJournalId":{"args":[],"tags":{"MorningJournalId":["String.String"]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.MorningJournal.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.MorningJournal.MorningJournal":{"args":[],"type":"{ id : Common.MorningJournal.MorningJournalId, createdAt : Basics.Int, content : Common.MorningJournal.Content }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournals.Msg"],"NewMorningJournalMsg":["Page.NewMorningJournal.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournals.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.MorningJournal.MorningJournal)"]}},"Page.NewMorningJournal.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.MorningJournal.MorningJournal"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.MorningJournal.MorningJournalId":{"args":[],"tags":{"MorningJournalId":["String.String"]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
