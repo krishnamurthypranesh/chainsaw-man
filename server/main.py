@@ -1,6 +1,7 @@
 import json
 import time
 import random
+from typing import Dict
 from bson import ObjectId
 
 from fastapi import FastAPI, status
@@ -10,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.database import get_db
+from server.helpers import validate_journal_content
 
 app = FastAPI()
 
@@ -58,7 +60,8 @@ class JournalEntry(BaseModel):
                 "created_at": 12345678,
                 "updated_at": 12345678,
                 "content": {
-                    "key": "value",
+                    "amor_fati": {},
+                    "premeditatio_malorum": {},
                 },
             }
         }
@@ -78,6 +81,12 @@ class ListJournalEntryInput(JournalEntry):
 
 @app.post("/journalEntry/create/")
 async def create(input: CreateJournalEntryInput):
+    journal: Dict = {}
+
+    if not validate_journal_content(input.content):
+        print(f"invalid json entry: {input.content}")
+        return JSONResponse(status_code=status.HTTP_406_NOT_ACCEPTABLE, content=journal)
+
     raw = jsonable_encoder(
         JournalEntry(
             created_at=time.time(),
@@ -86,8 +95,10 @@ async def create(input: CreateJournalEntryInput):
         )
     )
     new = await db["journal_entries"].insert_one(raw)
-    saved_entry = await db["journal_entries"].find_one({"_id": new.inserted_id})
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=saved_entry)
+    journal = await db["journal_entries"].find_one({"_id": new.inserted_id})
+
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=journal)
+
 
 @app.get("/journalEntry/{entry_id}/")
 async def get(entry_id: int):
