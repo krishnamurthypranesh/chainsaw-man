@@ -1,8 +1,8 @@
 module Page.NewMorningJournal exposing (Model, Msg, init, update, view)
 
 import Browser.Navigation as Nav
+import Common.Journal as MorningJournal
 import Common.JournalSection as JournalSection
-import Common.MorningJournal as MorningJournal
 import Error exposing (buildHttpErrorMessage)
 import Helpers exposing (stringFromMaybeString)
 import Html exposing (..)

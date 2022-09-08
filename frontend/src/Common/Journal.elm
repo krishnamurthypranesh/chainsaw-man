@@ -1,4 +1,4 @@
-module Common.MorningJournal exposing (MorningJournal, MorningJournalId, emptyMorningJournal, morningJournalDecoder, morningJournalsListDecoder, newMorningJournalEncoder, updateJournalContent)
+module Common.Journal exposing (JournalId, MorningJournal, emptyMorningJournal, morningJournalDecoder, morningJournalsListDecoder, newMorningJournalEncoder, updateJournalContent)
 
 import Common.JournalField exposing (JournalField)
 import Common.JournalSection exposing (JournalSection, journalSectionDecoder, journalSectionEncoder, setFieldValue)
@@ -6,17 +6,18 @@ import Dict exposing (Dict, fromList)
 import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
+import Url.Parser exposing (Parser, custom)
 
 
 type alias MorningJournal =
-    { id : MorningJournalId
+    { id : JournalId
     , createdAt : Int
     , content : Content
     }
 
 
-type MorningJournalId
-    = MorningJournalId String
+type JournalId
+    = JournalId String
 
 
 type alias Content =
@@ -29,9 +30,9 @@ type alias Content =
 -- DECODERS
 
 
-idDecoder : Decoder MorningJournalId
+idDecoder : Decoder JournalId
 idDecoder =
-    Decode.map MorningJournalId Decode.string
+    Decode.map JournalId Decode.string
 
 
 contentDecoder : Decoder Content
@@ -97,7 +98,7 @@ emptyMorningJournal =
             }
 
         journalId =
-            MorningJournalId ""
+            JournalId ""
 
         createdAt =
             0
