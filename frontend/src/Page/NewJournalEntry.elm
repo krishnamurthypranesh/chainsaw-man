@@ -60,7 +60,7 @@ update msg model =
 createMorningJournalEntry : JournalEntry -> Cmd Msg
 createMorningJournalEntry journal =
     Http.post
-        { url = "http://localhost:8080/journal/entries/create/"
+        { url = "http://localhost:8080/journal/entry/create/"
         , body = Http.jsonBody (newMorningJournalEncoder journal)
         , expect = Http.expectJson JournalEntryCreated journalEntryDecoder
         }

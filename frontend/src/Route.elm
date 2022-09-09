@@ -31,7 +31,7 @@ parseUrl url =
 matchRoute : Parser (Route -> a) a
 matchRoute =
     oneOf
-        [ map NewJournalEntry top -- if no route is found, take the user to the journal creation page
+        [ map ListJournalEntries top -- if no route is found, take the user to the journal creation page
         , map ListJournalEntries (s "journals" </> s "entries")
         , map NewJournalEntry (s "journals" </> s "new")
         , map ViewJournalEntry (s "journals" </> s "entries" </> idParser)

@@ -10771,6 +10771,10 @@ var $author$project$Main$ViewJournalEntryMsg = function (a) {
 var $author$project$Main$ViewJournalEntryPage = function (a) {
 	return {$: 'ViewJournalEntryPage', a: a};
 };
+var $author$project$Common$JournalEntry$ListJournalEntriesInput = F3(
+	function (createdAfter, createdBefore, journalType) {
+		return {createdAfter: createdAfter, createdBefore: createdBefore, journalType: journalType};
+	});
 var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
 var $author$project$Page$ListJournalsEntries$JournalEntriesReceived = function (a) {
 	return {$: 'JournalEntriesReceived', a: a};
@@ -10883,7 +10887,97 @@ var $krisajenkins$remotedata$RemoteData$fromResult = function (result) {
 		return $krisajenkins$remotedata$RemoteData$Success(x);
 	}
 };
-var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $author$project$Common$JournalEntry$JournalEntry = F3(
+	function (id, createdAt, content) {
+		return {content: content, createdAt: createdAt, id: id};
+	});
+var $author$project$Common$JournalEntry$Content = F2(
+	function (amorFati, premeditatioMalorum) {
+		return {amorFati: amorFati, premeditatioMalorum: premeditatioMalorum};
+	});
+var $author$project$Common$JournalSection$JournalSection = F2(
+	function (title, fields) {
+		return {fields: fields, title: title};
+	});
+var $author$project$Common$JournalField$JournalField = F2(
+	function (field, value) {
+		return {field: field, value: value};
+	});
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+			A2($elm$json$Json$Decode$field, key, valDecoder),
+			decoder);
+	});
+var $author$project$Common$JournalField$journalFieldDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'value',
+	$elm$json$Json$Decode$string,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'field',
+		$elm$json$Json$Decode$string,
+		$elm$json$Json$Decode$succeed($author$project$Common$JournalField$JournalField)));
+var $author$project$Common$JournalSection$journalSectionDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'fields',
+	$elm$json$Json$Decode$dict($author$project$Common$JournalField$journalFieldDecoder),
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'title',
+		$elm$json$Json$Decode$string,
+		$elm$json$Json$Decode$succeed($author$project$Common$JournalSection$JournalSection)));
+var $author$project$Common$JournalEntry$contentDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'premeditatio_malorum',
+	$author$project$Common$JournalSection$journalSectionDecoder,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'amor_fati',
+		$author$project$Common$JournalSection$journalSectionDecoder,
+		$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$Content)));
+var $author$project$Common$JournalEntry$JournalId = function (a) {
+	return {$: 'JournalId', a: a};
+};
+var $author$project$Common$JournalEntry$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$JournalEntry$JournalId, $elm$json$Json$Decode$string);
+var $author$project$Common$JournalEntry$journalEntryDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'content',
+	$author$project$Common$JournalEntry$contentDecoder,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'created_at',
+		$elm$json$Json$Decode$int,
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'_id',
+			$author$project$Common$JournalEntry$idDecoder,
+			$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))));
+var $author$project$Common$JournalEntry$journalEntriesListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$journalEntryDecoder);
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$Common$JournalEntry$listJournalEntriesInputEncoder = function (input) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'created_after',
+				$elm$json$Json$Encode$int(input.createdAfter)),
+				_Utils_Tuple2(
+				'created_before',
+				$elm$json$Json$Encode$int(input.createdBefore)),
+				_Utils_Tuple2(
+				'journal_type',
+				$elm$json$Json$Encode$string(input.journalType))
+			]));
+};
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -11034,90 +11128,31 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var $elm$http$Http$get = function (r) {
+var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Common$JournalEntry$JournalEntry = F3(
-	function (id, createdAt, content) {
-		return {content: content, createdAt: createdAt, id: id};
-	});
-var $author$project$Common$JournalEntry$Content = F2(
-	function (amorFati, premeditatioMalorum) {
-		return {amorFati: amorFati, premeditatioMalorum: premeditatioMalorum};
-	});
-var $author$project$Common$JournalSection$JournalSection = F2(
-	function (title, fields) {
-		return {fields: fields, title: title};
-	});
-var $author$project$Common$JournalField$JournalField = F2(
-	function (field, value) {
-		return {field: field, value: value};
-	});
-var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
-var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
-	function (key, valDecoder, decoder) {
-		return A2(
-			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
-			A2($elm$json$Json$Decode$field, key, valDecoder),
-			decoder);
-	});
-var $author$project$Common$JournalField$journalFieldDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'value',
-	$elm$json$Json$Decode$string,
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'field',
-		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalField$JournalField)));
-var $author$project$Common$JournalSection$journalSectionDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'fields',
-	$elm$json$Json$Decode$dict($author$project$Common$JournalField$journalFieldDecoder),
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'title',
-		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalSection$JournalSection)));
-var $author$project$Common$JournalEntry$contentDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'premeditatio_malorum',
-	$author$project$Common$JournalSection$journalSectionDecoder,
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'amor_fati',
-		$author$project$Common$JournalSection$journalSectionDecoder,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$Content)));
-var $author$project$Common$JournalEntry$JournalId = function (a) {
-	return {$: 'JournalId', a: a};
+var $author$project$Page$ListJournalsEntries$fetchJournalEntries = function (input) {
+	return $elm$http$Http$post(
+		{
+			body: $elm$http$Http$jsonBody(
+				$author$project$Common$JournalEntry$listJournalEntriesInputEncoder(input)),
+			expect: A2(
+				$elm$http$Http$expectJson,
+				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListJournalsEntries$JournalEntriesReceived),
+				$author$project$Common$JournalEntry$journalEntriesListDecoder),
+			url: 'http://localhost:8080/journals/entries/'
+		});
 };
-var $author$project$Common$JournalEntry$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$JournalEntry$JournalId, $elm$json$Json$Decode$string);
-var $author$project$Common$JournalEntry$journalEntryDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'content',
-	$author$project$Common$JournalEntry$contentDecoder,
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'created_at',
-		$elm$json$Json$Decode$int,
-		A3(
-			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'_id',
-			$author$project$Common$JournalEntry$idDecoder,
-			$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))));
-var $author$project$Common$JournalEntry$journalEntriesListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$journalEntryDecoder);
-var $author$project$Page$ListJournalsEntries$fetchJournalEntries = $elm$http$Http$get(
-	{
-		expect: A2(
-			$elm$http$Http$expectJson,
-			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListJournalsEntries$JournalEntriesReceived),
-			$author$project$Common$JournalEntry$journalEntriesListDecoder),
-		url: 'http://localhost:8080/journal/entries/'
-	});
-var $author$project$Page$ListJournalsEntries$init = _Utils_Tuple2(
-	{journalEntries: $krisajenkins$remotedata$RemoteData$Loading},
-	$author$project$Page$ListJournalsEntries$fetchJournalEntries);
+var $author$project$Page$ListJournalsEntries$init = function () {
+	var model = {
+		input: A3($author$project$Common$JournalEntry$ListJournalEntriesInput, 0, 0, ''),
+		journalEntries: $krisajenkins$remotedata$RemoteData$Loading
+	};
+	return _Utils_Tuple2(
+		model,
+		$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
+}();
 var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	var journalId = $author$project$Common$JournalEntry$JournalId('');
 	var createdAt = 0;
@@ -11162,6 +11197,11 @@ var $author$project$Page$NewJournalEntry$init = function (navKey) {
 };
 var $author$project$Page$ViewJournalEntry$JournalEntryReceived = function (a) {
 	return {$: 'JournalEntryReceived', a: a};
+};
+var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $elm$http$Http$get = function (r) {
+	return $elm$http$Http$request(
+		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
 var $author$project$Common$JournalEntry$idToString = function (jId) {
 	var id = jId.a;
@@ -11371,7 +11411,7 @@ var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
 var $author$project$Route$matchRoute = $elm$url$Url$Parser$oneOf(
 	_List_fromArray(
 		[
-			A2($elm$url$Url$Parser$map, $author$project$Route$NewJournalEntry, $elm$url$Url$Parser$top),
+			A2($elm$url$Url$Parser$map, $author$project$Route$ListJournalEntries, $elm$url$Url$Parser$top),
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$ListJournalEntries,
@@ -11586,7 +11626,7 @@ var $author$project$Page$ListJournalsEntries$update = F2(
 				_Utils_update(
 					model,
 					{journalEntries: $krisajenkins$remotedata$RemoteData$Loading}),
-				$author$project$Page$ListJournalsEntries$fetchJournalEntries);
+				$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
 		} else {
 			var response = msg.a;
 			return _Utils_Tuple2(
@@ -11612,12 +11652,6 @@ var $author$project$Error$buildHttpErrorMessage = function (err) {
 };
 var $author$project$Page$NewJournalEntry$JournalEntryCreated = function (a) {
 	return {$: 'JournalEntryCreated', a: a};
-};
-var $elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2($elm$json$Json$Encode$encode, 0, value));
 };
 var $elm$json$Json$Encode$dict = F3(
 	function (toKey, toValue, dictionary) {
@@ -11677,17 +11711,13 @@ var $author$project$Common$JournalEntry$newMorningJournalEncoder = function (jou
 						])))
 			]));
 };
-var $elm$http$Http$post = function (r) {
-	return $elm$http$Http$request(
-		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
-};
 var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (journal) {
 	return $elm$http$Http$post(
 		{
 			body: $elm$http$Http$jsonBody(
 				$author$project$Common$JournalEntry$newMorningJournalEncoder(journal)),
 			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$journalEntryDecoder),
-			url: 'http://localhost:8080/journal/entries/create/'
+			url: 'http://localhost:8080/journal/entry/create/'
 		});
 };
 var $elm$core$Maybe$map = F2(
@@ -11907,14 +11937,417 @@ var $author$project$Main$notFoundView = A2(
 		[
 			$elm$html$Html$text('Oops! The page you requested was not found!')
 		]));
-var $author$project$Page$ListJournalsEntries$view = function (_v0) {
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $author$project$Helpers$monthStringFromMonth = function (month) {
+	switch (month.$) {
+		case 'Jan':
+			return 'Jan';
+		case 'Feb':
+			return 'Feb';
+		case 'Mar':
+			return 'Mar';
+		case 'Apr':
+			return 'Apr';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'Jun';
+		case 'Jul':
+			return 'Jul';
+		case 'Aug':
+			return 'Aug';
+		case 'Sep':
+			return 'Sep';
+		case 'Oct':
+			return 'Oct';
+		case 'Nov':
+			return 'Nov';
+		default:
+			return 'Dec';
+	}
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $elm$time$Time$flooredDiv = F2(
+	function (numerator, denominator) {
+		return $elm$core$Basics$floor(numerator / denominator);
+	});
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$time$Time$toAdjustedMinutesHelp = F3(
+	function (defaultOffset, posixMinutes, eras) {
+		toAdjustedMinutesHelp:
+		while (true) {
+			if (!eras.b) {
+				return posixMinutes + defaultOffset;
+			} else {
+				var era = eras.a;
+				var olderEras = eras.b;
+				if (_Utils_cmp(era.start, posixMinutes) < 0) {
+					return posixMinutes + era.offset;
+				} else {
+					var $temp$defaultOffset = defaultOffset,
+						$temp$posixMinutes = posixMinutes,
+						$temp$eras = olderEras;
+					defaultOffset = $temp$defaultOffset;
+					posixMinutes = $temp$posixMinutes;
+					eras = $temp$eras;
+					continue toAdjustedMinutesHelp;
+				}
+			}
+		}
+	});
+var $elm$time$Time$toAdjustedMinutes = F2(
+	function (_v0, time) {
+		var defaultOffset = _v0.a;
+		var eras = _v0.b;
+		return A3(
+			$elm$time$Time$toAdjustedMinutesHelp,
+			defaultOffset,
+			A2(
+				$elm$time$Time$flooredDiv,
+				$elm$time$Time$posixToMillis(time),
+				60000),
+			eras);
+	});
+var $elm$time$Time$toCivil = function (minutes) {
+	var rawDay = A2($elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
+	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
+	var dayOfEra = rawDay - (era * 146097);
+	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
+	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
+	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
+	var month = mp + ((mp < 10) ? 3 : (-9));
+	var year = yearOfEra + (era * 400);
+	return {
+		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		month: month,
+		year: year + ((month <= 2) ? 1 : 0)
+	};
+};
+var $elm$time$Time$toDay = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).day;
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$time$Time$toHour = F2(
+	function (zone, time) {
+		return A2(
+			$elm$core$Basics$modBy,
+			24,
+			A2(
+				$elm$time$Time$flooredDiv,
+				A2($elm$time$Time$toAdjustedMinutes, zone, time),
+				60));
+	});
+var $elm$time$Time$toMinute = F2(
+	function (zone, time) {
+		return A2(
+			$elm$core$Basics$modBy,
+			60,
+			A2($elm$time$Time$toAdjustedMinutes, zone, time));
+	});
+var $elm$time$Time$Apr = {$: 'Apr'};
+var $elm$time$Time$Aug = {$: 'Aug'};
+var $elm$time$Time$Dec = {$: 'Dec'};
+var $elm$time$Time$Feb = {$: 'Feb'};
+var $elm$time$Time$Jan = {$: 'Jan'};
+var $elm$time$Time$Jul = {$: 'Jul'};
+var $elm$time$Time$Jun = {$: 'Jun'};
+var $elm$time$Time$Mar = {$: 'Mar'};
+var $elm$time$Time$May = {$: 'May'};
+var $elm$time$Time$Nov = {$: 'Nov'};
+var $elm$time$Time$Oct = {$: 'Oct'};
+var $elm$time$Time$Sep = {$: 'Sep'};
+var $elm$time$Time$toMonth = F2(
+	function (zone, time) {
+		var _v0 = $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).month;
+		switch (_v0) {
+			case 1:
+				return $elm$time$Time$Jan;
+			case 2:
+				return $elm$time$Time$Feb;
+			case 3:
+				return $elm$time$Time$Mar;
+			case 4:
+				return $elm$time$Time$Apr;
+			case 5:
+				return $elm$time$Time$May;
+			case 6:
+				return $elm$time$Time$Jun;
+			case 7:
+				return $elm$time$Time$Jul;
+			case 8:
+				return $elm$time$Time$Aug;
+			case 9:
+				return $elm$time$Time$Sep;
+			case 10:
+				return $elm$time$Time$Oct;
+			case 11:
+				return $elm$time$Time$Nov;
+			default:
+				return $elm$time$Time$Dec;
+		}
+	});
+var $elm$time$Time$toSecond = F2(
+	function (_v0, time) {
+		return A2(
+			$elm$core$Basics$modBy,
+			60,
+			A2(
+				$elm$time$Time$flooredDiv,
+				$elm$time$Time$posixToMillis(time),
+				1000));
+	});
+var $elm$time$Time$toYear = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).year;
+	});
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
+var $author$project$Helpers$dateTimeFromts = function (ts) {
+	return A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$time$Time$toDay, $elm$time$Time$utc, ts))) + (' ' + (A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$author$project$Helpers$monthStringFromMonth(
+			A2($elm$time$Time$toMonth, $elm$time$Time$utc, ts))) + (' ' + (A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$time$Time$toYear, $elm$time$Time$utc, ts))) + (', ' + (A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$time$Time$toHour, $elm$time$Time$utc, ts))) + (':' + (A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$time$Time$toMinute, $elm$time$Time$utc, ts))) + (':' + A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$time$Time$toSecond, $elm$time$Time$utc, ts))))))))))));
+};
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$th = _VirtualDom_node('th');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $author$project$Page$ListJournalsEntries$tableRowFromJournalEntry = function (entry) {
+	var createdTS = $elm$time$Time$millisToPosix(entry.createdAt * 1000);
 	return A2(
-		$elm$html$Html$div,
+		$elm$html$Html$tr,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$text('To be implemented...')
+				A2(
+				$elm$html$Html$th,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$scope('row')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$author$project$Common$JournalEntry$idToString(entry.id))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Morning Journal')
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$author$project$Helpers$dateTimeFromts(createdTS))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href(
+								'journals/entries/' + ($author$project$Common$JournalEntry$idToString(entry.id) + ''))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('View')
+							]))
+					]))
 			]));
+};
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $author$project$Page$ListJournalsEntries$buildListTable = function (journalEntries) {
+	var tableRows = A2($elm$core$List$map, $author$project$Page$ListJournalsEntries$tableRowFromJournalEntry, journalEntries);
+	var tableHeaders = A2(
+		$elm$html$Html$thead,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$scope('col')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('ID')
+							])),
+						A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$scope('col')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Type')
+							])),
+						A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$scope('col')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Created At')
+							])),
+						A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$scope('col')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('')
+							]))
+					]))
+			]));
+	return A2(
+		$elm$html$Html$table,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('table table-light table-striped')
+			]),
+		_List_fromArray(
+			[
+				tableHeaders,
+				A2($elm$html$Html$tbody, _List_Nil, tableRows)
+			]));
+};
+var $author$project$Page$ListJournalsEntries$view = function (model) {
+	var _v0 = model.journalEntries;
+	switch (_v0.$) {
+		case 'NotAsked':
+			return $elm$html$Html$text('');
+		case 'Loading':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('d-flex justify-content-center')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('spinner-border'),
+								A2($elm$html$Html$Attributes$attribute, 'role', 'status')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('visually-hidden')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Loading...')
+									]))
+							]))
+					]));
+		case 'Success':
+			var response = _v0.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Page$ListJournalsEntries$buildListTable(response)
+					]));
+		default:
+			var httpError = _v0.a;
+			return $elm$html$Html$text(
+				$author$project$Error$buildHttpErrorMessage(httpError));
+	}
 };
 var $author$project$Page$NewJournalEntry$CreateMorningJournalEntry = {$: 'CreateMorningJournalEntry'};
 var $author$project$Page$NewJournalEntry$StoreAmorFatiThoughts = function (a) {
@@ -12283,13 +12716,12 @@ var $author$project$Main$currentView = function (model) {
 				$author$project$Page$ViewJournalEntry$view(pageModel));
 	}
 };
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $author$project$Main$getNavBar = A2(
 	$elm$html$Html$nav,
 	_List_fromArray(
 		[
-			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
+			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top')
 		]),
 	_List_fromArray(
 		[
