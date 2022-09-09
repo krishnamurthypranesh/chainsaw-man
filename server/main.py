@@ -79,7 +79,7 @@ class ListJournalEntryInput(JournalEntry):
     pass
 
 
-@app.post("/journalEntry/create/")
+@app.post("/journal/entry/create/")
 async def create(input: CreateJournalEntryInput):
     journal: Dict = {}
 
@@ -100,20 +100,14 @@ async def create(input: CreateJournalEntryInput):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=journal)
 
 
-@app.get("/journalEntry/{entry_id}/")
-async def get(entry_id: int):
-    return {"key": "entry_id", "value": f"{entry_id}", "type": "int"}
+@app.get("/journal/entries/{entry_id}/")
+async def get(entry_id: str):
+    journal_entry = await db["journal_entries"].find_one({"_id": entry_id})
+    return JSONResponse(status_code=status.HTTP_200_OK, content=journal_entry)
 
 
-@app.get("/journalEntries/")
-async def list(created_at_gt: int = None, created_at_lt: int = None):
-    if (created_at_gt is None) and (created_at_lt is None):
-        return []
-    return [
-        JournalEntry(
-            id=round(random.random() * 10, 0),
-            created_at=time.time(),
-            updated_at=time.time(),
-            content=dict(),
-        )
-    ]
+@app.post("/journals/entries")
+async def list_journals(*args, **kwargs):
+    entries = await db["journal_entries"].find_many({})
+    print(f"journal entries: {entries}")
+    return JSONResponse(status_code=status.HTTP_200_OK, content=entries)
