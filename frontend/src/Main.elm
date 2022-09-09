@@ -138,8 +138,46 @@ update msg model =
 view : Model -> Document Msg
 view model =
     { title = "Everyday Stoic Journal"
-    , body = [ currentView model ]
+    , body = [ getNavBar, currentView model ]
     }
+
+
+
+-- add the common html code here
+
+
+getNavBar : Html Msg
+getNavBar =
+    nav [ class "navbar navbar-expand-lg sticky-top bg-light" ]
+        [ div [ class "container-fluid" ]
+            [ a [ href "/", class "navbar-brand" ]
+                [ text "Painted Porch" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarNav"
+                , attribute "aria-controls" "navbarNav"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span [ class "navbar-toggler-icon" ] []
+                ]
+            , div [ class "collapse navbar-collapse", id "navbarNav" ]
+                [ ul [ class "navbar-nav" ]
+                    [ li [ class "nav-item" ]
+                        [ a [ class "nav-link", attribute "aria-current" "page", href "/" ] [ text "Home" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/new" ] [ text "New Journal Entry" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/entries" ] [ text "List Journal Entries" ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
 
 currentView : Model -> Html Msg

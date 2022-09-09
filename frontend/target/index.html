@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" 
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  </head>
 
-  <body>
-    <div id="elm-app-is-loaded-here"></div>    
-    <script src="index.js"></script>
-    <script>
-      var app = Elm.Main.init({
-        node: document.getElementById("elm-app-is-loaded-here")
-      });      
-    </script>
-  </body>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <div id="elm-app-is-loaded-here"></div>
+  <script src="index.js"></script>
+  <script>
+    var app = Elm.Main.init({
+      node: document.getElementById("elm-app-is-loaded-here")
+    });      
+  </script>
+</body>
+
 </html>
