@@ -1,7 +1,7 @@
 module Page.NewJournalEntry exposing (Model, Msg, init, update, view)
 
 import Browser.Navigation as Nav
-import Common.JournalEntry as MorningJournal
+import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
 import Error exposing (buildHttpErrorMessage)
 import Helpers exposing (stringFromMaybeString)
@@ -18,7 +18,7 @@ import Json.Decode exposing (string)
 
 type alias Model =
     { navKey : Nav.Key
-    , journal : MorningJournal.MorningJournal
+    , journal : JournalEntry
     , createJournalEntryError : Maybe String
     }
 
@@ -32,20 +32,20 @@ type Msg
     | StorePremeditatioMalorumVice String
     | StorePremeditatioMalorumStrategy String
     | CreateMorningJournalEntry
-    | JournalEntryCreated (Result Http.Error MorningJournal.MorningJournal)
+    | JournalEntryCreated (Result Http.Error JournalEntry)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StoreAmorFatiThoughts thoughts ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
 
         StorePremeditatioMalorumVice vice ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none )
 
         StorePremeditatioMalorumStrategy strategy ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
 
         CreateMorningJournalEntry ->
             ( model, createMorningJournalEntry model.journal )
@@ -57,12 +57,12 @@ update msg model =
             ( { model | createJournalEntryError = Just (buildHttpErrorMessage error) }, Cmd.none )
 
 
-createMorningJournalEntry : MorningJournal.MorningJournal -> Cmd Msg
+createMorningJournalEntry : JournalEntry -> Cmd Msg
 createMorningJournalEntry journal =
     Http.post
-        { url = "http://localhost:8080/journalEntry/create/"
-        , body = Http.jsonBody (MorningJournal.newMorningJournalEncoder journal)
-        , expect = Http.expectJson JournalEntryCreated MorningJournal.morningJournalDecoder
+        { url = "http://localhost:8080/journal/entries/create/"
+        , body = Http.jsonBody (newMorningJournalEncoder journal)
+        , expect = Http.expectJson JournalEntryCreated journalEntryDecoder
         }
 
 
@@ -160,6 +160,6 @@ initialModel : Nav.Key -> Model
 initialModel navKey =
     let
         journal =
-            MorningJournal.emptyMorningJournal
+            emptyMorningJournal
     in
     { navKey = navKey, journal = journal, createJournalEntryError = Nothing }

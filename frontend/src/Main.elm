@@ -3,9 +3,11 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Html.Attributes exposing (attribute, class, href, id, type_)
 import Page.ListJournalsEntries as ListJournals
-import Page.NewJournalEntry as NewMorningJournal
-import Route exposing (Route)
+import Page.NewJournalEntry as NewJournalEntry
+import Page.ViewJournalEntry as ViewJournalEntry
+import Route exposing (Route(..))
 import Url exposing (Url)
 
 
@@ -35,7 +37,8 @@ type alias Model =
 type Page
     = NotFoundPage
     | ListJournalsPage ListJournals.Model
-    | NewMorningJournalPage NewMorningJournal.Model
+    | NewJournalEntryPage NewJournalEntry.Model
+    | ViewJournalEntryPage ViewJournalEntry.Model
 
 
 
@@ -70,9 +73,16 @@ initCurrentPage ( model, existingCmds ) =
                 Route.NewJournalEntry ->
                     let
                         ( pageModel, pageCmds ) =
-                            NewMorningJournal.init model.navKey
+                            NewJournalEntry.init model.navKey
                     in
-                    ( NewMorningJournalPage pageModel, Cmd.map NewMorningJournalMsg pageCmds )
+                    ( NewJournalEntryPage pageModel, Cmd.map NewJournalEntryMsg pageCmds )
+
+                Route.ViewJournalEntry journalId ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            ViewJournalEntry.init journalId model.navKey
+                    in
+                    ( ViewJournalEntryPage pageModel, Cmd.map ViewJournalEntryMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -85,7 +95,8 @@ initCurrentPage ( model, existingCmds ) =
 
 type Msg
     = ListJournalsMsg ListJournals.Msg
-    | NewMorningJournalMsg NewMorningJournal.Msg
+    | NewJournalEntryMsg NewJournalEntry.Msg
+    | ViewJournalEntryMsg ViewJournalEntry.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
 
@@ -102,13 +113,22 @@ update msg model =
             , Cmd.map ListJournalsMsg updatedCmd
             )
 
-        ( NewMorningJournalMsg subMsg, NewMorningJournalPage pageModel ) ->
+        ( NewJournalEntryMsg subMsg, NewJournalEntryPage pageModel ) ->
             let
                 ( updatedPageModel, updatedCmd ) =
-                    NewMorningJournal.update subMsg pageModel
+                    NewJournalEntry.update subMsg pageModel
             in
-            ( { model | page = NewMorningJournalPage updatedPageModel }
-            , Cmd.map NewMorningJournalMsg updatedCmd
+            ( { model | page = NewJournalEntryPage updatedPageModel }
+            , Cmd.map NewJournalEntryMsg updatedCmd
+            )
+
+        ( ViewJournalEntryMsg subMsg, ViewJournalEntryPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    ViewJournalEntry.update subMsg pageModel
+            in
+            ( { model | page = ViewJournalEntryPage updatedPageModel }
+            , Cmd.map ViewJournalEntryMsg updatedCmd
             )
 
         ( LinkClicked urlRequest, _ ) ->
@@ -190,9 +210,13 @@ currentView model =
             ListJournals.view pageModel
                 |> Html.map ListJournalsMsg
 
-        NewMorningJournalPage pageModel ->
-            NewMorningJournal.view pageModel
-                |> Html.map NewMorningJournalMsg
+        NewJournalEntryPage pageModel ->
+            NewJournalEntry.view pageModel
+                |> Html.map NewJournalEntryMsg
+
+        ViewJournalEntryPage pageModel ->
+            ViewJournalEntry.view pageModel
+                |> Html.map ViewJournalEntryMsg
 
 
 notFoundView : Html msg

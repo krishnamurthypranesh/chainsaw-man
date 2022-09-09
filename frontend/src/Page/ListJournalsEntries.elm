@@ -1,18 +1,18 @@
 module Page.ListJournalsEntries exposing (..)
 
-import Common.JournalEntry exposing (MorningJournal, morningJournalDecoder, morningJournalsListDecoder)
+import Common.JournalEntry exposing (JournalEntry, journalEntriesListDecoder, journalEntryDecoder)
 import Html exposing (..)
 import Http exposing (get)
 import RemoteData exposing (WebData)
 
 
 type alias Model =
-    { journalEntries : WebData (List MorningJournal) }
+    { journalEntries : WebData (List JournalEntry) }
 
 
 type Msg
     = FetchJournalEntries
-    | JournalEntriesReceived (WebData (List MorningJournal))
+    | JournalEntriesReceived (WebData (List JournalEntry))
 
 
 init : ( Model, Cmd Msg )
@@ -23,9 +23,9 @@ init =
 fetchJournalEntries : Cmd Msg
 fetchJournalEntries =
     Http.get
-        { url = "http://localhost:8080/journalEntries/"
+        { url = "http://localhost:8080/journal/entries/"
         , expect =
-            morningJournalsListDecoder |> Http.expectJson (RemoteData.fromResult >> JournalEntriesReceived)
+            journalEntriesListDecoder |> Http.expectJson (RemoteData.fromResult >> JournalEntriesReceived)
         }
 
 

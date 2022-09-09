@@ -10759,11 +10759,17 @@ var $author$project$Main$ListJournalsMsg = function (a) {
 var $author$project$Main$ListJournalsPage = function (a) {
 	return {$: 'ListJournalsPage', a: a};
 };
-var $author$project$Main$NewMorningJournalMsg = function (a) {
-	return {$: 'NewMorningJournalMsg', a: a};
+var $author$project$Main$NewJournalEntryMsg = function (a) {
+	return {$: 'NewJournalEntryMsg', a: a};
 };
-var $author$project$Main$NewMorningJournalPage = function (a) {
-	return {$: 'NewMorningJournalPage', a: a};
+var $author$project$Main$NewJournalEntryPage = function (a) {
+	return {$: 'NewJournalEntryPage', a: a};
+};
+var $author$project$Main$ViewJournalEntryMsg = function (a) {
+	return {$: 'ViewJournalEntryMsg', a: a};
+};
+var $author$project$Main$ViewJournalEntryPage = function (a) {
+	return {$: 'ViewJournalEntryPage', a: a};
 };
 var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
 var $author$project$Page$ListJournalsEntries$JournalEntriesReceived = function (a) {
@@ -11032,7 +11038,7 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Common$JournalEntry$MorningJournal = F3(
+var $author$project$Common$JournalEntry$JournalEntry = F3(
 	function (id, createdAt, content) {
 		return {content: content, createdAt: createdAt, id: id};
 	});
@@ -11087,7 +11093,7 @@ var $author$project$Common$JournalEntry$JournalId = function (a) {
 	return {$: 'JournalId', a: a};
 };
 var $author$project$Common$JournalEntry$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$JournalEntry$JournalId, $elm$json$Json$Decode$string);
-var $author$project$Common$JournalEntry$morningJournalDecoder = A3(
+var $author$project$Common$JournalEntry$journalEntryDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 	'content',
 	$author$project$Common$JournalEntry$contentDecoder,
@@ -11099,15 +11105,15 @@ var $author$project$Common$JournalEntry$morningJournalDecoder = A3(
 			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 			'_id',
 			$author$project$Common$JournalEntry$idDecoder,
-			$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$MorningJournal))));
-var $author$project$Common$JournalEntry$morningJournalsListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$morningJournalDecoder);
+			$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))));
+var $author$project$Common$JournalEntry$journalEntriesListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$journalEntryDecoder);
 var $author$project$Page$ListJournalsEntries$fetchJournalEntries = $elm$http$Http$get(
 	{
 		expect: A2(
 			$elm$http$Http$expectJson,
 			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListJournalsEntries$JournalEntriesReceived),
-			$author$project$Common$JournalEntry$morningJournalsListDecoder),
-		url: 'http://localhost:8080/journalEntries/'
+			$author$project$Common$JournalEntry$journalEntriesListDecoder),
+		url: 'http://localhost:8080/journal/entries/'
 	});
 var $author$project$Page$ListJournalsEntries$init = _Utils_Tuple2(
 	{journalEntries: $krisajenkins$remotedata$RemoteData$Loading},
@@ -11143,7 +11149,7 @@ var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 						A2($author$project$Common$JournalField$JournalField, 'strategy', ''))
 					])))
 	};
-	return A3($author$project$Common$JournalEntry$MorningJournal, journalId, createdAt, content);
+	return A3($author$project$Common$JournalEntry$JournalEntry, journalId, createdAt, content);
 }();
 var $author$project$Page$NewJournalEntry$initialModel = function (navKey) {
 	var journal = $author$project$Common$JournalEntry$emptyMorningJournal;
@@ -11154,6 +11160,32 @@ var $author$project$Page$NewJournalEntry$init = function (navKey) {
 		$author$project$Page$NewJournalEntry$initialModel(navKey),
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Page$ViewJournalEntry$JournalEntryReceived = function (a) {
+	return {$: 'JournalEntryReceived', a: a};
+};
+var $author$project$Common$JournalEntry$idToString = function (jId) {
+	var id = jId.a;
+	return id;
+};
+var $author$project$Page$ViewJournalEntry$fetchJournalEntry = function (journalId) {
+	return $elm$http$Http$get(
+		{
+			expect: A2(
+				$elm$http$Http$expectJson,
+				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ViewJournalEntry$JournalEntryReceived),
+				$author$project$Common$JournalEntry$journalEntryDecoder),
+			url: 'http://localhost:8080/journal/entries/' + $author$project$Common$JournalEntry$idToString(journalId)
+		});
+};
+var $author$project$Page$ViewJournalEntry$initialModel = function (navKey) {
+	return {journalEntry: $krisajenkins$remotedata$RemoteData$Loading, navKey: navKey};
+};
+var $author$project$Page$ViewJournalEntry$init = F2(
+	function (journalId, navKey) {
+		return _Utils_Tuple2(
+			$author$project$Page$ViewJournalEntry$initialModel(navKey),
+			$author$project$Page$ViewJournalEntry$fetchJournalEntry(journalId));
+	});
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
 	var existingCmds = _v0.b;
@@ -11169,13 +11201,21 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 				return _Utils_Tuple2(
 					$author$project$Main$ListJournalsPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$ListJournalsMsg, pageCmds));
-			default:
+			case 'NewJournalEntry':
 				var _v4 = $author$project$Page$NewJournalEntry$init(model.navKey);
 				var pageModel = _v4.a;
 				var pageCmds = _v4.b;
 				return _Utils_Tuple2(
-					$author$project$Main$NewMorningJournalPage(pageModel),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewMorningJournalMsg, pageCmds));
+					$author$project$Main$NewJournalEntryPage(pageModel),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewJournalEntryMsg, pageCmds));
+			default:
+				var journalId = _v2.a;
+				var _v5 = A2($author$project$Page$ViewJournalEntry$init, journalId, model.navKey);
+				var pageModel = _v5.a;
+				var pageCmds = _v5.b;
+				return _Utils_Tuple2(
+					$author$project$Main$ViewJournalEntryPage(pageModel),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewJournalEntryMsg, pageCmds));
 		}
 	}();
 	var currentPage = _v1.a;
@@ -11191,12 +11231,55 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 var $author$project$Route$NotFound = {$: 'NotFound'};
 var $author$project$Route$ListJournalEntries = {$: 'ListJournalEntries'};
 var $author$project$Route$NewJournalEntry = {$: 'NewJournalEntry'};
+var $author$project$Route$ViewJournalEntry = function (a) {
+	return {$: 'ViewJournalEntry', a: a};
+};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
 		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
+	});
+var $elm$url$Url$Parser$custom = F2(
+	function (tipe, stringToSomething) {
+		return $elm$url$Url$Parser$Parser(
+			function (_v0) {
+				var visited = _v0.visited;
+				var unvisited = _v0.unvisited;
+				var params = _v0.params;
+				var frag = _v0.frag;
+				var value = _v0.value;
+				if (!unvisited.b) {
+					return _List_Nil;
+				} else {
+					var next = unvisited.a;
+					var rest = unvisited.b;
+					var _v2 = stringToSomething(next);
+					if (_v2.$ === 'Just') {
+						var nextValue = _v2.a;
+						return _List_fromArray(
+							[
+								A5(
+								$elm$url$Url$Parser$State,
+								A2($elm$core$List$cons, next, visited),
+								rest,
+								params,
+								frag,
+								value(nextValue))
+							]);
+					} else {
+						return _List_Nil;
+					}
+				}
+			});
+	});
+var $author$project$Common$JournalEntry$idParser = A2(
+	$elm$url$Url$Parser$custom,
+	'JOURANLID',
+	function (journalId) {
+		return $elm$core$Maybe$Just(
+			$author$project$Common$JournalEntry$JournalId(journalId));
 	});
 var $elm$url$Url$Parser$mapState = F2(
 	function (func, _v0) {
@@ -11292,17 +11375,27 @@ var $author$project$Route$matchRoute = $elm$url$Url$Parser$oneOf(
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$ListJournalEntries,
-			$elm$url$Url$Parser$s('journalEntries')),
+			A2(
+				$elm$url$Url$Parser$slash,
+				$elm$url$Url$Parser$s('journals'),
+				$elm$url$Url$Parser$s('entries'))),
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$NewJournalEntry,
 			A2(
 				$elm$url$Url$Parser$slash,
-				$elm$url$Url$Parser$s('journalEntry'),
+				$elm$url$Url$Parser$s('journals'),
+				$elm$url$Url$Parser$s('new'))),
+			A2(
+			$elm$url$Url$Parser$map,
+			$author$project$Route$ViewJournalEntry,
+			A2(
+				$elm$url$Url$Parser$slash,
+				$elm$url$Url$Parser$s('journals'),
 				A2(
 					$elm$url$Url$Parser$slash,
-					$elm$url$Url$Parser$s('morning'),
-					$elm$url$Url$Parser$s('new'))))
+					$elm$url$Url$Parser$s('entries'),
+					$author$project$Common$JournalEntry$idParser)))
 		]));
 var $elm$url$Url$Parser$getFirstMatch = function (states) {
 	getFirstMatch:
@@ -11593,8 +11686,8 @@ var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (j
 		{
 			body: $elm$http$Http$jsonBody(
 				$author$project$Common$JournalEntry$newMorningJournalEncoder(journal)),
-			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$morningJournalDecoder),
-			url: 'http://localhost:8080/journalEntry/create/'
+			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$journalEntryDecoder),
+			url: 'http://localhost:8080/journal/entries/create/'
 		});
 };
 var $elm$core$Maybe$map = F2(
@@ -11711,10 +11804,19 @@ var $author$project$Page$NewJournalEntry$update = F2(
 				}
 		}
 	});
+var $author$project$Page$ViewJournalEntry$update = F2(
+	function (msg, model) {
+		var journalEntry = msg.a;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{journalEntry: journalEntry}),
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$4:
+		_v0$5:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'ListJournalsMsg':
@@ -11732,10 +11834,10 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$ListJournalsMsg, updatedCmd));
 					} else {
-						break _v0$4;
+						break _v0$5;
 					}
-				case 'NewMorningJournalMsg':
-					if (_v0.b.$ === 'NewMorningJournalPage') {
+				case 'NewJournalEntryMsg':
+					if (_v0.b.$ === 'NewJournalEntryPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
 						var _v2 = A2($author$project$Page$NewJournalEntry$update, subMsg, pageModel);
@@ -11745,11 +11847,28 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									page: $author$project$Main$NewMorningJournalPage(updatedPageModel)
+									page: $author$project$Main$NewJournalEntryPage(updatedPageModel)
 								}),
-							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewMorningJournalMsg, updatedCmd));
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewJournalEntryMsg, updatedCmd));
 					} else {
-						break _v0$4;
+						break _v0$5;
+					}
+				case 'ViewJournalEntryMsg':
+					if (_v0.b.$ === 'ViewJournalEntryPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v3 = A2($author$project$Page$ViewJournalEntry$update, subMsg, pageModel);
+						var updatedPageModel = _v3.a;
+						var updatedCmd = _v3.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$ViewJournalEntryPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewJournalEntryMsg, updatedCmd));
+					} else {
+						break _v0$5;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -12076,6 +12195,69 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 				$author$project$Page$NewJournalEntry$newJournalEntryForm(model)
 			]));
 };
+var $author$project$Page$ViewJournalEntry$viewEntry = function (entry) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Journal entry loaded...')
+			]));
+};
+var $author$project$Page$ViewJournalEntry$viewFetchError = function (err) {
+	var heading = 'Counldn\'t fetch the requested journal entry';
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(err)
+					])),
+				$elm$html$Html$text('Error: ' + err)
+			]));
+};
+var $author$project$Page$ViewJournalEntry$viewJournalEntry = function (entry) {
+	switch (entry.$) {
+		case 'NotAsked':
+			return $elm$html$Html$text('');
+		case 'Loading':
+			return A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Loading journal entry...')
+					]));
+		case 'Success':
+			var data = entry.a;
+			return $author$project$Page$ViewJournalEntry$viewEntry(data);
+		default:
+			var httpError = entry.a;
+			return $author$project$Page$ViewJournalEntry$viewFetchError(
+				$author$project$Error$buildHttpErrorMessage(httpError));
+	}
+};
+var $author$project$Page$ViewJournalEntry$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Journal Entry')
+					])),
+				$author$project$Page$ViewJournalEntry$viewJournalEntry(model.journalEntry)
+			]));
+};
 var $author$project$Main$currentView = function (model) {
 	var _v0 = model.page;
 	switch (_v0.$) {
@@ -12087,18 +12269,158 @@ var $author$project$Main$currentView = function (model) {
 				$elm$html$Html$map,
 				$author$project$Main$ListJournalsMsg,
 				$author$project$Page$ListJournalsEntries$view(pageModel));
+		case 'NewJournalEntryPage':
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$NewJournalEntryMsg,
+				$author$project$Page$NewJournalEntry$view(pageModel));
 		default:
 			var pageModel = _v0.a;
 			return A2(
 				$elm$html$Html$map,
-				$author$project$Main$NewMorningJournalMsg,
-				$author$project$Page$NewJournalEntry$view(pageModel));
+				$author$project$Main$ViewJournalEntryMsg,
+				$author$project$Page$ViewJournalEntry$view(pageModel));
 	}
 };
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $author$project$Main$getNavBar = A2(
+	$elm$html$Html$nav,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('container-fluid')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$href('/'),
+							$elm$html$Html$Attributes$class('navbar-brand')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Painted Porch')
+						])),
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('navbar-toggler'),
+							$elm$html$Html$Attributes$type_('button'),
+							A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+							A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-toggler-icon')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+							$elm$html$Html$Attributes$id('navbarNav')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$ul,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-nav')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
+													$elm$html$Html$Attributes$href('/')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Home')
+												]))
+										])),
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													$elm$html$Html$Attributes$href('/journals/new')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('New Journal Entry')
+												]))
+										])),
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													$elm$html$Html$Attributes$href('/journals/entries')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('List Journal Entries')
+												]))
+										]))
+								]))
+						]))
+				]))
+		]));
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
+				$author$project$Main$getNavBar,
 				$author$project$Main$currentView(model)
 			]),
 		title: 'Everyday Stoic Journal'
@@ -12116,4 +12438,4 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.JournalEntry.MorningJournal":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewMorningJournalMsg":["Page.NewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.MorningJournal)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.MorningJournal"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
