@@ -1,6 +1,7 @@
 import json
 import time
 import random
+import asyncio
 from typing import Dict
 from bson import ObjectId
 
@@ -75,8 +76,10 @@ class GetJournalEntryInput(JournalEntry):
     pass
 
 
-class ListJournalEntryInput(JournalEntry):
-    pass
+class ListJournalEntryInput(BaseModel):
+    created_after: int = None
+    created_before: int = None
+    journal_type: str = None
 
 
 @app.post("/journal/entry/create/")
@@ -106,8 +109,12 @@ async def get(entry_id: str):
     return JSONResponse(status_code=status.HTTP_200_OK, content=journal_entry)
 
 
-@app.post("/journals/entries")
-async def list_journals(*args, **kwargs):
-    entries = await db["journal_entries"].find_many({})
-    print(f"journal entries: {entries}")
+@app.post("/journals/entries/")
+async def list_journals(input: ListJournalEntryInput):
+    entries = list()
+    cursor = db["journal_entries"].find({})
+
+    for doc in await cursor.to_list(length=100):  # use pagination
+        entries.append(doc)
+
     return JSONResponse(status_code=status.HTTP_200_OK, content=entries)
