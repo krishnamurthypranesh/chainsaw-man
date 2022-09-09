@@ -1,4 +1,4 @@
-module Common.Journal exposing (JournalId, MorningJournal, emptyMorningJournal, morningJournalDecoder, morningJournalsListDecoder, newMorningJournalEncoder, updateJournalContent)
+module Common.JournalEntry exposing (JournalId, MorningJournal, emptyMorningJournal, morningJournalDecoder, morningJournalsListDecoder, newMorningJournalEncoder, updateJournalContent)
 
 import Common.JournalField exposing (JournalField)
 import Common.JournalSection exposing (JournalSection, journalSectionDecoder, journalSectionEncoder, setFieldValue)

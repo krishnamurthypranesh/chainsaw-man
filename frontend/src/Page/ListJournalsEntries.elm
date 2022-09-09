@@ -1,6 +1,6 @@
-module Page.ListJournals exposing (..)
+module Page.ListJournalsEntries exposing (..)
 
-import Common.Journal exposing (MorningJournal, morningJournalDecoder, morningJournalsListDecoder)
+import Common.JournalEntry exposing (MorningJournal, morningJournalDecoder, morningJournalsListDecoder)
 import Html exposing (..)
 import Http exposing (get)
 import RemoteData exposing (WebData)

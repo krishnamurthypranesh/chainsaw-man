@@ -3,8 +3,8 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Page.ListJournals as ListJournals
-import Page.NewMorningJournal as NewMorningJournal
+import Page.ListJournalsEntries as ListJournals
+import Page.NewJournalEntry as NewMorningJournal
 import Route exposing (Route)
 import Url exposing (Url)
 
@@ -60,14 +60,14 @@ initCurrentPage ( model, existingCmds ) =
                 Route.NotFound ->
                     ( NotFoundPage, Cmd.none )
 
-                Route.JournalEntries ->
+                Route.ListJournalEntries ->
                     let
                         ( pageModel, pageCmds ) =
                             ListJournals.init
                     in
                     ( ListJournalsPage pageModel, Cmd.map ListJournalsMsg pageCmds )
 
-                Route.NewMorningJournal ->
+                Route.NewJournalEntry ->
                     let
                         ( pageModel, pageCmds ) =
                             NewMorningJournal.init model.navKey
