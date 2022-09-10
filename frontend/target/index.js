@@ -11153,6 +11153,12 @@ var $author$project$Page$ListJournalsEntries$init = function () {
 		model,
 		$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
 }();
+var $author$project$Common$Toast$HideToast = {$: 'HideToast'};
+var $author$project$Common$Toast$Model = F3(
+	function (showToast, toastMessage, toastType) {
+		return {showToast: showToast, toastMessage: toastMessage, toastType: toastType};
+	});
+var $author$project$Common$Toast$None = {$: 'None'};
 var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	var journalId = $author$project$Common$JournalEntry$JournalId('');
 	var createdAt = 0;
@@ -11187,8 +11193,9 @@ var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	return A3($author$project$Common$JournalEntry$JournalEntry, journalId, createdAt, content);
 }();
 var $author$project$Page$NewJournalEntry$initialModel = function (navKey) {
+	var toast = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
 	var journal = $author$project$Common$JournalEntry$emptyMorningJournal;
-	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, navKey: navKey};
+	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, navKey: navKey, toastData: toast};
 };
 var $author$project$Page$NewJournalEntry$init = function (navKey) {
 	return _Utils_Tuple2(
@@ -11636,6 +11643,10 @@ var $author$project$Page$ListJournalsEntries$update = F2(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Common$Toast$Error = {$: 'Error'};
+var $author$project$Common$Toast$Info = {$: 'Info'};
+var $author$project$Logger$LevelError = {$: 'LevelError'};
+var $author$project$Common$Toast$ShowToast = {$: 'ShowToast'};
 var $author$project$Page$NewJournalEntry$JournalEntryCreated = function (a) {
 	return {$: 'JournalEntryCreated', a: a};
 };
@@ -11706,6 +11717,26 @@ var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (j
 			url: 'http://localhost:8080/journal/entry/create/'
 		});
 };
+var $author$project$Page$NewJournalEntry$ToastVisibilityToggle = function (a) {
+	return {$: 'ToastVisibilityToggle', a: a};
+};
+var $elm$core$Process$sleep = _Process_sleep;
+var $author$project$Page$NewJournalEntry$delay = F3(
+	function (toast, interval, msg) {
+		var newMsg = function () {
+			if (msg.$ === 'ShowToast') {
+				return $author$project$Page$NewJournalEntry$ToastVisibilityToggle($author$project$Common$Toast$HideToast);
+			} else {
+				return $author$project$Page$NewJournalEntry$ToastVisibilityToggle($author$project$Common$Toast$HideToast);
+			}
+		}();
+		return A2(
+			$elm$core$Task$perform,
+			function (_v0) {
+				return newMsg;
+			},
+			$elm$core$Process$sleep(interval));
+	});
 var $author$project$Error$errorFromHttpError = function (err) {
 	switch (err.$) {
 		case 'Timeout':
@@ -11720,6 +11751,22 @@ var $author$project$Error$errorFromHttpError = function (err) {
 			return 'An invalid url was used to make the request';
 	}
 };
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Logger$logMessage = F2(
+	function (msg, level) {
+		var levelValue = function () {
+			switch (level.$) {
+				case 'LevelDebug':
+					return '[DEBUG] -- ';
+				case 'LevelError':
+					return '[ERROR] -- ';
+				default:
+					return '[WARN] -- ';
+			}
+		}();
+		var _v0 = A2($elm$core$Debug$log, levelValue, msg);
+		return $elm$core$Maybe$Nothing;
+	});
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -11818,20 +11865,37 @@ var $author$project$Page$NewJournalEntry$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Page$NewJournalEntry$createMorningJournalEntry(model.journal));
-			default:
+			case 'JournalEntryCreated':
 				if (msg.a.$ === 'Ok') {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					var error = msg.a.a;
+					var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$ShowToast, 'Entry created successfully', $author$project$Common$Toast$Info);
+					var cmd = A3($author$project$Page$NewJournalEntry$delay, model.toastData, 5000.0, $author$project$Common$Toast$ShowToast);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								createJournalEntryError: $elm$core$Maybe$Just(
-									$author$project$Error$errorFromHttpError(error))
-							}),
-						$elm$core$Platform$Cmd$none);
+							{toastData: newToastData}),
+						cmd);
+				} else {
+					var error = msg.a.a;
+					var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$ShowToast, 'Error occurred when creating entry', $author$project$Common$Toast$Error);
+					var cmd = A3($author$project$Page$NewJournalEntry$delay, model.toastData, 5000.0, $author$project$Common$Toast$ShowToast);
+					var _v1 = A2(
+						$author$project$Logger$logMessage,
+						$author$project$Error$errorFromHttpError(error),
+						$author$project$Logger$LevelError);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toastData: newToastData}),
+						cmd);
 				}
+			default:
+				var toggle = msg.a;
+				var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{toastData: newToastData}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Page$ViewJournalEntry$update = F2(
@@ -12139,7 +12203,7 @@ var $elm$time$Time$Zone = F2(
 		return {$: 'Zone', a: a, b: b};
 	});
 var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
-var $author$project$Helpers$dateTimeFromts = function (ts) {
+var $author$project$Helpers$dateTimeFromTs = function (ts) {
 	return A3(
 		$elm$core$String$padLeft,
 		2,
@@ -12210,7 +12274,7 @@ var $author$project$Page$ListJournalsEntries$tableRowFromJournalEntry = function
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$author$project$Helpers$dateTimeFromts(createdTS))
+						$author$project$Helpers$dateTimeFromTs(createdTS))
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -12360,6 +12424,122 @@ var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice = function
 	return {$: 'StorePremeditatioMalorumVice', a: a};
 };
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$small = _VirtualDom_node('small');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$html$Html$strong = _VirtualDom_node('strong');
+var $author$project$Page$NewJournalEntry$buildToastHtml = function (model) {
+	var toastBgColor = function () {
+		var _v1 = model.toastType;
+		switch (_v1.$) {
+			case 'Info':
+				return 'text-bg-primary';
+			case 'Warn':
+				return 'text-bg-warning';
+			case 'Error':
+				return 'text-bg-danger';
+			default:
+				return '';
+		}
+	}();
+	var showToastValue = function () {
+		var _v0 = model.showToast;
+		if (_v0.$ === 'ShowToast') {
+			return 'show';
+		} else {
+			return 'hide';
+		}
+	}();
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('toast-container'),
+				$elm$html$Html$Attributes$class('position-fixed'),
+				$elm$html$Html$Attributes$class('bottom-0'),
+				$elm$html$Html$Attributes$class('end-0'),
+				$elm$html$Html$Attributes$class('p-3')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$id('liveToast'),
+						$elm$html$Html$Attributes$class('toast'),
+						$elm$html$Html$Attributes$class(showToastValue),
+						$elm$html$Html$Attributes$class(toastBgColor),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'alert'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'assertive'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-atomic', 'true')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('toast-header')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$img,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$src('...'),
+										$elm$html$Html$Attributes$class('rounded me-2'),
+										$elm$html$Html$Attributes$alt('...')
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$strong,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('me-auto')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Success')
+									])),
+								A2(
+								$elm$html$Html$small,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Just now')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$class('btn-close'),
+										A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'toast'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Close')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('toast-body')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(model.toastMessage)
+							]))
+					]))
+			]));
+};
 var $elm$html$Html$Attributes$cols = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -12402,6 +12582,7 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 			]),
 		_List_fromArray(
 			[
+				$author$project$Page$NewJournalEntry$buildToastHtml(model.toastData),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -12599,7 +12780,6 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 			]));
 };
 var $elm$html$Html$hr = _VirtualDom_node('hr');
-var $elm$html$Html$strong = _VirtualDom_node('strong');
 var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
 	return A2(
 		$elm$html$Html$div,
@@ -12634,7 +12814,7 @@ var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entr
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$author$project$Helpers$dateTimeFromts(
+								$author$project$Helpers$dateTimeFromTs(
 									$elm$time$Time$millisToPosix(entry.createdAt * 1000)))
 							]))
 					])),
@@ -13037,4 +13217,4 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"],"ToastVisibilityToggle":["Common.Toast.Msg"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.Toast.Msg":{"args":[],"tags":{"ShowToast":[],"HideToast":[]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
