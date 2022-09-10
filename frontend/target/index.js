@@ -12222,7 +12222,7 @@ var $author$project$Page$ListJournalsEntries$tableRowFromJournalEntry = function
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$href(
-								'journals/entries/' + ($author$project$Common$JournalEntry$idToString(entry.id) + ''))
+								'/journals/entries/' + ($author$project$Common$JournalEntry$idToString(entry.id) + ''))
 							]),
 						_List_fromArray(
 							[

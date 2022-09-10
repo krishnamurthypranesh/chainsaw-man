@@ -108,6 +108,6 @@ tableRowFromJournalEntry entry =
         , td [] [ text "Morning Journal" ]
         , td [] [ text (dateTimeFromts createdTS) ]
         , td []
-            [ a [ href ("journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]
+            [ a [ href ("/journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]
             ]
         ]

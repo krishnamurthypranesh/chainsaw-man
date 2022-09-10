@@ -1,6 +1,6 @@
 module Route exposing (..)
 
-import Common.JournalEntry exposing (JournalId, idParser)
+import Common.JournalEntry exposing (JournalId, idParser, idToString)
 import Html exposing (a)
 import Url exposing (Url)
 import Url.Parser exposing (..)
@@ -16,6 +16,22 @@ type Route
 
 -- | ViewJournalEntry JournalId
 -- add route for home page
+
+
+toString : Route -> String
+toString route =
+    case route of
+        NotFound ->
+            "404"
+
+        ListJournalEntries ->
+            "journals/entries/"
+
+        NewJournalEntry ->
+            "journals/new"
+
+        ViewJournalEntry jid ->
+            "journals/entries/new" ++ idToString jid
 
 
 parseUrl : Url -> Route
