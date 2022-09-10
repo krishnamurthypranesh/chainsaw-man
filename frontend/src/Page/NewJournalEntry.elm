@@ -3,7 +3,7 @@ module Page.NewJournalEntry exposing (Model, Msg, init, update, view)
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
-import Error exposing (buildHttpErrorMessage)
+import Error exposing (errorFromHttpError)
 import Helpers exposing (stringFromMaybeString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -54,7 +54,7 @@ update msg model =
             ( model, Cmd.none )
 
         JournalEntryCreated (Err error) ->
-            ( { model | createJournalEntryError = Just (buildHttpErrorMessage error) }, Cmd.none )
+            ( { model | createJournalEntryError = Just (errorFromHttpError error) }, Cmd.none )
 
 
 createMorningJournalEntry : JournalEntry -> Cmd Msg

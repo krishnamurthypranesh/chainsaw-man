@@ -11636,20 +11636,6 @@ var $author$project$Page$ListJournalsEntries$update = F2(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Error$buildHttpErrorMessage = function (err) {
-	switch (err.$) {
-		case 'Timeout':
-			return 'The request timed out!';
-		case 'BadBody':
-			return 'The response body could not be parsed!';
-		case 'NetworkError':
-			return 'There was an error when trying fetch data from the server';
-		case 'BadStatus':
-			return 'The server sent an SOS and the team is looking into it right now';
-		default:
-			return 'An invalid url was used to make the request';
-	}
-};
 var $author$project$Page$NewJournalEntry$JournalEntryCreated = function (a) {
 	return {$: 'JournalEntryCreated', a: a};
 };
@@ -11719,6 +11705,20 @@ var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (j
 			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$journalEntryDecoder),
 			url: 'http://localhost:8080/journal/entry/create/'
 		});
+};
+var $author$project$Error$errorFromHttpError = function (err) {
+	switch (err.$) {
+		case 'Timeout':
+			return 'The request timed out!';
+		case 'BadBody':
+			return 'The response body could not be parsed!';
+		case 'NetworkError':
+			return 'There was an error when trying fetch data from the server';
+		case 'BadStatus':
+			return 'The server sent an SOS and the team is looking into it right now';
+		default:
+			return 'An invalid url was used to make the request';
+	}
 };
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -11828,7 +11828,7 @@ var $author$project$Page$NewJournalEntry$update = F2(
 							model,
 							{
 								createJournalEntryError: $elm$core$Maybe$Just(
-									$author$project$Error$buildHttpErrorMessage(error))
+									$author$project$Error$errorFromHttpError(error))
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -12346,7 +12346,7 @@ var $author$project$Page$ListJournalsEntries$view = function (model) {
 		default:
 			var httpError = _v0.a;
 			return $elm$html$Html$text(
-				$author$project$Error$buildHttpErrorMessage(httpError));
+				$author$project$Error$errorFromHttpError(httpError));
 	}
 };
 var $author$project$Page$NewJournalEntry$CreateMorningJournalEntry = {$: 'CreateMorningJournalEntry'};
@@ -12846,7 +12846,7 @@ var $author$project$Page$ViewJournalEntry$viewJournalEntry = function (entry) {
 		default:
 			var httpError = entry.a;
 			return $author$project$Page$ViewJournalEntry$viewFetchError(
-				$author$project$Error$buildHttpErrorMessage(httpError));
+				$author$project$Error$errorFromHttpError(httpError));
 	}
 };
 var $author$project$Page$ViewJournalEntry$view = function (model) {

@@ -1,7 +1,7 @@
 module Page.ListJournalsEntries exposing (..)
 
 import Common.JournalEntry exposing (JournalEntry, ListJournalEntriesInput, idToString, journalEntriesListDecoder, journalEntryDecoder, listJournalEntriesInputEncoder)
-import Error exposing (buildHttpErrorMessage)
+import Error exposing (errorFromHttpError)
 import Helpers exposing (dateTimeFromts)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, scope)
@@ -70,7 +70,7 @@ view model =
 
         -- div [] [ text ("Retreived " ++ String.fromInt (List.length response) ++ " journal entries from the backend...") ]
         RemoteData.Failure httpError ->
-            text (buildHttpErrorMessage httpError)
+            text (errorFromHttpError httpError)
 
 
 buildListTable : List JournalEntry -> Html Msg

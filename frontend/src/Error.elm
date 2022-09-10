@@ -1,10 +1,10 @@
-module Error exposing (buildHttpErrorMessage)
+module Error exposing (errorFromHttpError)
 
 import Http exposing (Error(..))
 
 
-buildHttpErrorMessage : Http.Error -> String
-buildHttpErrorMessage err =
+errorFromHttpError : Http.Error -> String
+errorFromHttpError err =
     case err of
         Http.Timeout ->
             "The request timed out!"

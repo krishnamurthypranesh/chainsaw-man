@@ -3,7 +3,7 @@ module Page.ViewJournalEntry exposing (..)
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, JournalId, idToString, journalEntryDecoder)
 import Common.JournalSection exposing (getField)
-import Error exposing (buildHttpErrorMessage)
+import Error exposing (errorFromHttpError)
 import Helpers exposing (dateTimeFromts)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -80,7 +80,7 @@ viewJournalEntry entry =
             viewEntry data
 
         RemoteData.Failure httpError ->
-            viewFetchError (buildHttpErrorMessage httpError)
+            viewFetchError (errorFromHttpError httpError)
 
 
 viewEntry : JournalEntry -> Html Msg
@@ -100,6 +100,7 @@ viewFetchError err =
         [ h3 [] [ text err ]
         , text ("Error: " ++ err)
         ]
+
 
 buildJournalEntryHtml : JournalEntry -> Html Msg
 buildJournalEntryHtml entry =
