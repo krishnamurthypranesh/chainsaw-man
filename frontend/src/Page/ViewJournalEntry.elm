@@ -4,7 +4,7 @@ import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, JournalId, idToString, journalEntryDecoder)
 import Common.JournalSection exposing (getField)
 import Error exposing (errorFromHttpError)
-import Helpers exposing (dateTimeFromts)
+import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -110,7 +110,7 @@ buildJournalEntryHtml entry =
                 [ text "Morning Journal"
                 ]
             , div [ class "col", class "text-end" ]
-                [ text (dateTimeFromts (Time.millisToPosix (entry.createdAt * 1000)))
+                [ text (dateTimeFromTs (Time.millisToPosix (entry.createdAt * 1000)))
                 ]
             ]
         , div [ class "row", class "gy-2" ]

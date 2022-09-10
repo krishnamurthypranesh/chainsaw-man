@@ -2,7 +2,7 @@ module Page.ListJournalsEntries exposing (..)
 
 import Common.JournalEntry exposing (JournalEntry, ListJournalEntriesInput, idToString, journalEntriesListDecoder, journalEntryDecoder, listJournalEntriesInputEncoder)
 import Error exposing (errorFromHttpError)
-import Helpers exposing (dateTimeFromts)
+import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, scope)
 import Http exposing (get)
@@ -106,7 +106,7 @@ tableRowFromJournalEntry entry =
             [ text (idToString entry.id)
             ]
         , td [] [ text "Morning Journal" ]
-        , td [] [ text (dateTimeFromts createdTS) ]
+        , td [] [ text (dateTimeFromTs createdTS) ]
         , td []
             [ a [ href ("/journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]
             ]
