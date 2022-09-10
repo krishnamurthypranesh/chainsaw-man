@@ -1,7 +1,7 @@
 module Page.NewJournalEntry exposing (Model, Msg, init, update, view)
 
 import Browser.Navigation as Nav
-import Common.JournalEntry as MorningJournal
+import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
 import Error exposing (buildHttpErrorMessage)
 import Helpers exposing (stringFromMaybeString)
@@ -18,7 +18,7 @@ import Json.Decode exposing (string)
 
 type alias Model =
     { navKey : Nav.Key
-    , journal : MorningJournal.MorningJournal
+    , journal : JournalEntry
     , createJournalEntryError : Maybe String
     }
 
@@ -32,20 +32,20 @@ type Msg
     | StorePremeditatioMalorumVice String
     | StorePremeditatioMalorumStrategy String
     | CreateMorningJournalEntry
-    | JournalEntryCreated (Result Http.Error MorningJournal.MorningJournal)
+    | JournalEntryCreated (Result Http.Error JournalEntry)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StoreAmorFatiThoughts thoughts ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
 
         StorePremeditatioMalorumVice vice ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none )
 
         StorePremeditatioMalorumStrategy strategy ->
-            ( { model | journal = MorningJournal.updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
 
         CreateMorningJournalEntry ->
             ( model, createMorningJournalEntry model.journal )
@@ -57,12 +57,12 @@ update msg model =
             ( { model | createJournalEntryError = Just (buildHttpErrorMessage error) }, Cmd.none )
 
 
-createMorningJournalEntry : MorningJournal.MorningJournal -> Cmd Msg
+createMorningJournalEntry : JournalEntry -> Cmd Msg
 createMorningJournalEntry journal =
     Http.post
-        { url = "http://localhost:8080/journalEntry/create/"
-        , body = Http.jsonBody (MorningJournal.newMorningJournalEncoder journal)
-        , expect = Http.expectJson JournalEntryCreated MorningJournal.morningJournalDecoder
+        { url = "http://localhost:8080/journal/entry/create/"
+        , body = Http.jsonBody (newMorningJournalEncoder journal)
+        , expect = Http.expectJson JournalEntryCreated journalEntryDecoder
         }
 
 
@@ -73,8 +73,7 @@ createMorningJournalEntry journal =
 view : Model -> Html Msg
 view model =
     div []
-        [ h3 [] [ text "New Morning Journal Entry" ]
-        , newJournalEntryForm model
+        [ newJournalEntryForm model
         ]
 
 
@@ -107,11 +106,11 @@ newJournalEntryForm model =
                 [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]
             , div
                 [ class "input-group mb-3" ]
-                [ textarea [ cols 100, rows 10, placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
+                [ textarea [ cols 100, rows 10, value thoughts.value, onInput StoreAmorFatiThoughts, style "width" "100%" ] []
                 ]
             ]
         , div [ class "row", id "premeditatio-malorum" ]
-            [ h2 [] [ text model.journal.content.premeditatioMalorum.title ]
+            [ h2 [ class "display-2" ] [ text model.journal.content.premeditatioMalorum.title ]
             , p [ class "lead" ] [ text "Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you" ]
             , label [ class "form-label" ]
                 [ text "What's a vice you think you might encounter today?" ]
@@ -124,7 +123,7 @@ newJournalEntryForm model =
                 [ text "How will you handle this vice?"
                 ]
             , div [ class "input-grouop mb-3" ]
-                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
+                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy, style "width" "100%" ] []
                 ]
             ]
         , br [] []
@@ -132,7 +131,6 @@ newJournalEntryForm model =
             [ button [ type_ "button", onClick CreateMorningJournalEntry, class "btn btn-primary" ] [ text "Save Journal Entry" ]
             , br [] []
             , br [] []
-            , buildErrorMessage model.createJournalEntryError
             ]
         ]
 
@@ -160,6 +158,6 @@ initialModel : Nav.Key -> Model
 initialModel navKey =
     let
         journal =
-            MorningJournal.emptyMorningJournal
+            emptyMorningJournal
     in
     { navKey = navKey, journal = journal, createJournalEntryError = Nothing }

@@ -1,15 +1,28 @@
-module Common.JournalEntry exposing (JournalId, MorningJournal, emptyMorningJournal, morningJournalDecoder, morningJournalsListDecoder, newMorningJournalEncoder, updateJournalContent)
+module Common.JournalEntry exposing
+    ( JournalEntry
+    , JournalId
+    , ListJournalEntriesInput
+    , emptyMorningJournal
+    , idParser
+    , idToString
+    , journalEntriesListDecoder
+    , journalEntryDecoder
+    , listJournalEntriesInputEncoder
+    , newMorningJournalEncoder
+    , updateJournalContent
+    )
 
 import Common.JournalField exposing (JournalField)
 import Common.JournalSection exposing (JournalSection, journalSectionDecoder, journalSectionEncoder, setFieldValue)
 import Dict exposing (Dict, fromList)
+import Html exposing (a)
 import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 import Url.Parser exposing (Parser, custom)
 
 
-type alias MorningJournal =
+type alias JournalEntry =
     { id : JournalId
     , createdAt : Int
     , content : Content
@@ -35,6 +48,19 @@ idDecoder =
     Decode.map JournalId Decode.string
 
 
+idParser : Parser (JournalId -> a) a
+idParser =
+    custom "JOURANLID" <|
+        \journalId -> Just (JournalId journalId)
+
+
+idToString : JournalId -> String
+idToString jId =
+    case jId of
+        JournalId id ->
+            id
+
+
 contentDecoder : Decoder Content
 contentDecoder =
     Decode.succeed Content
@@ -42,17 +68,17 @@ contentDecoder =
         |> required "premeditatio_malorum" journalSectionDecoder
 
 
-morningJournalDecoder : Decoder MorningJournal
-morningJournalDecoder =
-    Decode.succeed MorningJournal
+journalEntryDecoder : Decoder JournalEntry
+journalEntryDecoder =
+    Decode.succeed JournalEntry
         |> required "_id" idDecoder
         |> required "created_at" Decode.int
         |> required "content" contentDecoder
 
 
-morningJournalsListDecoder : Decoder (List MorningJournal)
-morningJournalsListDecoder =
-    list morningJournalDecoder
+journalEntriesListDecoder : Decoder (List JournalEntry)
+journalEntriesListDecoder =
+    list journalEntryDecoder
 
 
 
@@ -67,7 +93,7 @@ contentEncoder c =
         ]
 
 
-newMorningJournalEncoder : MorningJournal -> Encode.Value
+newMorningJournalEncoder : JournalEntry -> Encode.Value
 newMorningJournalEncoder journal =
     Encode.object
         [ ( "content"
@@ -83,7 +109,7 @@ newMorningJournalEncoder journal =
 -- CONSTRUCTORS
 
 
-emptyMorningJournal : MorningJournal
+emptyMorningJournal : JournalEntry
 emptyMorningJournal =
     let
         content =
@@ -103,10 +129,10 @@ emptyMorningJournal =
         createdAt =
             0
     in
-    MorningJournal journalId createdAt content
+    JournalEntry journalId createdAt content
 
 
-updateJournalContent : MorningJournal -> String -> String -> String -> MorningJournal
+updateJournalContent : JournalEntry -> String -> String -> String -> JournalEntry
 updateJournalContent journal sectionName fieldName fieldValue =
     let
         oldContent =
@@ -121,3 +147,23 @@ updateJournalContent journal sectionName fieldName fieldValue =
 
         _ ->
             journal
+
+
+
+-- INPUTS
+
+
+type alias ListJournalEntriesInput =
+    { createdAfter : Int
+    , createdBefore : Int
+    , journalType : String
+    }
+
+
+listJournalEntriesInputEncoder : ListJournalEntriesInput -> Encode.Value
+listJournalEntriesInputEncoder input =
+    Encode.object
+        [ ( "created_after", Encode.int input.createdAfter )
+        , ( "created_before", Encode.int input.createdBefore )
+        , ( "journal_type", Encode.string input.journalType )
+        ]

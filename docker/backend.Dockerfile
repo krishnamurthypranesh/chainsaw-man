@@ -4,4 +4,4 @@ WORKDIR /code
 
 RUN mkdir docker
 
-ENTRYPOINT [ "docker/start_backend.sh" ]
+ENTRYPOINT [ "./start_backend.sh" ]

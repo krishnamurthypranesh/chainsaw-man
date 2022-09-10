@@ -1,6 +1,7 @@
 import json
 import time
 import random
+import asyncio
 from typing import Dict
 from bson import ObjectId
 
@@ -10,8 +11,8 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.database import get_db
-from server.helpers import validate_journal_content
+from database import get_db
+from helpers import validate_journal_content
 
 app = FastAPI()
 
@@ -75,11 +76,13 @@ class GetJournalEntryInput(JournalEntry):
     pass
 
 
-class ListJournalEntryInput(JournalEntry):
-    pass
+class ListJournalEntryInput(BaseModel):
+    created_after: int = None
+    created_before: int = None
+    journal_type: str = None
 
 
-@app.post("/journalEntry/create/")
+@app.post("/journal/entry/create/")
 async def create(input: CreateJournalEntryInput):
     journal: Dict = {}
 
@@ -100,20 +103,18 @@ async def create(input: CreateJournalEntryInput):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=journal)
 
 
-@app.get("/journalEntry/{entry_id}/")
-async def get(entry_id: int):
-    return {"key": "entry_id", "value": f"{entry_id}", "type": "int"}
+@app.get("/journal/entries/{entry_id}/")
+async def get(entry_id: str):
+    journal_entry = await db["journal_entries"].find_one({"_id": entry_id})
+    return JSONResponse(status_code=status.HTTP_200_OK, content=journal_entry)
 
 
-@app.get("/journalEntries/")
-async def list(created_at_gt: int = None, created_at_lt: int = None):
-    if (created_at_gt is None) and (created_at_lt is None):
-        return []
-    return [
-        JournalEntry(
-            id=round(random.random() * 10, 0),
-            created_at=time.time(),
-            updated_at=time.time(),
-            content=dict(),
-        )
-    ]
+@app.post("/journals/entries/")
+async def list_journals(input: ListJournalEntryInput):
+    entries = list()
+    cursor = db["journal_entries"].find({})
+
+    for doc in await cursor.to_list(length=100):  # use pagination
+        entries.append(doc)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=entries)
