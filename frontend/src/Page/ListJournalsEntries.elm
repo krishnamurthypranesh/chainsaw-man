@@ -1,8 +1,8 @@
 module Page.ListJournalsEntries exposing (..)
 
 import Common.JournalEntry exposing (JournalEntry, ListJournalEntriesInput, idToString, journalEntriesListDecoder, journalEntryDecoder, listJournalEntriesInputEncoder)
-import Error exposing (buildHttpErrorMessage)
-import Helpers exposing (dateTimeFromts)
+import Error exposing (errorFromHttpError)
+import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, scope)
 import Http exposing (get)
@@ -70,7 +70,7 @@ view model =
 
         -- div [] [ text ("Retreived " ++ String.fromInt (List.length response) ++ " journal entries from the backend...") ]
         RemoteData.Failure httpError ->
-            text (buildHttpErrorMessage httpError)
+            text (errorFromHttpError httpError)
 
 
 buildListTable : List JournalEntry -> Html Msg
@@ -106,7 +106,7 @@ tableRowFromJournalEntry entry =
             [ text (idToString entry.id)
             ]
         , td [] [ text "Morning Journal" ]
-        , td [] [ text (dateTimeFromts createdTS) ]
+        , td [] [ text (dateTimeFromTs createdTS) ]
         , td []
             [ a [ href ("/journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]
             ]

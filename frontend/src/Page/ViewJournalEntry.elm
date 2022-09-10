@@ -3,8 +3,8 @@ module Page.ViewJournalEntry exposing (..)
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, JournalId, idToString, journalEntryDecoder)
 import Common.JournalSection exposing (getField)
-import Error exposing (buildHttpErrorMessage)
-import Helpers exposing (dateTimeFromts)
+import Error exposing (errorFromHttpError)
+import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -80,7 +80,7 @@ viewJournalEntry entry =
             viewEntry data
 
         RemoteData.Failure httpError ->
-            viewFetchError (buildHttpErrorMessage httpError)
+            viewFetchError (errorFromHttpError httpError)
 
 
 viewEntry : JournalEntry -> Html Msg
@@ -101,6 +101,7 @@ viewFetchError err =
         , text ("Error: " ++ err)
         ]
 
+
 buildJournalEntryHtml : JournalEntry -> Html Msg
 buildJournalEntryHtml entry =
     div []
@@ -109,7 +110,7 @@ buildJournalEntryHtml entry =
                 [ text "Morning Journal"
                 ]
             , div [ class "col", class "text-end" ]
-                [ text (dateTimeFromts (Time.millisToPosix (entry.createdAt * 1000)))
+                [ text (dateTimeFromTs (Time.millisToPosix (entry.createdAt * 1000)))
                 ]
             ]
         , div [ class "row", class "gy-2" ]

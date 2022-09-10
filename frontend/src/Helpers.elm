@@ -1,4 +1,7 @@
-module Helpers exposing (..)
+module Helpers exposing
+    ( dateTimeFromTs
+    , stringFromMaybeString
+    )
 
 import Time exposing (Month, Posix, toDay, toHour, toMinute, toMonth, toSecond, toYear, utc)
 
@@ -13,8 +16,8 @@ stringFromMaybeString maybeString =
             val
 
 
-dateTimeFromts : Posix -> String
-dateTimeFromts ts =
+dateTimeFromTs : Posix -> String
+dateTimeFromTs ts =
     (String.padLeft 2 '0' <| String.fromInt <| Time.toDay utc ts)
         ++ " "
         ++ (String.padLeft 2 '0' <| monthStringFromMonth <| Time.toMonth utc ts)

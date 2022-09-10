@@ -3,13 +3,17 @@ module Page.NewJournalEntry exposing (Model, Msg, init, update, view)
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
-import Error exposing (buildHttpErrorMessage)
+import Common.Toast as Toast
+import Error exposing (errorFromHttpError)
 import Helpers exposing (stringFromMaybeString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode exposing (string)
+import Json.Decode exposing (int, string)
+import Logger exposing (logMessage)
+import Process
+import Task
 
 
 
@@ -20,6 +24,7 @@ type alias Model =
     { navKey : Nav.Key
     , journal : JournalEntry
     , createJournalEntryError : Maybe String
+    , toastData : Toast.Model
     }
 
 
@@ -33,6 +38,7 @@ type Msg
     | StorePremeditatioMalorumStrategy String
     | CreateMorningJournalEntry
     | JournalEntryCreated (Result Http.Error JournalEntry)
+    | ToastVisibilityToggle Toast.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,10 +57,35 @@ update msg model =
             ( model, createMorningJournalEntry model.journal )
 
         JournalEntryCreated (Ok _) ->
-            ( model, Cmd.none )
+            let
+                cmd =
+                    delay model.toastData 5000.0 Toast.ShowToast
+
+                newToastData =
+                    Toast.Model Toast.ShowToast "Entry created successfully" Toast.Info
+            in
+            ( { model | toastData = newToastData }, cmd )
 
         JournalEntryCreated (Err error) ->
-            ( { model | createJournalEntryError = Just (buildHttpErrorMessage error) }, Cmd.none )
+            let
+                _ =
+                    logMessage (errorFromHttpError error)
+                        Logger.LevelError
+
+                newToastData =
+                    Toast.Model Toast.ShowToast "Error occurred when creating entry" Toast.Error
+
+                cmd =
+                    delay model.toastData 5000.0 Toast.ShowToast
+            in
+            ( { model | toastData = newToastData }, cmd )
+
+        ToastVisibilityToggle toggle ->
+            let
+                newToastData =
+                    Toast.Model Toast.HideToast "" Toast.None
+            in
+            ( { model | toastData = newToastData }, Cmd.none )
 
 
 createMorningJournalEntry : JournalEntry -> Cmd Msg
@@ -95,7 +126,9 @@ newJournalEntryForm model =
             JournalSection.getField model.journal.content.premeditatioMalorum "strategy"
     in
     div [ class "container" ]
-        [ div [ class "row", id "amor-fati" ]
+        [ buildToastHtml model.toastData
+        , div
+            [ class "row", id "amor-fati" ]
             [ h2 [ class "display-2" ] [ text model.journal.content.amorFati.title ]
             , p [ class "lead" ]
                 [ text "Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate"
@@ -145,6 +178,74 @@ buildErrorMessage error =
             div [ class "alert alert-danger" ] [ text val ]
 
 
+buildToastHtml : Toast.Model -> Html Msg
+buildToastHtml model =
+    let
+        showToastValue =
+            case model.showToast of
+                Toast.ShowToast ->
+                    "show"
+
+                Toast.HideToast ->
+                    "hide"
+
+        toastBgColor =
+            case model.toastType of
+                Toast.Info ->
+                    "text-bg-primary"
+
+                Toast.Warn ->
+                    "text-bg-warning"
+
+                Toast.Error ->
+                    "text-bg-danger"
+
+                Toast.None ->
+                    ""
+    in
+    div
+        [ class "toast-container"
+        , class "position-fixed"
+        , class "bottom-0"
+        , class "end-0"
+        , class "p-3"
+        ]
+        [ div
+            [ id "liveToast"
+            , class "toast"
+            , class showToastValue
+            , class toastBgColor
+            , attribute "role" "alert"
+            , attribute "aria-live" "assertive"
+            , attribute "aria-atomic" "true"
+            ]
+            [ div
+                [ class "toast-header"
+                ]
+                [ img
+                    [ src "..."
+                    , class "rounded me-2"
+                    , alt "..."
+                    ]
+                    []
+                , strong [ class "me-auto" ] [ text "Success" ]
+                , small [] [ text "Just now" ]
+                , button
+                    [ type_ "button"
+                    , class
+                        "btn-close"
+                    , attribute "data-bs-dismiss" "toast"
+                    , attribute "aria-label" "Close"
+                    ]
+                    []
+                ]
+            , div [ class "toast-body" ]
+                [ text model.toastMessage
+                ]
+            ]
+        ]
+
+
 
 -- INIT
 
@@ -159,5 +260,23 @@ initialModel navKey =
     let
         journal =
             emptyMorningJournal
+
+        toast =
+            Toast.Model Toast.HideToast "" Toast.None
     in
-    { navKey = navKey, journal = journal, createJournalEntryError = Nothing }
+    { navKey = navKey, journal = journal, createJournalEntryError = Nothing, toastData = toast }
+
+
+delay : Toast.Model -> Float -> Toast.Msg -> Cmd Msg
+delay toast interval msg =
+    let
+        newMsg =
+            case msg of
+                Toast.ShowToast ->
+                    ToastVisibilityToggle Toast.HideToast
+
+                Toast.HideToast ->
+                    ToastVisibilityToggle Toast.HideToast
+    in
+    Process.sleep interval
+        |> Task.perform (\_ -> newMsg)
