@@ -1,6 +1,23 @@
 version: "3"
 services:
 
+  everyday-stoic-frontend:
+    networks:
+      - everyday-stoic
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    container_name: everyday-stoic-frontend
+    security_opt:
+      - seccomp:unconfined
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - "../frontend:/code/"
+    depends_on:
+      - everyday-stoic-backend
+
   everyday-stoic-backend:
     networks: 
       - everyday-stoic
@@ -14,7 +31,9 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - "../:/code/"
+      - "../server:/code/"
+    depends_on:
+      - everyday-stoic-db
 
   everyday-stoic-db:
     networks:
