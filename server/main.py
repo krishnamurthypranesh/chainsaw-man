@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.database import get_db
-from server.helpers import validate_journal_content
+from database import get_db
+from helpers import validate_journal_content
 
 app = FastAPI()
 

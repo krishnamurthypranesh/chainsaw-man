@@ -12360,32 +12360,6 @@ var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice = function
 	return {$: 'StorePremeditatioMalorumVice', a: a};
 };
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $author$project$Page$NewJournalEntry$buildErrorMessage = function (error) {
-	if (error.$ === 'Nothing') {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('error-notifier alert alert-danger hidden')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('')
-				]));
-	} else {
-		var val = error.a;
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('alert alert-danger')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(val)
-				]));
-	}
-};
 var $elm$html$Html$Attributes$cols = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -12492,9 +12466,9 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 									[
 										$elm$html$Html$Attributes$cols(100),
 										$elm$html$Html$Attributes$rows(10),
-										$elm$html$Html$Attributes$placeholder('Amor Fati'),
 										$elm$html$Html$Attributes$value(thoughts.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StoreAmorFatiThoughts)
+										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StoreAmorFatiThoughts),
+										A2($elm$html$Html$Attributes$style, 'width', '100%')
 									]),
 								_List_Nil)
 							]))
@@ -12510,7 +12484,10 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 					[
 						A2(
 						$elm$html$Html$h2,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('display-2')
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(model.journal.content.premeditatioMalorum.title)
@@ -12580,7 +12557,8 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 										$elm$html$Html$Attributes$rows(10),
 										$elm$html$Html$Attributes$placeholder(''),
 										$elm$html$Html$Attributes$value(premeditatioMalorumStrategy.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy)
+										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy),
+										A2($elm$html$Html$Attributes$style, 'width', '100%')
 									]),
 								_List_Nil)
 							]))
@@ -12607,8 +12585,7 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 								$elm$html$Html$text('Save Journal Entry')
 							])),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						$author$project$Page$NewJournalEntry$buildErrorMessage(model.createJournalEntryError)
+						A2($elm$html$Html$br, _List_Nil, _List_Nil)
 					]))
 			]));
 };
@@ -12618,23 +12595,220 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$h3,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('New Morning Journal Entry')
-					])),
 				$author$project$Page$NewJournalEntry$newJournalEntryForm(model)
 			]));
 };
-var $author$project$Page$ViewJournalEntry$viewEntry = function (entry) {
+var $elm$html$Html$hr = _VirtualDom_node('hr');
+var $elm$html$Html$strong = _VirtualDom_node('strong');
+var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$text('Journal entry loaded...')
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('row')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('col')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Morning Journal')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('col'),
+								$elm$html$Html$Attributes$class('text-end')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$author$project$Helpers$dateTimeFromts(
+									$elm$time$Time$millisToPosix(entry.createdAt * 1000)))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('row'),
+						$elm$html$Html$Attributes$class('gy-2')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card'),
+								A2($elm$html$Html$Attributes$style, 'width', '100%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-header')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Amor Fati')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-body')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('card-text')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('What is something that you\'re glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin\'t expect to happen')
+													]))
+											])),
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('card-text')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												A2($author$project$Common$JournalSection$getField, entry.content.amorFati, 'thoughts').value)
+											]))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card'),
+								A2($elm$html$Html$Attributes$style, 'width', '100%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-header')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Premeditatio Malorum')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-body')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('row gy-1')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('card-text')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$strong,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('What\'s a vice you think you might encounter today?')
+															]))
+													])),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('card-text')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														A2($author$project$Common$JournalSection$getField, entry.content.premeditatioMalorum, 'vice').value)
+													])),
+												A2($elm$html$Html$hr, _List_Nil, _List_Nil),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('card-text')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$strong,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('How will you handle this vice?')
+															]))
+													])),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('card-text')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														A2($author$project$Common$JournalSection$getField, entry.content.premeditatioMalorum, 'strategy').value)
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Page$ViewJournalEntry$viewEntry = function (entry) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('container')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Page$ViewJournalEntry$buildJournalEntryHtml(entry)
 			]));
 };
 var $author$project$Page$ViewJournalEntry$viewFetchError = function (err) {
@@ -12681,13 +12855,6 @@ var $author$project$Page$ViewJournalEntry$view = function (model) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$h3,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Journal Entry')
-					])),
 				$author$project$Page$ViewJournalEntry$viewJournalEntry(model.journalEntry)
 			]));
 };
@@ -12721,7 +12888,7 @@ var $author$project$Main$getNavBar = A2(
 	$elm$html$Html$nav,
 	_List_fromArray(
 		[
-			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top')
+			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
 		]),
 	_List_fromArray(
 		[

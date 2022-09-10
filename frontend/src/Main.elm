@@ -169,7 +169,7 @@ view model =
 getNavBar : Html Msg
 getNavBar =
     nav
-        [ class "navbar navbar-expand-lg sticky-top"
+        [ class "navbar navbar-expand-lg sticky-top bg-light"
         ]
         [ div [ class "container-fluid" ]
             [ a [ href "/", class "navbar-brand" ]

@@ -73,8 +73,7 @@ createMorningJournalEntry journal =
 view : Model -> Html Msg
 view model =
     div []
-        [ h3 [] [ text "New Morning Journal Entry" ]
-        , newJournalEntryForm model
+        [ newJournalEntryForm model
         ]
 
 
@@ -107,11 +106,11 @@ newJournalEntryForm model =
                 [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]
             , div
                 [ class "input-group mb-3" ]
-                [ textarea [ cols 100, rows 10, placeholder "Amor Fati", value thoughts.value, onInput StoreAmorFatiThoughts ] []
+                [ textarea [ cols 100, rows 10, value thoughts.value, onInput StoreAmorFatiThoughts, style "width" "100%" ] []
                 ]
             ]
         , div [ class "row", id "premeditatio-malorum" ]
-            [ h2 [] [ text model.journal.content.premeditatioMalorum.title ]
+            [ h2 [ class "display-2" ] [ text model.journal.content.premeditatioMalorum.title ]
             , p [ class "lead" ] [ text "Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you" ]
             , label [ class "form-label" ]
                 [ text "What's a vice you think you might encounter today?" ]
@@ -124,7 +123,7 @@ newJournalEntryForm model =
                 [ text "How will you handle this vice?"
                 ]
             , div [ class "input-grouop mb-3" ]
-                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy ] []
+                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy, style "width" "100%" ] []
                 ]
             ]
         , br [] []
@@ -132,7 +131,6 @@ newJournalEntryForm model =
             [ button [ type_ "button", onClick CreateMorningJournalEntry, class "btn btn-primary" ] [ text "Save Journal Entry" ]
             , br [] []
             , br [] []
-            , buildErrorMessage model.createJournalEntryError
             ]
         ]
 
