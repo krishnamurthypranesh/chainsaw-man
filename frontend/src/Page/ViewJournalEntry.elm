@@ -101,7 +101,6 @@ viewFetchError err =
         , text ("Error: " ++ err)
         ]
 
-
 buildJournalEntryHtml : JournalEntry -> Html Msg
 buildJournalEntryHtml entry =
     div []
