@@ -21,6 +21,15 @@ type Msg
     | JournalEntriesReceived (WebData (List JournalEntry))
 
 
+type OutMsg
+    = OpenModal Modal
+    | CloseModal
+
+
+type Modal
+    = DummyModal
+
+
 init : ( Model, Cmd Msg )
 init =
     let
@@ -40,14 +49,14 @@ fetchJournalEntries input =
         }
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, OutMsg )
 update msg model =
     case msg of
         FetchJournalEntries ->
-            ( { model | journalEntries = RemoteData.Loading }, fetchJournalEntries model.input )
+            ( { model | journalEntries = RemoteData.Loading }, fetchJournalEntries model.input, CloseModal )
 
         JournalEntriesReceived response ->
-            ( { model | journalEntries = response }, Cmd.none )
+            ( { model | journalEntries = response }, Cmd.none, CloseModal )
 
 
 view : Model -> Html Msg
@@ -111,3 +120,8 @@ tableRowFromJournalEntry entry =
             [ a [ href ("/journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]
             ]
         ]
+
+
+viewModal : Model -> Html Msg
+viewModal model =
+    div [] []

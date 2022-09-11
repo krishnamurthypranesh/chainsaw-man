@@ -11154,10 +11154,15 @@ var $author$project$Page$ListJournalsEntries$init = function () {
 		$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
 }();
 var $author$project$Common$Toast$HideToast = {$: 'HideToast'};
+var $author$project$Common$JournalTheme$Model = F5(
+	function (theme, name, oneLineDesc, detailedDesc, accentColor) {
+		return {accentColor: accentColor, detailedDesc: detailedDesc, name: name, oneLineDesc: oneLineDesc, theme: theme};
+	});
 var $author$project$Common$Toast$Model = F3(
 	function (showToast, toastMessage, toastType) {
 		return {showToast: showToast, toastMessage: toastMessage, toastType: toastType};
 	});
+var $author$project$Common$JournalTheme$None = {$: 'None'};
 var $author$project$Common$Toast$None = {$: 'None'};
 var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	var journalId = $author$project$Common$JournalEntry$JournalId('');
@@ -11194,8 +11199,9 @@ var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 }();
 var $author$project$Page$NewJournalEntry$initialModel = function (navKey) {
 	var toast = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
+	var themeData = A5($author$project$Common$JournalTheme$Model, $author$project$Common$JournalTheme$None, '', '', '', '');
 	var journal = $author$project$Common$JournalEntry$emptyMorningJournal;
-	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, navKey: navKey, toastData: toast};
+	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, journalThemeData: themeData, navKey: navKey, toastData: toast};
 };
 var $author$project$Page$NewJournalEntry$init = function (navKey) {
 	return _Utils_Tuple2(
@@ -11571,6 +11577,7 @@ var $author$project$Route$parseUrl = function (url) {
 var $author$project$Main$init = F3(
 	function (flags, url, navKey) {
 		var model = {
+			modal: $elm$core$Maybe$Nothing,
 			navKey: navKey,
 			page: $author$project$Main$NotFoundPage,
 			route: $author$project$Route$parseUrl(url)
@@ -11626,23 +11633,27 @@ var $elm$url$Url$toString = function (url) {
 					_Utils_ap(http, url.host)),
 				url.path)));
 };
+var $author$project$Page$ListJournalsEntries$CloseModal = {$: 'CloseModal'};
 var $author$project$Page$ListJournalsEntries$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'FetchJournalEntries') {
-			return _Utils_Tuple2(
+			return _Utils_Tuple3(
 				_Utils_update(
 					model,
 					{journalEntries: $krisajenkins$remotedata$RemoteData$Loading}),
-				$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
+				$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input),
+				$author$project$Page$ListJournalsEntries$CloseModal);
 		} else {
 			var response = msg.a;
-			return _Utils_Tuple2(
+			return _Utils_Tuple3(
 				_Utils_update(
 					model,
 					{journalEntries: response}),
-				$elm$core$Platform$Cmd$none);
+				$elm$core$Platform$Cmd$none,
+				$author$project$Page$ListJournalsEntries$CloseModal);
 		}
 	});
+var $author$project$Page$NewJournalEntry$CloseModal = {$: 'CloseModal'};
 var $author$project$Common$Toast$Error = {$: 'Error'};
 var $author$project$Common$Toast$Info = {$: 'Info'};
 var $author$project$Logger$LevelError = {$: 'LevelError'};
@@ -11836,44 +11847,49 @@ var $author$project$Page$NewJournalEntry$update = F2(
 		switch (msg.$) {
 			case 'StoreAmorFatiThoughts':
 				var thoughts = msg.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{
 							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'amor_fati', 'thoughts', thoughts)
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
 			case 'StorePremeditatioMalorumVice':
 				var vice = msg.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{
 							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'premeditatio_malorum', 'vice', vice)
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
 			case 'StorePremeditatioMalorumStrategy':
 				var strategy = msg.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{
 							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'premeditatio_malorum', 'strategy', strategy)
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
 			case 'CreateMorningJournalEntry':
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					model,
-					$author$project$Page$NewJournalEntry$createMorningJournalEntry(model.journal));
+					$author$project$Page$NewJournalEntry$createMorningJournalEntry(model.journal),
+					$author$project$Page$NewJournalEntry$CloseModal);
 			case 'JournalEntryCreated':
 				if (msg.a.$ === 'Ok') {
 					var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$ShowToast, 'Entry created successfully', $author$project$Common$Toast$Info);
 					var cmd = A3($author$project$Page$NewJournalEntry$delay, model.toastData, 5000.0, $author$project$Common$Toast$ShowToast);
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						_Utils_update(
 							model,
 							{toastData: newToastData}),
-						cmd);
+						cmd,
+						$author$project$Page$NewJournalEntry$CloseModal);
 				} else {
 					var error = msg.a.a;
 					var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$ShowToast, 'Error occurred when creating entry', $author$project$Common$Toast$Error);
@@ -11882,30 +11898,34 @@ var $author$project$Page$NewJournalEntry$update = F2(
 						$author$project$Logger$logMessage,
 						$author$project$Error$errorFromHttpError(error),
 						$author$project$Logger$LevelError);
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						_Utils_update(
 							model,
 							{toastData: newToastData}),
-						cmd);
+						cmd,
+						$author$project$Page$NewJournalEntry$CloseModal);
 				}
 			default:
 				var toggle = msg.a;
 				var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{toastData: newToastData}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
 		}
 	});
+var $author$project$Page$ViewJournalEntry$CloseModal = {$: 'CloseModal'};
 var $author$project$Page$ViewJournalEntry$update = F2(
 	function (msg, model) {
 		var journalEntry = msg.a;
-		return _Utils_Tuple2(
+		return _Utils_Tuple3(
 			_Utils_update(
 				model,
 				{journalEntry: journalEntry}),
-			$elm$core$Platform$Cmd$none);
+			$elm$core$Platform$Cmd$none,
+			$author$project$Page$ViewJournalEntry$CloseModal);
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -11937,6 +11957,7 @@ var $author$project$Main$update = F2(
 						var _v2 = A2($author$project$Page$NewJournalEntry$update, subMsg, pageModel);
 						var updatedPageModel = _v2.a;
 						var updatedCmd = _v2.b;
+						var modalMsg = _v2.c;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -11993,6 +12014,339 @@ var $author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $author$project$Main$buildNavBar = A2(
+	$elm$html$Html$nav,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('container-fluid')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$href('/'),
+							$elm$html$Html$Attributes$class('navbar-brand')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Painted Porch')
+						])),
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('navbar-toggler'),
+							$elm$html$Html$Attributes$type_('button'),
+							A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+							A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-toggler-icon')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+							$elm$html$Html$Attributes$id('navbarNav')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$ul,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-nav')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
+													$elm$html$Html$Attributes$href('/')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Home')
+												]))
+										])),
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													$elm$html$Html$Attributes$href('/journals/new')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('New Journal Entry')
+												]))
+										])),
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('nav-link'),
+													$elm$html$Html$Attributes$href('/journals/entries')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('List Journal Entries')
+												]))
+										]))
+								]))
+						]))
+				]))
+		]));
+var $elm$core$Debug$todo = _Debug_todo;
+var $author$project$Page$ListJournalsEntries$viewModal = function (model) {
+	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+};
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $author$project$Page$NewJournalEntry$viewModal = function (model) {
+	var styleDisplayValue = function () {
+		var _v4 = model.journalThemeData.theme;
+		switch (_v4.$) {
+			case 'None':
+				return 'block';
+			case 'AmorFati':
+				return 'none';
+			default:
+				return 'none';
+		}
+	}();
+	var hideValue = function () {
+		var _v3 = model.journalThemeData.theme;
+		switch (_v3.$) {
+			case 'None':
+				return 'show';
+			case 'AmorFati':
+				return '';
+			default:
+				return '';
+		}
+	}();
+	var ariaAttributeName = function () {
+		var _v2 = model.journalThemeData.theme;
+		switch (_v2.$) {
+			case 'None':
+				return 'aria-modal';
+			case 'AmorFati':
+				return 'aria-hidden';
+			default:
+				return 'aria-hidden';
+		}
+	}();
+	var _v0 = function () {
+		var _v1 = model.journalThemeData.theme;
+		switch (_v1.$) {
+			case 'None':
+				return _Utils_Tuple2('role', 'dialog');
+			case 'AmorFati':
+				return _Utils_Tuple2('', '');
+			default:
+				return _Utils_Tuple2('', '');
+		}
+	}();
+	var roleAttributeName = _v0.a;
+	var roleAttributeValue = _v0.b;
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('modal fade'),
+				$elm$html$Html$Attributes$class(hideValue),
+				A2($elm$html$Html$Attributes$style, 'display', styleDisplayValue),
+				$elm$html$Html$Attributes$id('themeSelectModal'),
+				A2($elm$html$Html$Attributes$attribute, 'tabindex', '-1'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', 'themeSelectModalLabel'),
+				A2($elm$html$Html$Attributes$attribute, ariaAttributeName, 'true'),
+				A2($elm$html$Html$Attributes$attribute, roleAttributeName, roleAttributeValue)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-dialog')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-content')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-header')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$h5,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('modal-title'),
+												$elm$html$Html$Attributes$id('themeSelectModalLabel')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Select Your Journal\'s Theme')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Attributes$class('btn-close'),
+												A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Close')
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-body')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$p,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Choose your theme here')
+											]))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-footer')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Attributes$class('btn'),
+												$elm$html$Html$Attributes$class('btn-secondary'),
+												A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Close')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Attributes$class('btn'),
+												$elm$html$Html$Attributes$class('btn-primary')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Save Changes')
+											]))
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Page$ViewJournalEntry$viewModal = function (model) {
+	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+};
+var $author$project$Main$currentModal = function (model) {
+	var _v0 = model.page;
+	switch (_v0.$) {
+		case 'NotFoundPage':
+			return _Debug_todo(
+				'Main',
+				{
+					start: {line: 239, column: 13},
+					end: {line: 239, column: 23}
+				})('branch \'NotFoundPage\' not implemented');
+		case 'NewJournalEntryPage':
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$NewJournalEntryMsg,
+				$author$project$Page$NewJournalEntry$viewModal(pageModel));
+		case 'ListJournalsPage':
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$ListJournalsMsg,
+				$author$project$Page$ListJournalsEntries$viewModal(pageModel));
+		default:
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$ViewJournalEntryMsg,
+				$author$project$Page$ViewJournalEntry$viewModal(pageModel));
+	}
+};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$notFoundView = A2(
 	$elm$html$Html$h3,
@@ -12001,7 +12355,6 @@ var $author$project$Main$notFoundView = A2(
 		[
 			$elm$html$Html$text('Oops! The page you requested was not found!')
 		]));
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $author$project$Helpers$monthStringFromMonth = function (month) {
@@ -12572,14 +12925,21 @@ var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) {
 	var vice = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'vice');
 	var thoughts = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thoughts');
-	var thankYou = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thank_you');
 	var premeditatioMalorumStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'strategy');
+	var hideFormValue = function () {
+		var _v0 = model.journalThemeData.theme;
+		switch (_v0.$) {
+			case 'None':
+				return 'show';
+			case 'AmorFati':
+				return 'show';
+			default:
+				return 'show';
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('container')
-			]),
+		_List_Nil,
 		_List_fromArray(
 			[
 				$author$project$Page$NewJournalEntry$buildToastHtml(model.toastData),
@@ -12771,13 +13131,25 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 			]));
 };
 var $author$project$Page$NewJournalEntry$view = function (model) {
+	var formHtml = function () {
+		var _v0 = model.journalThemeData.theme;
+		switch (_v0.$) {
+			case 'None':
+				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
+			case 'AmorFati':
+				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
+			default:
+				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
 		_List_fromArray(
 			[
-				$author$project$Page$NewJournalEntry$newJournalEntryForm(model)
-			]));
+				$elm$html$Html$Attributes$class('container')
+			]),
+		_List_fromArray(
+			[formHtml]));
 };
 var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
@@ -13063,143 +13435,12 @@ var $author$project$Main$currentView = function (model) {
 				$author$project$Page$ViewJournalEntry$view(pageModel));
 	}
 };
-var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $author$project$Main$getNavBar = A2(
-	$elm$html$Html$nav,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('container-fluid')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$a,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$href('/'),
-							$elm$html$Html$Attributes$class('navbar-brand')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Painted Porch')
-						])),
-					A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('navbar-toggler'),
-							$elm$html$Html$Attributes$type_('button'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-toggler-icon')
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('collapse navbar-collapse'),
-							$elm$html$Html$Attributes$id('navbarNav')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$ul,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-nav')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
-													$elm$html$Html$Attributes$href('/')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Home')
-												]))
-										])),
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													$elm$html$Html$Attributes$href('/journals/new')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('New Journal Entry')
-												]))
-										])),
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													$elm$html$Html$Attributes$href('/journals/entries')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('List Journal Entries')
-												]))
-										]))
-								]))
-						]))
-				]))
-		]));
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				$author$project$Main$getNavBar,
+				$author$project$Main$buildNavBar,
+				$author$project$Main$currentModal(model),
 				$author$project$Main$currentView(model)
 			]),
 		title: 'Everyday Stoic Journal'

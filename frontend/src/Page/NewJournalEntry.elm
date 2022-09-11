@@ -41,20 +41,29 @@ type Msg
     | ToastVisibilityToggle Toast.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+type OutMsg
+    = OpenModal Modal
+    | CloseModal
+
+
+type Modal
+    = ThemeSelectModal
+
+
+update : Msg -> Model -> ( Model, Cmd Msg, OutMsg )
 update msg model =
     case msg of
         StoreAmorFatiThoughts thoughts ->
-            ( { model | journal = updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none, CloseModal )
 
         StorePremeditatioMalorumVice vice ->
-            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none, CloseModal )
 
         StorePremeditatioMalorumStrategy strategy ->
-            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none )
+            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none, CloseModal )
 
         CreateMorningJournalEntry ->
-            ( model, createMorningJournalEntry model.journal )
+            ( model, createMorningJournalEntry model.journal, CloseModal )
 
         JournalEntryCreated (Ok _) ->
             let
@@ -64,7 +73,7 @@ update msg model =
                 newToastData =
                     Toast.Model Toast.ShowToast "Entry created successfully" Toast.Info
             in
-            ( { model | toastData = newToastData }, cmd )
+            ( { model | toastData = newToastData }, cmd, CloseModal )
 
         JournalEntryCreated (Err error) ->
             let
@@ -78,14 +87,14 @@ update msg model =
                 cmd =
                     delay model.toastData 5000.0 Toast.ShowToast
             in
-            ( { model | toastData = newToastData }, cmd )
+            ( { model | toastData = newToastData }, cmd, CloseModal )
 
         ToastVisibilityToggle toggle ->
             let
                 newToastData =
                     Toast.Model Toast.HideToast "" Toast.None
             in
-            ( { model | toastData = newToastData }, Cmd.none )
+            ( { model | toastData = newToastData }, Cmd.none, CloseModal )
 
 
 createMorningJournalEntry : JournalEntry -> Cmd Msg
@@ -103,8 +112,20 @@ createMorningJournalEntry journal =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ newJournalEntryForm model
+    let
+        formHtml =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    newJournalEntryForm model
+
+                JournalTheme.AmorFati ->
+                    newJournalEntryForm model
+
+                JournalTheme.PremeditatioMalorum ->
+                    newJournalEntryForm model
+    in
+    div [ class "container" ]
+        [ formHtml
         ]
 
 
@@ -125,7 +146,7 @@ newJournalEntryForm model =
         premeditatioMalorumStrategy =
             JournalSection.getField model.journal.content.premeditatioMalorum "strategy"
     in
-    div [ class "container" ]
+    div []
         [ buildToastHtml model.toastData
         , div
             [ class "row", id "amor-fati" ]
@@ -246,6 +267,81 @@ buildToastHtml model =
         ]
 
 
+viewModal : Model -> Html Msg
+viewModal model =
+    let
+        hideValue =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    "show"
+
+                JournalTheme.AmorFati ->
+                    ""
+
+                JournalTheme.PremeditatioMalorum ->
+                    ""
+
+        ariaAttributeName =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    "aria-modal"
+
+                JournalTheme.AmorFati ->
+                    "aria-hidden"
+
+                JournalTheme.PremeditatioMalorum ->
+                    "aria-hidden"
+
+        styleDisplayValue =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    "block"
+
+                JournalTheme.AmorFati ->
+                    "none"
+
+                JournalTheme.PremeditatioMalorum ->
+                    "none"
+
+        ( roleAttributeName, roleAttributeValue ) =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    ( "role", "dialog" )
+
+                JournalTheme.AmorFati ->
+                    ( "", "" )
+
+                JournalTheme.PremeditatioMalorum ->
+                    ( "", "" )
+    in
+    div
+        [ class "modal fade"
+        , class hideValue
+        , style "display" styleDisplayValue
+        , id "themeSelectModal"
+        , attribute "tabindex" "-1"
+        , attribute "aria-labelledby" "themeSelectModalLabel"
+        , attribute ariaAttributeName "true"
+        , attribute roleAttributeName roleAttributeValue
+        ]
+        [ div [ class "modal-dialog" ]
+            [ div [ class "modal-content" ]
+                [ div [ class "modal-header" ]
+                    [ h5 [ class "modal-title", id "themeSelectModalLabel" ] [ text "Select Your Journal's Theme" ]
+                    , button [ type_ "button", class "btn-close", attribute "data-bs-dismiss" "modal", attribute "aria-label" "Close" ] []
+                    ]
+                , div [ class "modal-body" ]
+                    [ p [] [ text "Choose your theme here" ]
+                    ]
+                , div [ class "modal-footer" ]
+                    [ button [ type_ "button", class "btn", class "btn-secondary", attribute "data-bs-dismiss" "modal" ] [ text "Close" ]
+                    , button [ type_ "button", class "btn", class "btn-primary" ] [ text "Save Changes" ]
+                    ]
+                ]
+            ]
+        ]
+
+
 
 -- INIT
 
@@ -263,8 +359,11 @@ initialModel navKey =
 
         toast =
             Toast.Model Toast.HideToast "" Toast.None
+
+        themeData =
+            JournalTheme.Model JournalTheme.None "" "" "" ""
     in
-    { navKey = navKey, journal = journal, createJournalEntryError = Nothing, toastData = toast }
+    { navKey = navKey, journal = journal, createJournalEntryError = Nothing, toastData = toast, journalThemeData = themeData }
 
 
 delay : Toast.Model -> Float -> Toast.Msg -> Cmd Msg

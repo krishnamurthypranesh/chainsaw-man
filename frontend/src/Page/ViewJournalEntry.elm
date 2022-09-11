@@ -39,11 +39,20 @@ type Msg
     = JournalEntryReceived (WebData JournalEntry)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+type OutMsg
+    = OpenModal Modal
+    | CloseModal
+
+
+type Modal
+    = DummyModal
+
+
+update : Msg -> Model -> ( Model, Cmd Msg, OutMsg )
 update msg model =
     case msg of
         JournalEntryReceived journalEntry ->
-            ( { model | journalEntry = journalEntry }, Cmd.none )
+            ( { model | journalEntry = journalEntry }, Cmd.none, CloseModal )
 
 
 fetchJournalEntry : JournalId -> Cmd Msg
@@ -153,3 +162,8 @@ buildJournalEntryHtml entry =
                 ]
             ]
         ]
+
+
+viewModal : Model -> Html Msg
+viewModal model =
+    div [] []

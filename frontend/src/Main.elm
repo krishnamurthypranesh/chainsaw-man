@@ -31,6 +31,7 @@ type alias Model =
     { route : Route
     , page : Page
     , navKey : Nav.Key
+    , modal : Maybe Modal
     }
 
 
@@ -39,6 +40,12 @@ type Page
     | ListJournalsPage ListJournals.Model
     | NewJournalEntryPage NewJournalEntry.Model
     | ViewJournalEntryPage ViewJournalEntry.Model
+
+
+type Modal
+    = NewJournalEntryModal NewJournalEntry.Modal
+    | ListJouranlsModal ListJournals.Modal
+    | ViewJournalEntryModal ViewJournalEntry.Modal
 
 
 
@@ -50,7 +57,7 @@ init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     let
         model =
-            { route = Route.parseUrl url, page = NotFoundPage, navKey = navKey }
+            { route = Route.parseUrl url, page = NotFoundPage, navKey = navKey, modal = Nothing }
     in
     initCurrentPage ( model, Cmd.none )
 
@@ -106,7 +113,7 @@ update msg model =
     case ( msg, model.page ) of
         ( ListJournalsMsg subMsg, ListJournalsPage pageModel ) ->
             let
-                ( updatedPageModel, updatedCmd ) =
+                ( updatedPageModel, updatedCmd, _ ) =
                     ListJournals.update subMsg pageModel
             in
             ( { model | page = ListJournalsPage updatedPageModel }
@@ -115,7 +122,7 @@ update msg model =
 
         ( NewJournalEntryMsg subMsg, NewJournalEntryPage pageModel ) ->
             let
-                ( updatedPageModel, updatedCmd ) =
+                ( updatedPageModel, updatedCmd, modalMsg ) =
                     NewJournalEntry.update subMsg pageModel
             in
             ( { model | page = NewJournalEntryPage updatedPageModel }
@@ -124,7 +131,7 @@ update msg model =
 
         ( ViewJournalEntryMsg subMsg, ViewJournalEntryPage pageModel ) ->
             let
-                ( updatedPageModel, updatedCmd ) =
+                ( updatedPageModel, updatedCmd, _ ) =
                     ViewJournalEntry.update subMsg pageModel
             in
             ( { model | page = ViewJournalEntryPage updatedPageModel }
@@ -158,7 +165,11 @@ update msg model =
 view : Model -> Document Msg
 view model =
     { title = "Everyday Stoic Journal"
-    , body = [ getNavBar, currentView model ]
+    , body =
+        [ buildNavBar
+        , currentModal model
+        , currentView model
+        ]
     }
 
 
@@ -166,8 +177,8 @@ view model =
 -- add the common html code here
 
 
-getNavBar : Html Msg
-getNavBar =
+buildNavBar : Html Msg
+buildNavBar =
     nav
         [ class "navbar navbar-expand-lg sticky-top bg-light"
         ]
@@ -218,6 +229,25 @@ currentView model =
 
         ViewJournalEntryPage pageModel ->
             ViewJournalEntry.view pageModel
+                |> Html.map ViewJournalEntryMsg
+
+
+currentModal : Model -> Html Msg
+currentModal model =
+    case model.page of
+        NotFoundPage ->
+            Debug.todo "branch 'NotFoundPage' not implemented"
+
+        NewJournalEntryPage pageModel ->
+            NewJournalEntry.viewModal pageModel
+                |> Html.map NewJournalEntryMsg
+
+        ListJournalsPage pageModel ->
+            ListJournals.viewModal pageModel
+                |> Html.map ListJournalsMsg
+
+        ViewJournalEntryPage pageModel ->
+            ViewJournalEntry.viewModal pageModel
                 |> Html.map ViewJournalEntryMsg
 
 
