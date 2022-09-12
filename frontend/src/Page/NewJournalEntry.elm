@@ -1,8 +1,9 @@
-module Page.NewJournalEntry exposing (Model, Msg, init, update, view)
+module Page.NewJournalEntry exposing (Modal, Model, Msg, buildNavBar, init, update, view, viewModal)
 
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
+import Common.JournalTheme as JournalTheme
 import Common.Toast as Toast
 import Error exposing (errorFromHttpError)
 import Helpers exposing (stringFromMaybeString)
@@ -25,6 +26,7 @@ type alias Model =
     , journal : JournalEntry
     , createJournalEntryError : Maybe String
     , toastData : Toast.Model
+    , journalThemeData : JournalTheme.Model
     }
 
 
@@ -116,7 +118,7 @@ view model =
         formHtml =
             case model.journalThemeData.theme of
                 JournalTheme.None ->
-                    newJournalEntryForm model
+                    div [] []
 
                 JournalTheme.AmorFati ->
                     newJournalEntryForm model
@@ -132,10 +134,6 @@ view model =
 newJournalEntryForm : Model -> Html Msg
 newJournalEntryForm model =
     let
-        -- amor fati
-        thankYou =
-            JournalSection.getField model.journal.content.amorFati "thank_you"
-
         thoughts =
             JournalSection.getField model.journal.content.amorFati "thoughts"
 
@@ -145,8 +143,21 @@ newJournalEntryForm model =
 
         premeditatioMalorumStrategy =
             JournalSection.getField model.journal.content.premeditatioMalorum "strategy"
+
+        filterValue =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    "blur(2px)"
+
+                JournalTheme.AmorFati ->
+                    ""
+
+                JournalTheme.PremeditatioMalorum ->
+                    ""
     in
-    div []
+    div
+        [ style "filter" filterValue
+        ]
         [ buildToastHtml model.toastData
         , div
             [ class "row", id "amor-fati" ]
@@ -187,16 +198,6 @@ newJournalEntryForm model =
             , br [] []
             ]
         ]
-
-
-buildErrorMessage : Maybe String -> Html Msg
-buildErrorMessage error =
-    case error of
-        Nothing ->
-            div [ class "error-notifier alert alert-danger hidden" ] [ text "" ]
-
-        Just val ->
-            div [ class "alert alert-danger" ] [ text val ]
 
 
 buildToastHtml : Toast.Model -> Html Msg
@@ -327,15 +328,100 @@ viewModal model =
         [ div [ class "modal-dialog" ]
             [ div [ class "modal-content" ]
                 [ div [ class "modal-header" ]
-                    [ h5 [ class "modal-title", id "themeSelectModalLabel" ] [ text "Select Your Journal's Theme" ]
+                    [ h5 [ class "modal-title", class "text-center", id "themeSelectModalLabel" ] [ text "Choose Theme" ]
+
+                    -- add an onlick CloseModal event here
                     , button [ type_ "button", class "btn-close", attribute "data-bs-dismiss" "modal", attribute "aria-label" "Close" ] []
                     ]
+
+                -- use grids to center and align the content here as required
                 , div [ class "modal-body" ]
-                    [ p [] [ text "Choose your theme here" ]
+                    [ div [ class "row gy-4" ]
+                        [ div [ class "dropdown" ]
+                            [ button
+                                [ class "btn"
+                                , class "dropdown-toggle"
+                                , type_ "button"
+                                , attribute "data-bs-toggle" "dropdown"
+                                , attribute "aria-expanded" "false"
+                                , style "color" "#FF0000;"
+                                , style "border" "1px solid black"
+                                ]
+                                [ text "Choose your journal's theme"
+                                ]
+                            , ul [ class "dropdown-menu" ]
+                                [ li []
+                                    [ a [ class "dropdown-item", href "#", style "color" "maroon" ] [ text "Amor Fati - A love of Fate" ]
+                                    ]
+                                , li [] [ hr [ class "dropdown-divider" ] [] ]
+                                , li []
+                                    [ a [ class "dropdown-item", href "#", style "color" "green" ] [ text "Premeditatio Malorum - Foresight and resilience" ]
+                                    ]
+                                ]
+                            ]
+                        , p
+                            [ style "margin-bottom" "2px"
+                            ]
+                            [ text "Description goes here" ]
+                        ]
                     ]
-                , div [ class "modal-footer" ]
-                    [ button [ type_ "button", class "btn", class "btn-secondary", attribute "data-bs-dismiss" "modal" ] [ text "Close" ]
-                    , button [ type_ "button", class "btn", class "btn-primary" ] [ text "Save Changes" ]
+                , div [ class "modal-footer", style "justify-content" "space-between" ]
+                    [ button [ type_ "button", class "btn", class "btn-primary", attribute "data-bs-dismiss" "modal" ] [ text "Surprise Me!" ]
+                    , button [ type_ "button", class "btn", class "btn", style "background-color" "green" ] [ text "Start Journaling" ]
+                    ]
+                ]
+            ]
+        ]
+
+
+buildNavBar : Model -> Html Msg
+buildNavBar model =
+    let
+        ( styleFilter, styleFilterValue ) =
+            case model.journalThemeData.theme of
+                JournalTheme.None ->
+                    ( "filter", "blur(2px)" )
+
+                JournalTheme.AmorFati ->
+                    ( "", "" )
+
+                JournalTheme.PremeditatioMalorum ->
+                    ( "", "" )
+    in
+    nav
+        [ class "navbar navbar-expand-lg sticky-top bg-light"
+        , style styleFilter styleFilterValue
+        ]
+        [ div [ class "container-fluid" ]
+            [ a [ href "/", class "navbar-brand" ]
+                [ text "Painted Porch" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarNav"
+                , attribute "aria-controls" "navbarNav"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span [ class "navbar-toggler-icon" ] []
+                ]
+            , div [ class "collapse navbar-collapse", id "navbarNav" ]
+                [ ul [ class "navbar-nav" ]
+                    [ li [ class "nav-item" ]
+                        [ a [ class "nav-link", attribute "aria-current" "page", href "/" ] [ text "Home" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a
+                            [ class "nav-link"
+                            , href "/journals/new"
+                            , class "active"
+                            ]
+                            [ text "New Journal Entry" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/entries" ] [ text "List Journal Entries" ]
+                        ]
                     ]
                 ]
             ]

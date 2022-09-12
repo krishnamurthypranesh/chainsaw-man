@@ -4,7 +4,7 @@ import Common.JournalEntry exposing (JournalEntry, ListJournalEntriesInput, idTo
 import Error exposing (errorFromHttpError)
 import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, href, scope)
+import Html.Attributes exposing (attribute, class, href, id, scope, type_)
 import Http exposing (get)
 import RemoteData exposing (WebData)
 import Time exposing (millisToPosix)
@@ -125,3 +125,39 @@ tableRowFromJournalEntry entry =
 viewModal : Model -> Html Msg
 viewModal model =
     div [] []
+
+
+buildNavBar : Model -> Html Msg
+buildNavBar model =
+    nav
+        [ class "navbar navbar-expand-lg sticky-top bg-light"
+        ]
+        [ div [ class "container-fluid" ]
+            [ a [ href "/", class "navbar-brand" ]
+                [ text "Painted Porch" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarNav"
+                , attribute "aria-controls" "navbarNav"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span [ class "navbar-toggler-icon" ] []
+                ]
+            , div [ class "collapse navbar-collapse", id "navbarNav" ]
+                [ ul [ class "navbar-nav" ]
+                    [ li [ class "nav-item" ]
+                        [ a [ class "nav-link", attribute "aria-current" "page", href "/" ] [ text "Home" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/new" ] [ text "New Journal Entry" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/entries" ] [ text "List Journal Entries" ]
+                        ]
+                    ]
+                ]
+            ]
+        ]

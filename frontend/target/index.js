@@ -12014,144 +12014,13 @@ var $author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $author$project$Main$buildNavBar = A2(
-	$elm$html$Html$nav,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('container-fluid')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$a,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$href('/'),
-							$elm$html$Html$Attributes$class('navbar-brand')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Painted Porch')
-						])),
-					A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('navbar-toggler'),
-							$elm$html$Html$Attributes$type_('button'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-toggler-icon')
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('collapse navbar-collapse'),
-							$elm$html$Html$Attributes$id('navbarNav')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$ul,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-nav')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
-													$elm$html$Html$Attributes$href('/')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Home')
-												]))
-										])),
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													$elm$html$Html$Attributes$href('/journals/new')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('New Journal Entry')
-												]))
-										])),
-									A2(
-									$elm$html$Html$li,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav-item')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('nav-link'),
-													$elm$html$Html$Attributes$href('/journals/entries')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('List Journal Entries')
-												]))
-										]))
-								]))
-						]))
-				]))
-		]));
 var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Page$ListJournalsEntries$viewModal = function (model) {
 	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 	var styleDisplayValue = function () {
 		var _v4 = model.journalThemeData.theme;
@@ -12243,11 +12112,12 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('modal-title'),
+												$elm$html$Html$Attributes$class('text-center'),
 												$elm$html$Html$Attributes$id('themeSelectModalLabel')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Select Your Journal\'s Theme')
+												$elm$html$Html$text('Choose Theme')
 											])),
 										A2(
 										$elm$html$Html$button,
@@ -12269,18 +12139,114 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$p,
-										_List_Nil,
+										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Choose your theme here')
+												$elm$html$Html$Attributes$class('row gy-4')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('dropdown')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$button,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('btn'),
+																$elm$html$Html$Attributes$class('dropdown-toggle'),
+																$elm$html$Html$Attributes$type_('button'),
+																A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+																A2($elm$html$Html$Attributes$style, 'color', '#FF0000;'),
+																A2($elm$html$Html$Attributes$style, 'border', '1px solid black')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Choose your journal\'s theme')
+															])),
+														A2(
+														$elm$html$Html$ul,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('dropdown-menu')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$li,
+																_List_Nil,
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$a,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('dropdown-item'),
+																				$elm$html$Html$Attributes$href('#'),
+																				A2($elm$html$Html$Attributes$style, 'color', 'maroon')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Amor Fati - A love of Fate')
+																			]))
+																	])),
+																A2(
+																$elm$html$Html$li,
+																_List_Nil,
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$hr,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('dropdown-divider')
+																			]),
+																		_List_Nil)
+																	])),
+																A2(
+																$elm$html$Html$li,
+																_List_Nil,
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$a,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('dropdown-item'),
+																				$elm$html$Html$Attributes$href('#'),
+																				A2($elm$html$Html$Attributes$style, 'color', 'green')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Premeditatio Malorum - Foresight and resilience')
+																			]))
+																	]))
+															]))
+													])),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Description goes here')
+													]))
 											]))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('modal-footer')
+										$elm$html$Html$Attributes$class('modal-footer'),
+										A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between')
 									]),
 								_List_fromArray(
 									[
@@ -12290,12 +12256,12 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 											[
 												$elm$html$Html$Attributes$type_('button'),
 												$elm$html$Html$Attributes$class('btn'),
-												$elm$html$Html$Attributes$class('btn-secondary'),
+												$elm$html$Html$Attributes$class('btn-primary'),
 												A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Close')
+												$elm$html$Html$text('Surprise Me!')
 											])),
 										A2(
 										$elm$html$Html$button,
@@ -12303,11 +12269,12 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 											[
 												$elm$html$Html$Attributes$type_('button'),
 												$elm$html$Html$Attributes$class('btn'),
-												$elm$html$Html$Attributes$class('btn-primary')
+												$elm$html$Html$Attributes$class('btn'),
+												A2($elm$html$Html$Attributes$style, 'background-color', 'green')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Save Changes')
+												$elm$html$Html$text('Start Journaling')
 											]))
 									]))
 							]))
@@ -12324,8 +12291,8 @@ var $author$project$Main$currentModal = function (model) {
 			return _Debug_todo(
 				'Main',
 				{
-					start: {line: 239, column: 13},
-					end: {line: 239, column: 23}
+					start: {line: 222, column: 13},
+					end: {line: 222, column: 23}
 				})('branch \'NotFoundPage\' not implemented');
 		case 'NewJournalEntryPage':
 			var pageModel = _v0.a;
@@ -12347,6 +12314,421 @@ var $author$project$Main$currentModal = function (model) {
 				$author$project$Page$ViewJournalEntry$viewModal(pageModel));
 	}
 };
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $author$project$Page$ListJournalsEntries$buildNavBar = function (model) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container-fluid')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/'),
+								$elm$html$Html$Attributes$class('navbar-brand')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Painted Porch')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-toggler'),
+								$elm$html$Html$Attributes$type_('button'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-toggler-icon')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+								$elm$html$Html$Attributes$id('navbarNav')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$ul,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-nav')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
+														$elm$html$Html$Attributes$href('/')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Home')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/new')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('New Journal Entry')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/entries')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('List Journal Entries')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
+	var _v0 = function () {
+		var _v1 = model.journalThemeData.theme;
+		switch (_v1.$) {
+			case 'None':
+				return _Utils_Tuple2('filter', 'blur(2px)');
+			case 'AmorFati':
+				return _Utils_Tuple2('', '');
+			default:
+				return _Utils_Tuple2('', '');
+		}
+	}();
+	var styleFilter = _v0.a;
+	var styleFilterValue = _v0.b;
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light'),
+				A2($elm$html$Html$Attributes$style, styleFilter, styleFilterValue)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container-fluid')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/'),
+								$elm$html$Html$Attributes$class('navbar-brand')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Painted Porch')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-toggler'),
+								$elm$html$Html$Attributes$type_('button'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-toggler-icon')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+								$elm$html$Html$Attributes$id('navbarNav')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$ul,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-nav')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
+														$elm$html$Html$Attributes$href('/')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Home')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/new'),
+														$elm$html$Html$Attributes$class('active')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('New Journal Entry')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/entries')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('List Journal Entries')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Page$ViewJournalEntry$buildNavBar = function (model) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container-fluid')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/'),
+								$elm$html$Html$Attributes$class('navbar-brand')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Painted Porch')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-toggler'),
+								$elm$html$Html$Attributes$type_('button'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarNav'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-toggler-icon')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+								$elm$html$Html$Attributes$id('navbarNav')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$ul,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-nav')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
+														$elm$html$Html$Attributes$href('/')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Home')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/new')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('New Journal Entry')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('nav-link'),
+														$elm$html$Html$Attributes$href('/journals/entries')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('List Journal Entries')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$notFoundView = A2(
 	$elm$html$Html$h3,
@@ -12355,6 +12737,31 @@ var $author$project$Main$notFoundView = A2(
 		[
 			$elm$html$Html$text('Oops! The page you requested was not found!')
 		]));
+var $author$project$Main$currentNavBar = function (model) {
+	var _v0 = model.page;
+	switch (_v0.$) {
+		case 'NotFoundPage':
+			return $author$project$Main$notFoundView;
+		case 'ListJournalsPage':
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$ListJournalsMsg,
+				$author$project$Page$ListJournalsEntries$buildNavBar(pageModel));
+		case 'NewJournalEntryPage':
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$NewJournalEntryMsg,
+				$author$project$Page$NewJournalEntry$buildNavBar(pageModel));
+		default:
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$ViewJournalEntryMsg,
+				$author$project$Page$ViewJournalEntry$buildNavBar(pageModel));
+	}
+};
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $author$project$Helpers$monthStringFromMonth = function (month) {
@@ -12926,20 +13333,23 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 	var vice = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'vice');
 	var thoughts = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thoughts');
 	var premeditatioMalorumStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'strategy');
-	var hideFormValue = function () {
+	var filterValue = function () {
 		var _v0 = model.journalThemeData.theme;
 		switch (_v0.$) {
 			case 'None':
-				return 'show';
+				return 'blur(2px)';
 			case 'AmorFati':
-				return 'show';
+				return '';
 			default:
-				return 'show';
+				return '';
 		}
 	}();
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'filter', filterValue)
+			]),
 		_List_fromArray(
 			[
 				$author$project$Page$NewJournalEntry$buildToastHtml(model.toastData),
@@ -13135,7 +13545,7 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 		var _v0 = model.journalThemeData.theme;
 		switch (_v0.$) {
 			case 'None':
-				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
+				return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 			case 'AmorFati':
 				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
 			default:
@@ -13151,7 +13561,6 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 		_List_fromArray(
 			[formHtml]));
 };
-var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
 	return A2(
 		$elm$html$Html$div,
@@ -13439,11 +13848,11 @@ var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				$author$project$Main$buildNavBar,
+				$author$project$Main$currentNavBar(model),
 				$author$project$Main$currentModal(model),
 				$author$project$Main$currentView(model)
 			]),
-		title: 'Everyday Stoic Journal'
+		title: 'Pained Porch'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
