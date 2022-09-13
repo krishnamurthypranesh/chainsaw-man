@@ -10759,12 +10759,16 @@ var $author$project$Main$ListJournalsMsg = function (a) {
 var $author$project$Main$ListJournalsPage = function (a) {
 	return {$: 'ListJournalsPage', a: a};
 };
+var $author$project$Main$NewJournalEntryModal = function (a) {
+	return {$: 'NewJournalEntryModal', a: a};
+};
 var $author$project$Main$NewJournalEntryMsg = function (a) {
 	return {$: 'NewJournalEntryMsg', a: a};
 };
 var $author$project$Main$NewJournalEntryPage = function (a) {
 	return {$: 'NewJournalEntryPage', a: a};
 };
+var $author$project$Page$NewJournalEntry$ThemeSelectModal = {$: 'ThemeSelectModal'};
 var $author$project$Main$ViewJournalEntryMsg = function (a) {
 	return {$: 'ViewJournalEntryMsg', a: a};
 };
@@ -11153,16 +11157,127 @@ var $author$project$Page$ListJournalsEntries$init = function () {
 		model,
 		$author$project$Page$ListJournalsEntries$fetchJournalEntries(model.input));
 }();
-var $author$project$Common$Toast$HideToast = {$: 'HideToast'};
-var $author$project$Common$JournalTheme$Model = F5(
+var $author$project$Page$NewJournalEntry$OpenModal = function (a) {
+	return {$: 'OpenModal', a: a};
+};
+var $author$project$Page$NewJournalEntry$JournalThemesReceived = function (a) {
+	return {$: 'JournalThemesReceived', a: a};
+};
+var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $elm$http$Http$get = function (r) {
+	return $elm$http$Http$request(
+		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $author$project$Common$JournalTheme$JournalTheme = F5(
 	function (theme, name, oneLineDesc, detailedDesc, accentColor) {
 		return {accentColor: accentColor, detailedDesc: detailedDesc, name: name, oneLineDesc: oneLineDesc, theme: theme};
 	});
+var $author$project$Common$JournalTheme$None = {$: 'None'};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
+	function (path, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return $elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						decoder,
+						$elm$json$Json$Decode$null(fallback)
+					]));
+		};
+		var handleResult = function (input) {
+			var _v0 = A2(
+				$elm$json$Json$Decode$decodeValue,
+				A2($elm$json$Json$Decode$at, path, $elm$json$Json$Decode$value),
+				input);
+			if (_v0.$ === 'Ok') {
+				var rawValue = _v0.a;
+				var _v1 = A2(
+					$elm$json$Json$Decode$decodeValue,
+					nullOr(valDecoder),
+					rawValue);
+				if (_v1.$ === 'Ok') {
+					var finalResult = _v1.a;
+					return $elm$json$Json$Decode$succeed(finalResult);
+				} else {
+					return A2(
+						$elm$json$Json$Decode$at,
+						path,
+						nullOr(valDecoder));
+				}
+			} else {
+				return $elm$json$Json$Decode$succeed(fallback);
+			}
+		};
+		return A2($elm$json$Json$Decode$andThen, handleResult, $elm$json$Json$Decode$value);
+	});
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder,
+				_List_fromArray(
+					[key]),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var $author$project$Common$JournalTheme$AmorFati = {$: 'AmorFati'};
+var $author$project$Common$JournalTheme$PremeditatioMalorum = {$: 'PremeditatioMalorum'};
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$core$String$toLower = _String_toLower;
+var $author$project$Common$JournalTheme$themeValueFromString = function (theme) {
+	var _v0 = $elm$core$String$toLower(theme);
+	switch (_v0) {
+		case 'amor fati':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$AmorFati);
+		case 'premeditatio malorum':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$PremeditatioMalorum);
+		case '':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$None);
+		default:
+			return $elm$json$Json$Decode$fail('invalid journal theme: ' + theme);
+	}
+};
+var $author$project$Common$JournalTheme$themeValueDecoder = A2($elm$json$Json$Decode$andThen, $author$project$Common$JournalTheme$themeValueFromString, $elm$json$Json$Decode$string);
+var $author$project$Common$JournalTheme$journalThemeDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'accent_color',
+	$elm$json$Json$Decode$string,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'detailed_description',
+		$elm$json$Json$Decode$string,
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'short_description',
+			$elm$json$Json$Decode$string,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'name',
+				$elm$json$Json$Decode$string,
+				A4(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
+					'theme',
+					$author$project$Common$JournalTheme$themeValueDecoder,
+					$author$project$Common$JournalTheme$None,
+					$elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$JournalTheme))))));
+var $author$project$Common$JournalTheme$journalThemeListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalTheme$journalThemeDecoder);
+var $author$project$Page$NewJournalEntry$fetchJournalThemes = $elm$http$Http$get(
+	{
+		expect: A2(
+			$elm$http$Http$expectJson,
+			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$NewJournalEntry$JournalThemesReceived),
+			$author$project$Common$JournalTheme$journalThemeListDecoder),
+		url: 'http://localhost:8080/journals/themes/'
+	});
+var $author$project$Common$Toast$HideToast = {$: 'HideToast'};
 var $author$project$Common$Toast$Model = F3(
 	function (showToast, toastMessage, toastType) {
 		return {showToast: showToast, toastMessage: toastMessage, toastType: toastType};
 	});
-var $author$project$Common$JournalTheme$None = {$: 'None'};
 var $author$project$Common$Toast$None = {$: 'None'};
 var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	var journalId = $author$project$Common$JournalEntry$JournalId('');
@@ -11199,22 +11314,18 @@ var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 }();
 var $author$project$Page$NewJournalEntry$initialModel = function (navKey) {
 	var toast = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
-	var themeData = A5($author$project$Common$JournalTheme$Model, $author$project$Common$JournalTheme$None, '', '', '', '');
+	var themeData = A5($author$project$Common$JournalTheme$JournalTheme, $author$project$Common$JournalTheme$None, '', '', '', '');
 	var journal = $author$project$Common$JournalEntry$emptyMorningJournal;
-	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, journalThemeData: themeData, navKey: navKey, toastData: toast};
+	return {createJournalEntryError: $elm$core$Maybe$Nothing, journal: journal, journalThemesList: $krisajenkins$remotedata$RemoteData$Loading, journalingStarted: false, navKey: navKey, selectedJournalTheme: themeData, toastData: toast};
 };
 var $author$project$Page$NewJournalEntry$init = function (navKey) {
-	return _Utils_Tuple2(
+	return _Utils_Tuple3(
 		$author$project$Page$NewJournalEntry$initialModel(navKey),
-		$elm$core$Platform$Cmd$none);
+		$author$project$Page$NewJournalEntry$fetchJournalThemes,
+		$author$project$Page$NewJournalEntry$OpenModal);
 };
 var $author$project$Page$ViewJournalEntry$JournalEntryReceived = function (a) {
 	return {$: 'JournalEntryReceived', a: a};
-};
-var $elm$http$Http$emptyBody = _Http_emptyBody;
-var $elm$http$Http$get = function (r) {
-	return $elm$http$Http$request(
-		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
 var $author$project$Common$JournalEntry$idToString = function (jId) {
 	var id = jId.a;
@@ -11246,37 +11357,51 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 		var _v2 = model.route;
 		switch (_v2.$) {
 			case 'NotFound':
-				return _Utils_Tuple2($author$project$Main$NotFoundPage, $elm$core$Platform$Cmd$none);
+				return _Utils_Tuple3($author$project$Main$NotFoundPage, $elm$core$Platform$Cmd$none, $elm$core$Maybe$Nothing);
 			case 'ListJournalEntries':
 				var _v3 = $author$project$Page$ListJournalsEntries$init;
 				var pageModel = _v3.a;
 				var pageCmds = _v3.b;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					$author$project$Main$ListJournalsPage(pageModel),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$ListJournalsMsg, pageCmds));
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$ListJournalsMsg, pageCmds),
+					$elm$core$Maybe$Nothing);
 			case 'NewJournalEntry':
 				var _v4 = $author$project$Page$NewJournalEntry$init(model.navKey);
 				var pageModel = _v4.a;
 				var pageCmds = _v4.b;
-				return _Utils_Tuple2(
+				var modalMsg = _v4.c;
+				var pageModalValue = function () {
+					var _v5 = modalMsg($author$project$Page$NewJournalEntry$ThemeSelectModal);
+					if (_v5.$ === 'OpenModal') {
+						return $elm$core$Maybe$Just(
+							$author$project$Main$NewJournalEntryModal($author$project$Page$NewJournalEntry$ThemeSelectModal));
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}();
+				return _Utils_Tuple3(
 					$author$project$Main$NewJournalEntryPage(pageModel),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewJournalEntryMsg, pageCmds));
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewJournalEntryMsg, pageCmds),
+					pageModalValue);
 			default:
 				var journalId = _v2.a;
-				var _v5 = A2($author$project$Page$ViewJournalEntry$init, journalId, model.navKey);
-				var pageModel = _v5.a;
-				var pageCmds = _v5.b;
-				return _Utils_Tuple2(
+				var _v6 = A2($author$project$Page$ViewJournalEntry$init, journalId, model.navKey);
+				var pageModel = _v6.a;
+				var pageCmds = _v6.b;
+				return _Utils_Tuple3(
 					$author$project$Main$ViewJournalEntryPage(pageModel),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewJournalEntryMsg, pageCmds));
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewJournalEntryMsg, pageCmds),
+					$elm$core$Maybe$Nothing);
 		}
 	}();
 	var currentPage = _v1.a;
 	var mappedPageCmds = _v1.b;
+	var modalValue = _v1.c;
 	return _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{page: currentPage}),
+			{modal: modalValue, page: currentPage}),
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[existingCmds, mappedPageCmds])));
@@ -11653,7 +11778,9 @@ var $author$project$Page$ListJournalsEntries$update = F2(
 				$author$project$Page$ListJournalsEntries$CloseModal);
 		}
 	});
-var $author$project$Page$NewJournalEntry$CloseModal = {$: 'CloseModal'};
+var $author$project$Page$NewJournalEntry$CloseModal = function (a) {
+	return {$: 'CloseModal', a: a};
+};
 var $author$project$Common$Toast$Error = {$: 'Error'};
 var $author$project$Common$Toast$Info = {$: 'Info'};
 var $author$project$Logger$LevelError = {$: 'LevelError'};
@@ -11762,6 +11889,26 @@ var $author$project$Error$errorFromHttpError = function (err) {
 			return 'An invalid url was used to make the request';
 	}
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Debug$log = _Debug_log;
 var $author$project$Logger$logMessage = F2(
 	function (msg, level) {
@@ -11778,6 +11925,16 @@ var $author$project$Logger$logMessage = F2(
 		var _v0 = A2($elm$core$Debug$log, levelValue, msg);
 		return $elm$core$Maybe$Nothing;
 	});
+var $author$project$Common$JournalTheme$themeValueToString = function (theme) {
+	switch (theme.$) {
+		case 'AmorFati':
+			return 'AmorFati';
+		case 'PremeditatioMalorum':
+			return 'PremeditatioMalorum';
+		default:
+			return '';
+	}
+};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -11875,6 +12032,21 @@ var $author$project$Page$NewJournalEntry$update = F2(
 						}),
 					$elm$core$Platform$Cmd$none,
 					$author$project$Page$NewJournalEntry$CloseModal);
+			case 'FetchJournalThemes':
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{journalThemesList: $krisajenkins$remotedata$RemoteData$Loading}),
+					$author$project$Page$NewJournalEntry$fetchJournalThemes,
+					$author$project$Page$NewJournalEntry$OpenModal);
+			case 'JournalThemesReceived':
+				var themes = msg.a;
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{journalThemesList: themes}),
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$OpenModal);
 			case 'CreateMorningJournalEntry':
 				return _Utils_Tuple3(
 					model,
@@ -11905,6 +12077,48 @@ var $author$project$Page$NewJournalEntry$update = F2(
 						cmd,
 						$author$project$Page$NewJournalEntry$CloseModal);
 				}
+			case 'JournalThemeSelected':
+				var theme = msg.a;
+				var themesList = function () {
+					var _v6 = model.journalThemesList;
+					if (_v6.$ === 'Success') {
+						var ts = _v6.a;
+						return ts;
+					} else {
+						return _List_Nil;
+					}
+				}();
+				var isSelectedTheme = function (t) {
+					return _Utils_eq(
+						$author$project$Common$JournalTheme$themeValueToString(theme),
+						$author$project$Common$JournalTheme$themeValueToString(t.theme)) ? true : false;
+				};
+				var maybeSelectedTheme = $elm$core$List$head(
+					A2($elm$core$List$filter, isSelectedTheme, themesList));
+				var selectedTheme = function () {
+					if (maybeSelectedTheme.$ === 'Just') {
+						var t = maybeSelectedTheme.a;
+						return t;
+					} else {
+						return A5($author$project$Common$JournalTheme$JournalTheme, $author$project$Common$JournalTheme$None, '', '', '', '');
+					}
+				}();
+				var _v2 = A2($elm$core$Debug$log, 'themes list', themesList);
+				var _v3 = A2($elm$core$Debug$log, 'maybe selected theme', maybeSelectedTheme);
+				var _v4 = A2($elm$core$Debug$log, 'selected theme', selectedTheme);
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{selectedJournalTheme: selectedTheme}),
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$OpenModal);
+			case 'StartJournaling':
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{journalingStarted: true}),
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
 			default:
 				var toggle = msg.a;
 				var newToastData = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
@@ -11958,10 +12172,20 @@ var $author$project$Main$update = F2(
 						var updatedPageModel = _v2.a;
 						var updatedCmd = _v2.b;
 						var modalMsg = _v2.c;
+						var modalValue = function () {
+							var _v3 = modalMsg($author$project$Page$NewJournalEntry$ThemeSelectModal);
+							if (_v3.$ === 'OpenModal') {
+								return $elm$core$Maybe$Just(
+									$author$project$Main$NewJournalEntryModal($author$project$Page$NewJournalEntry$ThemeSelectModal));
+							} else {
+								return $elm$core$Maybe$Nothing;
+							}
+						}();
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
+									modal: modalValue,
 									page: $author$project$Main$NewJournalEntryPage(updatedPageModel)
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewJournalEntryMsg, updatedCmd));
@@ -11972,9 +12196,9 @@ var $author$project$Main$update = F2(
 					if (_v0.b.$ === 'ViewJournalEntryPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
-						var _v3 = A2($author$project$Page$ViewJournalEntry$update, subMsg, pageModel);
-						var updatedPageModel = _v3.a;
-						var updatedCmd = _v3.b;
+						var _v4 = A2($author$project$Page$ViewJournalEntry$update, subMsg, pageModel);
+						var updatedPageModel = _v4.a;
+						var updatedCmd = _v4.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -11989,12 +12213,22 @@ var $author$project$Main$update = F2(
 					var urlRequest = _v0.a.a;
 					if (urlRequest.$ === 'Internal') {
 						var url = urlRequest.a;
-						return _Utils_Tuple2(
-							model,
-							A2(
-								$elm$browser$Browser$Navigation$pushUrl,
-								model.navKey,
-								$elm$url$Url$toString(url)));
+						var cmd = function () {
+							var _v6 = url.fragment;
+							if (_v6.$ === 'Just') {
+								var v = _v6.a;
+								return (v === '') ? $elm$core$Platform$Cmd$none : A2(
+									$elm$browser$Browser$Navigation$pushUrl,
+									model.navKey,
+									$elm$url$Url$toString(url));
+							} else {
+								return A2(
+									$elm$browser$Browser$Navigation$pushUrl,
+									model.navKey,
+									$elm$url$Url$toString(url));
+							}
+						}();
+						return _Utils_Tuple2(model, cmd);
 					} else {
 						var url = urlRequest.a;
 						return _Utils_Tuple2(
@@ -12019,75 +12253,177 @@ var $author$project$Page$ListJournalsEntries$viewModal = function (model) {
 	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$html$Html$h5 = _VirtualDom_node('h5');
-var $elm$html$Html$hr = _VirtualDom_node('hr');
-var $author$project$Page$NewJournalEntry$viewModal = function (model) {
-	var styleDisplayValue = function () {
-		var _v4 = model.journalThemeData.theme;
-		switch (_v4.$) {
-			case 'None':
-				return 'block';
-			case 'AmorFati':
-				return 'none';
-			default:
-				return 'none';
-		}
-	}();
-	var hideValue = function () {
-		var _v3 = model.journalThemeData.theme;
-		switch (_v3.$) {
-			case 'None':
-				return 'show';
-			case 'AmorFati':
-				return '';
-			default:
-				return '';
-		}
-	}();
-	var ariaAttributeName = function () {
-		var _v2 = model.journalThemeData.theme;
-		switch (_v2.$) {
-			case 'None':
-				return 'aria-modal';
-			case 'AmorFati':
-				return 'aria-hidden';
-			default:
-				return 'aria-hidden';
-		}
-	}();
-	var _v0 = function () {
-		var _v1 = model.journalThemeData.theme;
-		switch (_v1.$) {
-			case 'None':
-				return _Utils_Tuple2('role', 'dialog');
-			case 'AmorFati':
-				return _Utils_Tuple2('', '');
-			default:
-				return _Utils_Tuple2('', '');
-		}
-	}();
+var $author$project$Page$NewJournalEntry$JournalThemeSelected = function (a) {
+	return {$: 'JournalThemeSelected', a: a};
+};
+var $author$project$Page$NewJournalEntry$buildOptionFromJournalTheme = function (theme) {
+	return A2(
+		$elm$html$Html$li,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('dropdown-item'),
+						$elm$html$Html$Attributes$href('#'),
+						A2($elm$html$Html$Attributes$style, 'color', theme.accentColor),
+						$elm$html$Html$Events$onClick(
+						$author$project$Page$NewJournalEntry$JournalThemeSelected(theme.theme))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(theme.name + (' - ' + theme.oneLineDesc))
+					]))
+			]));
+};
+var $author$project$Page$NewJournalEntry$buildDropDownOptionsFromJournalThemeList = function (themes) {
+	return A2($elm$core$List$map, $author$project$Page$NewJournalEntry$buildOptionFromJournalTheme, themes);
+};
+var $author$project$Page$NewJournalEntry$ModalOptions = F5(
+	function (hideValue, ariaAttributeName, styleDisplayValue, roleAttributeName, roleAttributeValue) {
+		return {ariaAttributeName: ariaAttributeName, hideValue: hideValue, roleAttributeName: roleAttributeName, roleAttributeValue: roleAttributeValue, styleDisplayValue: styleDisplayValue};
+	});
+var $author$project$Page$NewJournalEntry$getModalOpts = function (theme) {
+	var styleDisplayValue = 'block';
+	var options = A5($author$project$Page$NewJournalEntry$ModalOptions, '', '', '', '', '');
+	var hideValue = 'show';
+	var ariaAttributeName = 'aria-modal';
+	var _v0 = _Utils_Tuple2('role', 'dialog');
 	var roleAttributeName = _v0.a;
 	var roleAttributeValue = _v0.b;
+	return _Utils_update(
+		options,
+		{ariaAttributeName: ariaAttributeName, hideValue: hideValue, roleAttributeName: roleAttributeName, roleAttributeValue: roleAttributeValue, styleDisplayValue: styleDisplayValue});
+};
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $author$project$Page$NewJournalEntry$StartJournaling = {$: 'StartJournaling'};
+var $author$project$Page$NewJournalEntry$viewModalFooter = function (theme) {
+	var buttonColor = function () {
+		var _v2 = theme.theme;
+		if (_v2.$ === 'None') {
+			return 'ghostwhite';
+		} else {
+			return theme.accentColor;
+		}
+	}();
+	var baseAttrList = _List_fromArray(
+		[
+			$elm$html$Html$Attributes$type_('button'),
+			$elm$html$Html$Attributes$class('btn'),
+			$elm$html$Html$Events$onClick($author$project$Page$NewJournalEntry$StartJournaling)
+		]);
+	var withButtonColor = A2(
+		$elm$core$List$cons,
+		A2($elm$html$Html$Attributes$style, 'background-color', buttonColor),
+		baseAttrList);
+	var withButtonTextStyle = function () {
+		var _v1 = theme.theme;
+		if (_v1.$ === 'None') {
+			return A2(
+				$elm$core$List$cons,
+				A2($elm$html$Html$Attributes$style, 'color', 'black'),
+				withButtonColor);
+		} else {
+			return A2(
+				$elm$core$List$cons,
+				A2($elm$html$Html$Attributes$style, 'color', 'white'),
+				withButtonColor);
+		}
+	}();
+	var finalAttrList = function () {
+		var _v0 = theme.theme;
+		if (_v0.$ === 'None') {
+			return A2(
+				$elm$core$List$cons,
+				A2($elm$html$Html$Attributes$attribute, 'disabled', ''),
+				withButtonTextStyle);
+		} else {
+			return withButtonTextStyle;
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('modal fade'),
-				$elm$html$Html$Attributes$class(hideValue),
-				A2($elm$html$Html$Attributes$style, 'display', styleDisplayValue),
-				$elm$html$Html$Attributes$id('themeSelectModal'),
-				A2($elm$html$Html$Attributes$attribute, 'tabindex', '-1'),
-				A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', 'themeSelectModalLabel'),
-				A2($elm$html$Html$Attributes$attribute, ariaAttributeName, 'true'),
-				A2($elm$html$Html$Attributes$attribute, roleAttributeName, roleAttributeValue)
+				$elm$html$Html$Attributes$class('modal-footer'),
+				A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between')
 			]),
 		_List_fromArray(
 			[
 				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('button'),
+						$elm$html$Html$Attributes$class('btn'),
+						$elm$html$Html$Attributes$class('btn-primary'),
+						A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Surprise Me!')
+					])),
+				A2(
+				$elm$html$Html$button,
+				finalAttrList,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Start Journaling')
+					]))
+			]));
+};
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $author$project$Page$NewJournalEntry$viewModalHeader = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('modal-header')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h5,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('modal-title'),
+					$elm$html$Html$Attributes$class('text-center'),
+					$elm$html$Html$Attributes$id('themeSelectModalLabel')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Choose Theme')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Attributes$class('btn-close'),
+					A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal'),
+					A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Close')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Page$NewJournalEntry$viewModal = function (model) {
+	var _v0 = model.journalThemesList;
+	switch (_v0.$) {
+		case 'NotAsked':
+			var options = $author$project$Page$NewJournalEntry$getModalOpts(model.selectedJournalTheme);
+			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('modal-dialog')
+						$elm$html$Html$Attributes$class('modal fade'),
+						$elm$html$Html$Attributes$class(options.hideValue),
+						$elm$html$Html$Attributes$class('modal-lg'),
+						A2($elm$html$Html$Attributes$style, 'display', options.styleDisplayValue),
+						$elm$html$Html$Attributes$id('themeSelectModal'),
+						A2($elm$html$Html$Attributes$attribute, 'tabindex', '-1'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', 'themeSelectModalLabel'),
+						A2($elm$html$Html$Attributes$attribute, options.ariaAttributeName, 'true'),
+						A2($elm$html$Html$Attributes$attribute, options.roleAttributeName, options.roleAttributeValue)
 					]),
 				_List_fromArray(
 					[
@@ -12095,7 +12431,7 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('modal-content')
+								$elm$html$Html$Attributes$class('modal-dialog')
 							]),
 						_List_fromArray(
 							[
@@ -12103,46 +12439,16 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('modal-header')
+										$elm$html$Html$Attributes$class('modal-content')
 									]),
 								_List_fromArray(
 									[
-										A2(
-										$elm$html$Html$h5,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('modal-title'),
-												$elm$html$Html$Attributes$class('text-center'),
-												$elm$html$Html$Attributes$id('themeSelectModalLabel')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Choose Theme')
-											])),
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$type_('button'),
-												$elm$html$Html$Attributes$class('btn-close'),
-												A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Close')
-											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('modal-body')
-									]),
-								_List_fromArray(
-									[
+										$author$project$Page$NewJournalEntry$viewModalHeader,
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('row gy-4')
+												$elm$html$Html$Attributes$class('modal-body')
 											]),
 										_List_fromArray(
 											[
@@ -12150,168 +12456,285 @@ var $author$project$Page$NewJournalEntry$viewModal = function (model) {
 												$elm$html$Html$div,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('dropdown')
+														$elm$html$Html$Attributes$class('row gy-4')
 													]),
 												_List_fromArray(
 													[
 														A2(
-														$elm$html$Html$button,
+														$elm$html$Html$div,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$class('btn'),
-																$elm$html$Html$Attributes$class('dropdown-toggle'),
-																$elm$html$Html$Attributes$type_('button'),
-																A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
-																A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
-																A2($elm$html$Html$Attributes$style, 'color', '#FF0000;'),
-																A2($elm$html$Html$Attributes$style, 'border', '1px solid black')
-															]),
-														_List_fromArray(
-															[
-																$elm$html$Html$text('Choose your journal\'s theme')
-															])),
-														A2(
-														$elm$html$Html$ul,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('dropdown-menu')
+																$elm$html$Html$Attributes$class('dropdown')
 															]),
 														_List_fromArray(
 															[
 																A2(
-																$elm$html$Html$li,
-																_List_Nil,
+																$elm$html$Html$button,
 																_List_fromArray(
 																	[
-																		A2(
-																		$elm$html$Html$a,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$Attributes$class('dropdown-item'),
-																				$elm$html$Html$Attributes$href('#'),
-																				A2($elm$html$Html$Attributes$style, 'color', 'maroon')
-																			]),
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$text('Amor Fati - A love of Fate')
-																			]))
+																		$elm$html$Html$Attributes$class('btn'),
+																		$elm$html$Html$Attributes$class('dropdown-toggle'),
+																		$elm$html$Html$Attributes$type_('button'),
+																		A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
+																		A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+																		A2($elm$html$Html$Attributes$style, 'color', '#FF0000;'),
+																		A2($elm$html$Html$Attributes$style, 'border', '1px solid black')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text('Choose your journal\'s theme')
 																	])),
 																A2(
-																$elm$html$Html$li,
-																_List_Nil,
+																$elm$html$Html$p,
 																_List_fromArray(
 																	[
-																		A2(
-																		$elm$html$Html$hr,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$Attributes$class('dropdown-divider')
-																			]),
-																		_List_Nil)
-																	])),
-																A2(
-																$elm$html$Html$li,
-																_List_Nil,
+																		A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
+																	]),
 																_List_fromArray(
 																	[
-																		A2(
-																		$elm$html$Html$a,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$Attributes$class('dropdown-item'),
-																				$elm$html$Html$Attributes$href('#'),
-																				A2($elm$html$Html$Attributes$style, 'color', 'green')
-																			]),
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$text('Premeditatio Malorum - Foresight and resilience')
-																			]))
+																		$elm$html$Html$text(model.selectedJournalTheme.detailedDesc)
 																	]))
 															]))
 													])),
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Description goes here')
-													]))
+												$author$project$Page$NewJournalEntry$viewModalFooter(model.selectedJournalTheme)
 											]))
-									])),
+									]))
+							]))
+					]));
+		case 'Loading':
+			var options = $author$project$Page$NewJournalEntry$getModalOpts(model.selectedJournalTheme);
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal fade'),
+						$elm$html$Html$Attributes$class(options.hideValue),
+						$elm$html$Html$Attributes$class('modal-lg'),
+						A2($elm$html$Html$Attributes$style, 'display', options.styleDisplayValue),
+						$elm$html$Html$Attributes$id('themeSelectModal'),
+						A2($elm$html$Html$Attributes$attribute, 'tabindex', '-1'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', 'themeSelectModalLabel'),
+						A2($elm$html$Html$Attributes$attribute, options.ariaAttributeName, 'true'),
+						A2($elm$html$Html$Attributes$attribute, options.roleAttributeName, options.roleAttributeValue)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-dialog')
+							]),
+						_List_fromArray(
+							[
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('modal-footer'),
-										A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between')
+										$elm$html$Html$Attributes$class('modal-content')
 									]),
 								_List_fromArray(
 									[
+										$author$project$Page$NewJournalEntry$viewModalHeader,
 										A2(
-										$elm$html$Html$button,
+										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$type_('button'),
-												$elm$html$Html$Attributes$class('btn'),
-												$elm$html$Html$Attributes$class('btn-primary'),
-												A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'modal')
+												$elm$html$Html$Attributes$class('modal-body')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Surprise Me!')
-											])),
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$type_('button'),
-												$elm$html$Html$Attributes$class('btn'),
-												$elm$html$Html$Attributes$class('btn'),
-												A2($elm$html$Html$Attributes$style, 'background-color', 'green')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Start Journaling')
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('row gy-4')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('col text-center')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('spinner-border'),
+																		$elm$html$Html$Attributes$class('text-secondary')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$span,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('visually-hidden')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Loading...')
+																			]))
+																	]))
+															]))
+													])),
+												$author$project$Page$NewJournalEntry$viewModalFooter(model.selectedJournalTheme)
 											]))
 									]))
 							]))
-					]))
-			]));
+					]));
+		case 'Success':
+			var themes = _v0.a;
+			var options = $author$project$Page$NewJournalEntry$getModalOpts(model.selectedJournalTheme);
+			var dropdownOptions = $author$project$Page$NewJournalEntry$buildDropDownOptionsFromJournalThemeList(themes);
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal fade'),
+						$elm$html$Html$Attributes$class(options.hideValue),
+						$elm$html$Html$Attributes$class('modal-lg'),
+						A2($elm$html$Html$Attributes$style, 'display', options.styleDisplayValue),
+						$elm$html$Html$Attributes$id('themeSelectModal'),
+						A2($elm$html$Html$Attributes$attribute, 'tabindex', '-1'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', 'themeSelectModalLabel'),
+						A2($elm$html$Html$Attributes$attribute, options.ariaAttributeName, 'true'),
+						A2($elm$html$Html$Attributes$attribute, options.roleAttributeName, options.roleAttributeValue)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-dialog')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-content')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Page$NewJournalEntry$viewModalHeader,
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('modal-body')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('row gy-4')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('dropdown')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$button,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('btn'),
+																		$elm$html$Html$Attributes$class('dropdown-toggle'),
+																		$elm$html$Html$Attributes$type_('button'),
+																		A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
+																		A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+																		A2($elm$html$Html$Attributes$style, 'color', '#FF0000;'),
+																		A2($elm$html$Html$Attributes$style, 'border', '1px solid black')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text('Choose your journal\'s theme')
+																	])),
+																A2(
+																$elm$html$Html$ul,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('dropdown-menu')
+																	]),
+																dropdownOptions),
+																A2(
+																$elm$html$Html$p,
+																_List_fromArray(
+																	[
+																		A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
+																		A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text(model.selectedJournalTheme.detailedDesc)
+																	]))
+															]))
+													])),
+												$author$project$Page$NewJournalEntry$viewModalFooter(model.selectedJournalTheme)
+											]))
+									]))
+							]))
+					]));
+		default:
+			return A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Failed to fetch themes')
+					]));
+	}
 };
 var $author$project$Page$ViewJournalEntry$viewModal = function (model) {
 	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $author$project$Main$currentModal = function (model) {
-	var _v0 = model.page;
-	switch (_v0.$) {
-		case 'NotFoundPage':
-			return _Debug_todo(
-				'Main',
-				{
-					start: {line: 222, column: 13},
-					end: {line: 222, column: 23}
-				})('branch \'NotFoundPage\' not implemented');
-		case 'NewJournalEntryPage':
-			var pageModel = _v0.a;
-			return A2(
-				$elm$html$Html$map,
-				$author$project$Main$NewJournalEntryMsg,
-				$author$project$Page$NewJournalEntry$viewModal(pageModel));
-		case 'ListJournalsPage':
-			var pageModel = _v0.a;
-			return A2(
-				$elm$html$Html$map,
-				$author$project$Main$ListJournalsMsg,
-				$author$project$Page$ListJournalsEntries$viewModal(pageModel));
-		default:
-			var pageModel = _v0.a;
-			return A2(
-				$elm$html$Html$map,
-				$author$project$Main$ViewJournalEntryMsg,
-				$author$project$Page$ViewJournalEntry$viewModal(pageModel));
+	var _v0 = model.modal;
+	if (_v0.$ === 'Just') {
+		var _v1 = model.page;
+		switch (_v1.$) {
+			case 'NotFoundPage':
+				return _Debug_todo(
+					'Main',
+					{
+						start: {line: 253, column: 21},
+						end: {line: 253, column: 31}
+					})('branch \'NotFoundPage\' not implemented');
+			case 'NewJournalEntryPage':
+				var pageModel = _v1.a;
+				return A2(
+					$elm$html$Html$map,
+					$author$project$Main$NewJournalEntryMsg,
+					$author$project$Page$NewJournalEntry$viewModal(pageModel));
+			case 'ListJournalsPage':
+				var pageModel = _v1.a;
+				return A2(
+					$elm$html$Html$map,
+					$author$project$Main$ListJournalsMsg,
+					$author$project$Page$ListJournalsEntries$viewModal(pageModel));
+			default:
+				var pageModel = _v1.a;
+				return A2(
+					$elm$html$Html$map,
+					$author$project$Main$ViewJournalEntryMsg,
+					$author$project$Page$ViewJournalEntry$viewModal(pageModel));
+		}
+	} else {
+		return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 	}
 };
 var $elm$html$Html$nav = _VirtualDom_node('nav');
@@ -12449,24 +12872,29 @@ var $author$project$Page$ListJournalsEntries$buildNavBar = function (model) {
 			]));
 };
 var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
-	var _v0 = function () {
-		var _v1 = model.journalThemeData.theme;
-		switch (_v1.$) {
-			case 'None':
-				return _Utils_Tuple2('filter', 'blur(2px)');
-			case 'AmorFati':
-				return _Utils_Tuple2('', '');
-			default:
-				return _Utils_Tuple2('', '');
-		}
-	}();
+	var _v0 = model.journalingStarted ? _Utils_Tuple2('', '') : _Utils_Tuple2('filter', 'blur(2px)');
 	var styleFilter = _v0.a;
 	var styleFilterValue = _v0.b;
+	var _v1 = function () {
+		var _v2 = model.selectedJournalTheme.theme;
+		if (_v2.$ === 'None') {
+			return _Utils_Tuple2(
+				$elm$html$Html$Attributes$class('bg-light'),
+				'black');
+		} else {
+			return _Utils_Tuple2(
+				A2($elm$html$Html$Attributes$style, 'background-color', model.selectedJournalTheme.accentColor),
+				'white');
+		}
+	}();
+	var colorAttr = _v1.a;
+	var navBarTextColor = _v1.b;
 	return A2(
 		$elm$html$Html$nav,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top bg-light'),
+				$elm$html$Html$Attributes$class('navbar navbar-expand-lg sticky-top'),
+				colorAttr,
 				A2($elm$html$Html$Attributes$style, styleFilter, styleFilterValue)
 			]),
 		_List_fromArray(
@@ -12484,7 +12912,8 @@ var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$href('/'),
-								$elm$html$Html$Attributes$class('navbar-brand')
+								$elm$html$Html$Attributes$class('navbar-brand'),
+								A2($elm$html$Html$Attributes$style, 'color', navBarTextColor)
 							]),
 						_List_fromArray(
 							[
@@ -12543,7 +12972,8 @@ var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
 													[
 														$elm$html$Html$Attributes$class('nav-link'),
 														A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page'),
-														$elm$html$Html$Attributes$href('/')
+														$elm$html$Html$Attributes$href('/'),
+														A2($elm$html$Html$Attributes$style, 'color', navBarTextColor)
 													]),
 												_List_fromArray(
 													[
@@ -12564,7 +12994,8 @@ var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
 													[
 														$elm$html$Html$Attributes$class('nav-link'),
 														$elm$html$Html$Attributes$href('/journals/new'),
-														$elm$html$Html$Attributes$class('active')
+														$elm$html$Html$Attributes$class('active'),
+														A2($elm$html$Html$Attributes$style, 'color', navBarTextColor)
 													]),
 												_List_fromArray(
 													[
@@ -12584,7 +13015,8 @@ var $author$project$Page$NewJournalEntry$buildNavBar = function (model) {
 												_List_fromArray(
 													[
 														$elm$html$Html$Attributes$class('nav-link'),
-														$elm$html$Html$Attributes$href('/journals/entries')
+														$elm$html$Html$Attributes$href('/journals/entries'),
+														A2($elm$html$Html$Attributes$style, 'color', navBarTextColor)
 													]),
 												_List_fromArray(
 													[
@@ -12729,7 +13161,6 @@ var $author$project$Page$ViewJournalEntry$buildNavBar = function (model) {
 					]))
 			]));
 };
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$notFoundView = A2(
 	$elm$html$Html$h3,
 	_List_Nil,
@@ -13173,138 +13604,19 @@ var $author$project$Page$ListJournalsEntries$view = function (model) {
 				$author$project$Error$errorFromHttpError(httpError));
 	}
 };
-var $author$project$Page$NewJournalEntry$CreateMorningJournalEntry = {$: 'CreateMorningJournalEntry'};
-var $author$project$Page$NewJournalEntry$StoreAmorFatiThoughts = function (a) {
-	return {$: 'StoreAmorFatiThoughts', a: a};
-};
-var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy = function (a) {
-	return {$: 'StorePremeditatioMalorumStrategy', a: a};
-};
-var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice = function (a) {
-	return {$: 'StorePremeditatioMalorumVice', a: a};
-};
-var $elm$html$Html$br = _VirtualDom_node('br');
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$small = _VirtualDom_node('small');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $elm$html$Html$strong = _VirtualDom_node('strong');
-var $author$project$Page$NewJournalEntry$buildToastHtml = function (model) {
-	var toastBgColor = function () {
-		var _v1 = model.toastType;
-		switch (_v1.$) {
-			case 'Info':
-				return 'text-bg-primary';
-			case 'Warn':
-				return 'text-bg-warning';
-			case 'Error':
-				return 'text-bg-danger';
-			default:
-				return '';
-		}
-	}();
-	var showToastValue = function () {
-		var _v0 = model.showToast;
-		if (_v0.$ === 'ShowToast') {
-			return 'show';
-		} else {
-			return 'hide';
-		}
+var $author$project$Page$NewJournalEntry$view = function (model) {
+	var formHtml = function () {
+		var _v0 = model.selectedJournalTheme.theme;
+		return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 	}();
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('toast-container'),
-				$elm$html$Html$Attributes$class('position-fixed'),
-				$elm$html$Html$Attributes$class('bottom-0'),
-				$elm$html$Html$Attributes$class('end-0'),
-				$elm$html$Html$Attributes$class('p-3')
+				$elm$html$Html$Attributes$class('container')
 			]),
 		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$id('liveToast'),
-						$elm$html$Html$Attributes$class('toast'),
-						$elm$html$Html$Attributes$class(showToastValue),
-						$elm$html$Html$Attributes$class(toastBgColor),
-						A2($elm$html$Html$Attributes$attribute, 'role', 'alert'),
-						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'assertive'),
-						A2($elm$html$Html$Attributes$attribute, 'aria-atomic', 'true')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('toast-header')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$img,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$src('...'),
-										$elm$html$Html$Attributes$class('rounded me-2'),
-										$elm$html$Html$Attributes$alt('...')
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$strong,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('me-auto')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Success')
-									])),
-								A2(
-								$elm$html$Html$small,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Just now')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$class('btn-close'),
-										A2($elm$html$Html$Attributes$attribute, 'data-bs-dismiss', 'toast'),
-										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Close')
-									]),
-								_List_Nil)
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('toast-body')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(model.toastMessage)
-							]))
-					]))
-			]));
-};
-var $elm$html$Html$Attributes$cols = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'cols',
-		$elm$core$String$fromInt(n));
+			[formHtml]));
 };
 var $author$project$Common$JournalSection$getField = F2(
 	function (js, fieldName) {
@@ -13319,248 +13631,8 @@ var $author$project$Common$JournalSection$getField = F2(
 		}();
 		return field;
 	});
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$Attributes$rows = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'rows',
-		$elm$core$String$fromInt(n));
-};
-var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) {
-	var vice = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'vice');
-	var thoughts = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thoughts');
-	var premeditatioMalorumStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'strategy');
-	var filterValue = function () {
-		var _v0 = model.journalThemeData.theme;
-		switch (_v0.$) {
-			case 'None':
-				return 'blur(2px)';
-			case 'AmorFati':
-				return '';
-			default:
-				return '';
-		}
-	}();
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'filter', filterValue)
-			]),
-		_List_fromArray(
-			[
-				$author$project$Page$NewJournalEntry$buildToastHtml(model.toastData),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('row'),
-						$elm$html$Html$Attributes$id('amor-fati')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h2,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('display-2')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(model.journal.content.amorFati.title)
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('lead')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate')
-							])),
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('You\'ve woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!')
-							])),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('What is something that you\'re glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin\'t expect to happen')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('input-group mb-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$textarea,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$cols(100),
-										$elm$html$Html$Attributes$rows(10),
-										$elm$html$Html$Attributes$value(thoughts.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StoreAmorFatiThoughts),
-										A2($elm$html$Html$Attributes$style, 'width', '100%')
-									]),
-								_List_Nil)
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('row'),
-						$elm$html$Html$Attributes$id('premeditatio-malorum')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h2,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('display-2')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(model.journal.content.premeditatioMalorum.title)
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('lead')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you')
-							])),
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('What\'s a vice you think you might encounter today?')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('input-group mb-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$placeholder(''),
-										$elm$html$Html$Attributes$value(vice.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice)
-									]),
-								_List_Nil)
-							])),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('How will you handle this vice?')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('input-grouop mb-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$textarea,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$cols(100),
-										$elm$html$Html$Attributes$rows(10),
-										$elm$html$Html$Attributes$placeholder(''),
-										$elm$html$Html$Attributes$value(premeditatioMalorumStrategy.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy),
-										A2($elm$html$Html$Attributes$style, 'width', '100%')
-									]),
-								_List_Nil)
-							]))
-					])),
-				A2($elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('row')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('button'),
-								$elm$html$Html$Events$onClick($author$project$Page$NewJournalEntry$CreateMorningJournalEntry),
-								$elm$html$Html$Attributes$class('btn btn-primary')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Save Journal Entry')
-							])),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil)
-					]))
-			]));
-};
-var $author$project$Page$NewJournalEntry$view = function (model) {
-	var formHtml = function () {
-		var _v0 = model.journalThemeData.theme;
-		switch (_v0.$) {
-			case 'None':
-				return A2($elm$html$Html$div, _List_Nil, _List_Nil);
-			case 'AmorFati':
-				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
-			default:
-				return $author$project$Page$NewJournalEntry$newJournalEntryForm(model);
-		}
-	}();
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('container')
-			]),
-		_List_fromArray(
-			[formHtml]));
-};
+var $elm$html$Html$hr = _VirtualDom_node('hr');
+var $elm$html$Html$strong = _VirtualDom_node('strong');
 var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
 	return A2(
 		$elm$html$Html$div,
@@ -13867,4 +13939,4 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"],"ToastVisibilityToggle":["Common.Toast.Msg"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.Toast.Msg":{"args":[],"tags":{"ShowToast":[],"HideToast":[]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.JournalTheme.JournalTheme":{"args":[],"type":"{ theme : Common.JournalTheme.ThemeValue, name : String.String, oneLineDesc : String.String, detailedDesc : String.String, accentColor : String.String }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"FetchJournalThemes":[],"JournalThemesReceived":["RemoteData.WebData (List.List Common.JournalTheme.JournalTheme)"],"JournalThemeSelected":["Common.JournalTheme.ThemeValue"],"StartJournaling":[],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"],"ToastVisibilityToggle":["Common.Toast.Msg"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.Toast.Msg":{"args":[],"tags":{"ShowToast":[],"HideToast":[]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Common.JournalTheme.ThemeValue":{"args":[],"tags":{"AmorFati":[],"PremeditatioMalorum":[],"None":[]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));

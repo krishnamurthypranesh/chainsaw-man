@@ -1,18 +1,15 @@
-module Page.NewJournalEntry exposing (Modal, Model, Msg, buildNavBar, init, update, view, viewModal)
+module Page.NewJournalEntry exposing (Modal(..), Model, Msg, OutMsg(..), buildNavBar, init, update, view, viewModal)
 
 import Browser.Navigation as Nav
 import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
 import Common.JournalSection as JournalSection
-import Common.JournalTheme as JournalTheme exposing (journalThemeListDecoder)
+import Common.JournalTheme as JournalTheme
 import Common.Toast as Toast
 import Error exposing (errorFromHttpError)
-import Helpers exposing (stringFromMaybeString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode exposing (int, string)
-import List exposing (drop)
 import Logger exposing (logMessage)
 import Process
 import RemoteData exposing (WebData)
@@ -30,6 +27,7 @@ type alias Model =
     , toastData : Toast.Model
     , selectedJournalTheme : JournalTheme.JournalTheme
     , journalThemesList : WebData (List JournalTheme.JournalTheme)
+    , journalingStarted : Bool
     }
 
 
@@ -46,17 +44,21 @@ type alias ModalOptions =
 -- UPDATE
 
 
-type Msg
+type
+    Msg
+    -- storing journal content
     = StoreAmorFatiThoughts String
     | StorePremeditatioMalorumVice String
     | StorePremeditatioMalorumStrategy String
+      -- fetching and choosing journal themes
     | FetchJournalThemes
     | JournalThemesReceived (WebData (List JournalTheme.JournalTheme))
-    | JournalThemeSelected
+    | JournalThemeSelected JournalTheme.ThemeValue
+    | StartJournaling
+      -- saving journal entry
     | CreateMorningJournalEntry
     | JournalEntryCreated (Result Http.Error JournalEntry)
     | ToastVisibilityToggle Toast.Msg
-    | DropdownOptionSelected JournalTheme.ThemeValue
 
 
 type OutMsg
@@ -113,7 +115,7 @@ update msg model =
             in
             ( { model | toastData = newToastData }, cmd, CloseModal )
 
-        DropdownOptionSelected theme ->
+        JournalThemeSelected theme ->
             let
                 themesList =
                     case model.journalThemesList of
@@ -153,15 +155,15 @@ update msg model =
             in
             ( { model | selectedJournalTheme = selectedTheme }, Cmd.none, OpenModal )
 
+        StartJournaling ->
+            ( { model | journalingStarted = True }, Cmd.none, CloseModal )
+
         ToastVisibilityToggle toggle ->
             let
                 newToastData =
                     Toast.Model Toast.HideToast "" Toast.None
             in
             ( { model | toastData = newToastData }, Cmd.none, CloseModal )
-
-        JournalThemeSelected ->
-            ( model, Cmd.none, CloseModal )
 
 
 createMorningJournalEntry : JournalEntry -> Cmd Msg
@@ -192,14 +194,8 @@ view model =
     let
         formHtml =
             case model.selectedJournalTheme.theme of
-                JournalTheme.None ->
+                _ ->
                     div [] []
-
-                JournalTheme.AmorFati ->
-                    newJournalEntryForm model
-
-                JournalTheme.PremeditatioMalorum ->
-                    newJournalEntryForm model
     in
     div [ class "container" ]
         [ formHtml
@@ -272,7 +268,7 @@ buildOptionFromJournalTheme : JournalTheme.JournalTheme -> Html Msg
 buildOptionFromJournalTheme theme =
     li
         []
-        [ a [ class "dropdown-item", href "#", style "color" theme.accentColor, onClick (DropdownOptionSelected theme.theme) ]
+        [ a [ class "dropdown-item", href "#", style "color" theme.accentColor, onClick (JournalThemeSelected theme.theme) ]
             [ text (theme.name ++ " - " ++ theme.oneLineDesc)
             ]
         ]
@@ -356,38 +352,41 @@ viewModalHeader =
         ]
 
 
-viewModalFooter : JournalTheme.JournalTheme -> Bool -> Html Msg
-viewModalFooter theme themeListLoaded =
+viewModalFooter : JournalTheme.JournalTheme -> Html Msg
+viewModalFooter theme =
     let
         baseAttrList =
             [ type_ "button"
             , class "btn"
+            , onClick StartJournaling
             ]
 
         buttonColor =
-            if themeListLoaded then
-                case theme.theme of
-                    JournalTheme.None ->
-                        "ghostwhite"
+            case theme.theme of
+                JournalTheme.None ->
+                    "ghostwhite"
 
-                    JournalTheme.AmorFati ->
-                        theme.accentColor
-
-                    JournalTheme.PremeditatioMalorum ->
-                        theme.accentColor
-
-            else
-                "ghostwhite"
+                _ ->
+                    theme.accentColor
 
         withButtonColor =
             style "background-color" buttonColor :: baseAttrList
 
-        finalAttrList =
-            if themeListLoaded then
-                withButtonColor
+        withButtonTextStyle =
+            case theme.theme of
+                JournalTheme.None ->
+                    style "color" "black" :: withButtonColor
 
-            else
-                attribute "disabled" "" :: withButtonColor
+                _ ->
+                    style "color" "white" :: withButtonColor
+
+        finalAttrList =
+            case theme.theme of
+                JournalTheme.None ->
+                    attribute "disabled" "" :: withButtonTextStyle
+
+                _ ->
+                    withButtonTextStyle
     in
     div [ class "modal-footer", style "justify-content" "space-between" ]
         [ button [ type_ "button", class "btn", class "btn-primary", attribute "data-bs-dismiss" "modal" ] [ text "Surprise Me!" ]
@@ -402,42 +401,16 @@ getModalOpts theme =
             ModalOptions "" "" "" "" ""
 
         hideValue =
-            case theme.theme of
-                JournalTheme.None ->
-                    "show"
-
-                _ ->
-                    "show"
+            "show"
 
         ariaAttributeName =
-            case theme.theme of
-                JournalTheme.None ->
-                    "aria-modal"
-
-                _ ->
-                    "aria-hidden"
+            "aria-modal"
 
         styleDisplayValue =
-            case theme.theme of
-                JournalTheme.None ->
-                    "block"
-
-                JournalTheme.AmorFati ->
-                    "block"
-
-                JournalTheme.PremeditatioMalorum ->
-                    "block"
+            "block"
 
         ( roleAttributeName, roleAttributeValue ) =
-            case theme.theme of
-                JournalTheme.None ->
-                    ( "role", "dialog" )
-
-                JournalTheme.AmorFati ->
-                    ( "", "" )
-
-                JournalTheme.PremeditatioMalorum ->
-                    ( "", "" )
+            ( "role", "dialog" )
     in
     { options
         | hideValue = hideValue
@@ -490,7 +463,7 @@ viewModal model =
                                         [ text model.selectedJournalTheme.detailedDesc ]
                                     ]
                                 ]
-                            , viewModalFooter model.selectedJournalTheme False
+                            , viewModalFooter model.selectedJournalTheme
                             ]
                         ]
                     ]
@@ -523,7 +496,7 @@ viewModal model =
                                         ]
                                     ]
                                 ]
-                            , viewModalFooter model.selectedJournalTheme False
+                            , viewModalFooter model.selectedJournalTheme
                             ]
                         ]
                     ]
@@ -567,12 +540,13 @@ viewModal model =
                                         ]
                                     , ul [ class "dropdown-menu" ] dropdownOptions
                                     , p
-                                        [ style "margin-bottom" "2px"
+                                        [ style "margin-top" "1rem"
+                                        , style "margin-bottom" "2px"
                                         ]
                                         [ text model.selectedJournalTheme.detailedDesc ]
                                     ]
                                 ]
-                            , viewModalFooter model.selectedJournalTheme True
+                            , viewModalFooter model.selectedJournalTheme
                             ]
                         ]
                     ]
@@ -586,19 +560,31 @@ buildNavBar : Model -> Html Msg
 buildNavBar model =
     let
         ( styleFilter, styleFilterValue ) =
+            if model.journalingStarted then
+                ( "", "" )
+
+            else
+                ( "filter", "blur(2px)" )
+
+        ( colorAttr, navBarTextColor ) =
             case model.selectedJournalTheme.theme of
                 JournalTheme.None ->
-                    ( "filter", "blur(2px)" )
+                    ( class "bg-light", "black" )
 
                 _ ->
-                    ( "filter", "blur(2px)" )
+                    ( style "background-color" model.selectedJournalTheme.accentColor, "white" )
     in
     nav
-        [ class "navbar navbar-expand-lg sticky-top bg-light"
+        [ class "navbar navbar-expand-lg sticky-top"
+        , colorAttr
         , style styleFilter styleFilterValue
         ]
         [ div [ class "container-fluid" ]
-            [ a [ href "/", class "navbar-brand" ]
+            [ a
+                [ href "/"
+                , class "navbar-brand"
+                , style "color" navBarTextColor
+                ]
                 [ text "Painted Porch" ]
             , button
                 [ class "navbar-toggler"
@@ -614,47 +600,35 @@ buildNavBar model =
             , div [ class "collapse navbar-collapse", id "navbarNav" ]
                 [ ul [ class "navbar-nav" ]
                     [ li [ class "nav-item" ]
-                        [ a [ class "nav-link", attribute "aria-current" "page", href "/" ] [ text "Home" ]
+                        [ a
+                            [ class "nav-link"
+                            , attribute "aria-current" "page"
+                            , href "/"
+                            , style "color" navBarTextColor
+                            ]
+                            [ text "Home" ]
                         ]
                     , li [ class "nav-item" ]
                         [ a
                             [ class "nav-link"
                             , href "/journals/new"
                             , class "active"
+                            , style "color" navBarTextColor
                             ]
                             [ text "New Journal Entry" ]
                         ]
                     , li [ class "nav-item" ]
-                        [ a [ class "nav-link", href "/journals/entries" ] [ text "List Journal Entries" ]
+                        [ a
+                            [ class "nav-link"
+                            , href "/journals/entries"
+                            , style "color" navBarTextColor
+                            ]
+                            [ text "List Journal Entries" ]
                         ]
                     ]
                 ]
             ]
         ]
-
-
-
--- INIT
-
-
-init : Nav.Key -> ( Model, Cmd Msg )
-init navKey =
-    ( initialModel navKey, fetchJournalThemes )
-
-
-initialModel : Nav.Key -> Model
-initialModel navKey =
-    let
-        journal =
-            emptyMorningJournal
-
-        toast =
-            Toast.Model Toast.HideToast "" Toast.None
-
-        themeData =
-            JournalTheme.JournalTheme JournalTheme.None "" "" "" ""
-    in
-    { navKey = navKey, journal = journal, createJournalEntryError = Nothing, toastData = toast, selectedJournalTheme = themeData, journalThemesList = RemoteData.Loading }
 
 
 delay : Toast.Model -> Float -> Toast.Msg -> Cmd Msg
@@ -670,3 +644,27 @@ delay toast interval msg =
     in
     Process.sleep interval
         |> Task.perform (\_ -> newMsg)
+
+
+
+-- INIT
+
+
+init : Nav.Key -> ( Model, Cmd Msg, Modal -> OutMsg )
+init navKey =
+    ( initialModel navKey, fetchJournalThemes, OpenModal )
+
+
+initialModel : Nav.Key -> Model
+initialModel navKey =
+    let
+        journal =
+            emptyMorningJournal
+
+        toast =
+            Toast.Model Toast.HideToast "" Toast.None
+
+        themeData =
+            JournalTheme.JournalTheme JournalTheme.None "" "" "" ""
+    in
+    { navKey = navKey, journal = journal, createJournalEntryError = Nothing, toastData = toast, selectedJournalTheme = themeData, journalThemesList = RemoteData.Loading, journalingStarted = False }
