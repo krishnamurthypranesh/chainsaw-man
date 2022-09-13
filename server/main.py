@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import get_db
 from helpers import validate_journal_content
+from theme import THEMES
 
 app = FastAPI()
 
@@ -118,3 +119,9 @@ async def list_journals(input: ListJournalEntryInput):
         entries.append(doc)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=entries)
+
+
+@app.get("/journals/themes/")
+async def list_themes():
+    await asyncio.sleep(2)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=THEMES)
