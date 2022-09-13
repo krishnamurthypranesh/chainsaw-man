@@ -67,3 +67,8 @@ journalThemeDecoder =
 journalThemeListDecoder : Decoder (List JournalTheme)
 journalThemeListDecoder =
     list journalThemeDecoder
+
+
+emptyJournalTheme : JournalTheme
+emptyJournalTheme =
+    JournalTheme None "" "" "" ""
