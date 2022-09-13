@@ -4,8 +4,8 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, style, type_)
-import Page.ListJournalsEntries as ListJournals
-import Page.NewJournalEntry as NewJournalEntry
+import Page.ListJournalsEntries as ListJournals exposing (OutMsg(..))
+import Page.NewJournalEntry as NewJournalEntry exposing (Modal(..), OutMsg(..))
 import Page.ViewJournalEntry as ViewJournalEntry
 import Route exposing (Route(..))
 import Url exposing (Url)
@@ -65,33 +65,41 @@ init flags url navKey =
 initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 initCurrentPage ( model, existingCmds ) =
     let
-        ( currentPage, mappedPageCmds ) =
+        ( currentPage, mappedPageCmds, modalValue ) =
             case model.route of
                 Route.NotFound ->
-                    ( NotFoundPage, Cmd.none )
+                    ( NotFoundPage, Cmd.none, Nothing )
 
                 Route.ListJournalEntries ->
                     let
                         ( pageModel, pageCmds ) =
                             ListJournals.init
                     in
-                    ( ListJournalsPage pageModel, Cmd.map ListJournalsMsg pageCmds )
+                    ( ListJournalsPage pageModel, Cmd.map ListJournalsMsg pageCmds, Nothing )
 
                 Route.NewJournalEntry ->
                     let
-                        ( pageModel, pageCmds ) =
+                        ( pageModel, pageCmds, modalMsg ) =
                             NewJournalEntry.init model.navKey
+
+                        pageModalValue =
+                            case modalMsg NewJournalEntry.ThemeSelectModal of
+                                NewJournalEntry.OpenModal _ ->
+                                    Just (NewJournalEntryModal NewJournalEntry.ThemeSelectModal)
+
+                                NewJournalEntry.CloseModal _ ->
+                                    Nothing
                     in
-                    ( NewJournalEntryPage pageModel, Cmd.map NewJournalEntryMsg pageCmds )
+                    ( NewJournalEntryPage pageModel, Cmd.map NewJournalEntryMsg pageCmds, pageModalValue )
 
                 Route.ViewJournalEntry journalId ->
                     let
                         ( pageModel, pageCmds ) =
                             ViewJournalEntry.init journalId model.navKey
                     in
-                    ( ViewJournalEntryPage pageModel, Cmd.map ViewJournalEntryMsg pageCmds )
+                    ( ViewJournalEntryPage pageModel, Cmd.map ViewJournalEntryMsg pageCmds, Nothing )
     in
-    ( { model | page = currentPage }
+    ( { model | page = currentPage, modal = modalValue }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
     )
 
@@ -124,8 +132,16 @@ update msg model =
             let
                 ( updatedPageModel, updatedCmd, modalMsg ) =
                     NewJournalEntry.update subMsg pageModel
+
+                modalValue =
+                    case modalMsg NewJournalEntry.ThemeSelectModal of
+                        NewJournalEntry.OpenModal _ ->
+                            Just (NewJournalEntryModal NewJournalEntry.ThemeSelectModal)
+
+                        NewJournalEntry.CloseModal _ ->
+                            Nothing
             in
-            ( { model | page = NewJournalEntryPage updatedPageModel }
+            ( { model | page = NewJournalEntryPage updatedPageModel, modal = modalValue }
             , Cmd.map NewJournalEntryMsg updatedCmd
             )
 
@@ -141,7 +157,20 @@ update msg model =
         ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Nav.pushUrl model.navKey (Url.toString url) )
+                    let
+                        cmd =
+                            case url.fragment of
+                                Just v ->
+                                    if v == "" then
+                                        Cmd.none
+
+                                    else
+                                        Nav.pushUrl model.navKey (Url.toString url)
+
+                                Nothing ->
+                                    Nav.pushUrl model.navKey (Url.toString url)
+                    in
+                    ( model, cmd )
 
                 Browser.External url ->
                     ( model, Nav.load url )
@@ -217,21 +246,26 @@ currentView model =
 
 currentModal : Model -> Html Msg
 currentModal model =
-    case model.page of
-        NotFoundPage ->
-            Debug.todo "branch 'NotFoundPage' not implemented"
+    case model.modal of
+        Just _ ->
+            case model.page of
+                NotFoundPage ->
+                    Debug.todo "branch 'NotFoundPage' not implemented"
 
-        NewJournalEntryPage pageModel ->
-            NewJournalEntry.viewModal pageModel
-                |> Html.map NewJournalEntryMsg
+                NewJournalEntryPage pageModel ->
+                    NewJournalEntry.viewModal pageModel
+                        |> Html.map NewJournalEntryMsg
 
-        ListJournalsPage pageModel ->
-            ListJournals.viewModal pageModel
-                |> Html.map ListJournalsMsg
+                ListJournalsPage pageModel ->
+                    ListJournals.viewModal pageModel
+                        |> Html.map ListJournalsMsg
 
-        ViewJournalEntryPage pageModel ->
-            ViewJournalEntry.viewModal pageModel
-                |> Html.map ViewJournalEntryMsg
+                ViewJournalEntryPage pageModel ->
+                    ViewJournalEntry.viewModal pageModel
+                        |> Html.map ViewJournalEntryMsg
+
+        Nothing ->
+            div [] []
 
 
 notFoundView : Html msg
