@@ -1,3 +1,8 @@
+import asyncio
+
+from fastapi import status
+from fastapi.responses import JSONResponse
+
 THEMES = [
     {
         "theme": "amor fati",
@@ -14,3 +19,13 @@ THEMES = [
         "accent_color": "#7575a3",
     },
 ]
+
+
+class Theme:
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    async def list_themes():
+        await asyncio.sleep(2)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=THEMES)
