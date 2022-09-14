@@ -26,6 +26,6 @@ class Theme:
         self.args = args
         self.kwargs = kwargs
 
-    async def list_themes():
+    async def list_themes(self):
         await asyncio.sleep(2)
         return JSONResponse(status_code=status.HTTP_200_OK, content=THEMES)

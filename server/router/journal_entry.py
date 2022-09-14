@@ -23,10 +23,6 @@ async def list_journals(
     ).list_journals(input)
 
 
-@JOURNAL_ENTRY_ROUTER.get("/journals/themes/")
-async def list_journal_themes():
-    return await Theme.list_themes()
-
 
 @JOURNAL_ENTRY_ROUTER.get("/journal/entries/{entry_id}/")
 async def get_journal_entry(

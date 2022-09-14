@@ -4,8 +4,10 @@ from typing import Any
 
 from motor import motor_asyncio
 
+from constants import collection
 
-def get_client() -> Any:
+
+def _get_client() -> Any:
     uname: str = urllib.parse.quote_plus(os.environ.get("MONGO_INITDB_ROOT_USERNAME"))
     passwd: str = urllib.parse.quote_plus(os.environ.get("MONGO_INITDB_ROOT_PASSWORD"))
     url: str = os.environ.get("MONGO_DB_URL")
@@ -21,5 +23,9 @@ def get_client() -> Any:
 
 
 def get_journal_entries_collection():
-    client = get_client()
-    yield getattr(client, "journal_entries")["journal_entries"]
+    client = _get_client()
+    yield getattr(client, "journal_entries")[collection.JOURNAL_ENTRIES_COLLECTION]
+
+def get_journal_themes_data_collection():
+    client = _get_client()
+    yield getattr(client, "journal_entries")[collection.JOURNAL_THEME_DATA_COLLECTION]
