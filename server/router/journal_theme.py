@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends
 
 from api import Theme
-from models import journal_entry as journal_entry_models
-from repository.journal_entry import get_journal_entry_repo
-from helpers.journal_entry_helpers import JournalEntryHelper
+from repository.journal_theme_data import get_journal_theme_data_repo
 
 JOURNAL_THEME_ROUTER = APIRouter()
 
+
 @JOURNAL_THEME_ROUTER.get("/journals/themes/")
-async def list_journal_themes():
-    return await Theme().list_themes()
+async def list_journal_themes(
+    journal_theme_data_repo=Depends(get_journal_theme_data_repo),
+):
+    return await Theme(journal_theme_data_repo=journal_theme_data_repo).list_themes()

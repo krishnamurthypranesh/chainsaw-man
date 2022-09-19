@@ -189,17 +189,29 @@ fetchJournalThemes =
 view : Model -> Html Msg
 view model =
     let
-        formHtml =
+        ( formHtml, classList ) =
             case model.selectedJournalTheme of
                 Nothing ->
-                    div [] []
+                    ( div [] [], [] )
 
                 Just theme ->
-                    case theme of
-                        _ ->
-                            div [] []
+                    let
+                        cL =
+                            [ class "container" ]
+
+                        updatedCL =
+                            if model.isModalOpen then
+                                style "filter" "blur(2px)" :: cL
+
+                            else
+                                cL
+
+                        _ =
+                            Debug.log "CLASS LIST" updatedCL
+                    in
+                    ( newJournalEntryForm model, updatedCL )
     in
-    div [ class "container" ]
+    div classList
         [ formHtml
         ]
 
@@ -207,6 +219,14 @@ view model =
 newJournalEntryForm : Model -> Html Msg
 newJournalEntryForm model =
     let
+        selectedTheme =
+            case model.selectedJournalTheme of
+                Just v ->
+                    v
+
+                Nothing ->
+                    JournalTheme.emptyJournalTheme
+
         thoughts =
             JournalSection.getField model.journal.content.amorFati "thoughts"
 
@@ -220,35 +240,19 @@ newJournalEntryForm model =
     div
         []
         [ buildToastHtml model.toastData
-        , div
-            [ class "row", id "amor-fati" ]
-            [ h2 [ class "display-2" ] [ text model.journal.content.amorFati.title ]
-            , p [ class "lead" ]
-                [ text "Your fate is to go through life each day. What happens is dictated by it and you can only react to what happens. So, you might as well love your fate"
-                ]
-            , label [ class "form-label" ] [ text "You've woken up today! Many people will not have the privilege to do so today. So, say thank you for waking up today!" ]
-            , br [] []
+        , div [ class "row", id "journal-content-section" ]
+            [ h2 [ class "display-2" ] [ text selectedTheme.name ]
+            , p [ class "lead" ] [ text selectedTheme.data.quote ]
             , label [ class "form-label" ]
-                [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen" ]
-            , div
-                [ class "input-group mb-3" ]
-                [ textarea [ cols 100, rows 10, value thoughts.value, onInput StoreAmorFatiThoughts, style "width" "100%" ] []
-                ]
-            ]
-        , div [ class "row", id "premeditatio-malorum" ]
-            [ h2 [ class "display-2" ] [ text model.journal.content.premeditatioMalorum.title ]
-            , p [ class "lead" ] [ text "Unexpectdness adds weight to disaster. Whatever that disaster might be to you, think about it, see it happen to you in your minds eye and then think of what you can do handle it when it does happen to you" ]
-            , label [ class "form-label" ]
-                [ text "What's a vice you think you might encounter today?" ]
+                [ text selectedTheme.data.ideaNudge ]
             , div
                 [ class "input-group mb-3" ]
                 [ input [ placeholder "", value vice.value, onInput StorePremeditatioMalorumVice ] []
                 ]
             , br [] []
             , label [ class "form-label" ]
-                [ text "How will you handle this vice?"
-                ]
-            , div [ class "input-grouop mb-3" ]
+                [ text selectedTheme.data.thoughtNudge ]
+            , div [ class "input-group mb-3" ]
                 [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy, style "width" "100%" ] []
                 ]
             ]

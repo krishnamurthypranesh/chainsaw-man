@@ -1,5 +1,6 @@
 module Common.JournalTheme exposing (..)
 
+import Common.JournalThemeData exposing (JournalThemeData, emptyJournalThemeData, journalThemeDataDecoder)
 import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode
@@ -11,6 +12,7 @@ type alias JournalTheme =
     , oneLineDesc : String
     , detailedDesc : String
     , accentColor : String
+    , data : JournalThemeData
     }
 
 
@@ -27,17 +29,25 @@ themeValueDecoder =
 
 themeValueFromString : String -> Decoder ThemeValue
 themeValueFromString theme =
-    case String.toLower theme of
-        "amor fati" ->
+    let
+        _ =
+            Debug.log "THEME" theme
+    in
+    case String.toUpper theme of
+        "AMOR_FATI" ->
             Decode.succeed AmorFati
 
-        "premeditatio malorum" ->
+        "PREMEDITATIO_MALORUM" ->
             Decode.succeed PremeditatioMalorum
 
         "" ->
             Decode.succeed None
 
         _ ->
+            let
+                _ =
+                    Debug.log "ERROR CASE" theme
+            in
             Decode.fail ("invalid journal theme: " ++ theme)
 
 
@@ -45,10 +55,10 @@ themeValueToString : ThemeValue -> String
 themeValueToString theme =
     case theme of
         AmorFati ->
-            "AmorFati"
+            "AMOR_FATI"
 
         PremeditatioMalorum ->
-            "PremeditatioMalorum"
+            "PREMEDITATIO_MALORUM"
 
         None ->
             ""
@@ -62,6 +72,7 @@ journalThemeDecoder =
         |> required "short_description" Decode.string
         |> required "detailed_description" Decode.string
         |> required "accent_color" Decode.string
+        |> required "data" journalThemeDataDecoder
 
 
 journalThemeListDecoder : Decoder (List JournalTheme)
@@ -71,4 +82,4 @@ journalThemeListDecoder =
 
 emptyJournalTheme : JournalTheme
 emptyJournalTheme =
-    JournalTheme None "" "" "" ""
+    JournalTheme None "" "" "" "" emptyJournalThemeData
