@@ -15,13 +15,13 @@ class JournalThemeDataRepo:
         entries = []
         queries = []
 
+        if theme is not None and theme != "":
+            queries.append({"$match": {"theme": theme}})
+
         if sample_size is None or (sample_size is not None and sample_size < 1):
             raise Exception("invalid sample_size")
 
         queries.append({"$sample": {"size": 1}})
-
-        if theme is not None and theme != "":
-            queries.append({"$match": {"theme": theme}})
 
         try:
             cursor = self.db.aggregate(queries)
