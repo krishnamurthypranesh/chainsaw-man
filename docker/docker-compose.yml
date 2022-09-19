@@ -45,6 +45,7 @@ services:
     volumes:
       - mongo-everyday-stoic:/data/db
     env_file: .env
+    command: mongod --quiet
 
 volumes:
   mongo-everyday-stoic:

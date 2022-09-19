@@ -1,20 +1,9 @@
-import json
-import time
-import random
-import asyncio
-from typing import Dict
-from bson import ObjectId
-
-from fastapi import FastAPI, status
-from pydantic import BaseModel, Field
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from router import JOURNAL_ENTRY_ROUTER, JOURNAL_THEME_ROUTER, JOURNAL_THEME_DATA_ROUTER
 
 from helpers.journal_entry_helpers import JournalEntryHelper
-import models.journal_entry as journal_entry_models
 
 app = FastAPI()
 

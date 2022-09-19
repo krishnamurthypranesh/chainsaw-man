@@ -3,7 +3,6 @@ from typing import List
 
 class JournalEntryHelper:
     def __init__(self):
-        print("inside init")
         pass
 
     def validate_journal_content(content: dict) -> bool:
