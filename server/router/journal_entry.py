@@ -4,7 +4,7 @@ from api import JournalEntry
 from api import Theme
 from models import journal_entry as journal_entry_models
 from repository.journal_entry import get_journal_entry_repo
-from helpers.journal_entry_helpers import JournalEntryHelper
+from helpers.journal_entry import JournalEntryHelper
 
 JOURNAL_ENTRY_ROUTER = APIRouter()
 
@@ -23,7 +23,6 @@ async def list_journals(
     ).list_journals(input)
 
 
-
 @JOURNAL_ENTRY_ROUTER.get("/journal/entries/{entry_id}/")
 async def get_journal_entry(
     entry_id: str,
@@ -31,3 +30,12 @@ async def get_journal_entry(
     helper=Depends(JournalEntryHelper),
 ):
     return await JournalEntry(journal_entry_repo, helper).get(entry_id)
+
+
+@JOURNAL_ENTRY_ROUTER.post("/journal/entry/create/")
+async def create(
+    input: journal_entry_models.CreateJournalEntryInput,
+    journal_entry_repo=Depends(get_journal_entry_repo),
+    helper=Depends(JournalEntryHelper),
+):
+    return await JournalEntry(journal_entry_repo, helper).create(input)

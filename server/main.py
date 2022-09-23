@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from router import JOURNAL_ENTRY_ROUTER, JOURNAL_THEME_ROUTER, JOURNAL_THEME_DATA_ROUTER
 
-from helpers.journal_entry_helpers import JournalEntryHelper
+from helpers.journal_entry import JournalEntryHelper
 
 app = FastAPI()
 
@@ -18,7 +18,6 @@ app.add_middleware(
 )
 
 journal_entry_helper = JournalEntryHelper()
-
 
 app.include_router(JOURNAL_ENTRY_ROUTER)
 

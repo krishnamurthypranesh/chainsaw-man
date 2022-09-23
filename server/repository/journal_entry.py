@@ -1,6 +1,7 @@
 from fastapi import Depends
 
 from constants import error
+from models import journal_entry as entry_models
 from connections.database import get_journal_entries_collection
 
 
@@ -24,6 +25,12 @@ class JournalEntryRepo:
             entries.append(doc)
 
         return entries
+
+    async def insert_one(self, data: entry_models.JournalEntry):
+        new = await self.db.insert_one(data)
+        journal = await self.find_one_journal_entry(new.inserted_id)
+
+        return journal
 
 
 async def get_journal_entry_repo(db=Depends(get_journal_entries_collection)):
