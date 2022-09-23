@@ -10891,21 +10891,17 @@ var $krisajenkins$remotedata$RemoteData$fromResult = function (result) {
 		return $krisajenkins$remotedata$RemoteData$Success(x);
 	}
 };
-var $author$project$Common$JournalEntry$JournalEntry = F3(
-	function (id, createdAt, content) {
-		return {content: content, createdAt: createdAt, id: id};
+var $author$project$Common$JournalEntry$JournalEntry = F5(
+	function (id, theme, content, createdAt, updatedAt) {
+		return {content: content, createdAt: createdAt, id: id, theme: theme, updatedAt: updatedAt};
 	});
-var $author$project$Common$JournalEntry$Content = F2(
-	function (amorFati, premeditatioMalorum) {
-		return {amorFati: amorFati, premeditatioMalorum: premeditatioMalorum};
-	});
-var $author$project$Common$JournalSection$JournalSection = F2(
-	function (title, fields) {
-		return {fields: fields, title: title};
-	});
-var $author$project$Common$JournalField$JournalField = F2(
-	function (field, value) {
-		return {field: field, value: value};
+var $author$project$Common$JournalEntry$JournalId = function (a) {
+	return {$: 'JournalId', a: a};
+};
+var $author$project$Common$JournalEntry$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$JournalEntry$JournalId, $elm$json$Json$Decode$string);
+var $author$project$Common$JournalEntry$JournalContent = F5(
+	function (quote, idea_nudge, thought_nudge, idea, thought) {
+		return {idea: idea, idea_nudge: idea_nudge, quote: quote, thought: thought, thought_nudge: thought_nudge};
 	});
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
@@ -10915,50 +10911,122 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2($elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var $author$project$Common$JournalField$journalFieldDecoder = A3(
+var $author$project$Common$JournalEntry$journalContentDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'value',
+	'thought',
 	$elm$json$Json$Decode$string,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'field',
+		'idea',
 		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalField$JournalField)));
-var $author$project$Common$JournalSection$journalSectionDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'fields',
-	$elm$json$Json$Decode$dict($author$project$Common$JournalField$journalFieldDecoder),
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'title',
-		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalSection$JournalSection)));
-var $author$project$Common$JournalEntry$contentDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'premeditatio_malorum',
-	$author$project$Common$JournalSection$journalSectionDecoder,
-	A3(
-		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'amor_fati',
-		$author$project$Common$JournalSection$journalSectionDecoder,
-		$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$Content)));
-var $author$project$Common$JournalEntry$JournalId = function (a) {
-	return {$: 'JournalId', a: a};
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'thought_nudge',
+			$elm$json$Json$Decode$string,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'idea_nudge',
+				$elm$json$Json$Decode$string,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'quote',
+					$elm$json$Json$Decode$string,
+					$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalContent))))));
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
+	function (path, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return $elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						decoder,
+						$elm$json$Json$Decode$null(fallback)
+					]));
+		};
+		var handleResult = function (input) {
+			var _v0 = A2(
+				$elm$json$Json$Decode$decodeValue,
+				A2($elm$json$Json$Decode$at, path, $elm$json$Json$Decode$value),
+				input);
+			if (_v0.$ === 'Ok') {
+				var rawValue = _v0.a;
+				var _v1 = A2(
+					$elm$json$Json$Decode$decodeValue,
+					nullOr(valDecoder),
+					rawValue);
+				if (_v1.$ === 'Ok') {
+					var finalResult = _v1.a;
+					return $elm$json$Json$Decode$succeed(finalResult);
+				} else {
+					return A2(
+						$elm$json$Json$Decode$at,
+						path,
+						nullOr(valDecoder));
+				}
+			} else {
+				return $elm$json$Json$Decode$succeed(fallback);
+			}
+		};
+		return A2($elm$json$Json$Decode$andThen, handleResult, $elm$json$Json$Decode$value);
+	});
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder,
+				_List_fromArray(
+					[key]),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var $author$project$Common$JournalTheme$AmorFati = {$: 'AmorFati'};
+var $author$project$Common$JournalTheme$None = {$: 'None'};
+var $author$project$Common$JournalTheme$PremeditatioMalorum = {$: 'PremeditatioMalorum'};
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$core$Debug$log = _Debug_log;
+var $elm$core$String$toUpper = _String_toUpper;
+var $author$project$Common$JournalTheme$themeValueFromString = function (theme) {
+	var _v0 = A2($elm$core$Debug$log, 'THEME', theme);
+	var _v1 = $elm$core$String$toUpper(theme);
+	switch (_v1) {
+		case 'AMOR_FATI':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$AmorFati);
+		case 'PREMEDITATIO_MALORUM':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$PremeditatioMalorum);
+		case '':
+			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$None);
+		default:
+			var _v2 = A2($elm$core$Debug$log, 'ERROR CASE', theme);
+			return $elm$json$Json$Decode$fail('invalid journal theme: ' + theme);
+	}
 };
-var $author$project$Common$JournalEntry$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Common$JournalEntry$JournalId, $elm$json$Json$Decode$string);
-var $author$project$Common$JournalEntry$journalEntryDecoder = A3(
-	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'content',
-	$author$project$Common$JournalEntry$contentDecoder,
+var $author$project$Common$JournalTheme$themeValueDecoder = A2($elm$json$Json$Decode$andThen, $author$project$Common$JournalTheme$themeValueFromString, $elm$json$Json$Decode$string);
+var $author$project$Common$JournalEntry$journalEntryDecoder = A4(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
+	'updated_at',
+	$elm$json$Json$Decode$int,
+	0,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 		'created_at',
 		$elm$json$Json$Decode$int,
 		A3(
 			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'_id',
-			$author$project$Common$JournalEntry$idDecoder,
-			$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))));
+			'content',
+			$author$project$Common$JournalEntry$journalContentDecoder,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'theme',
+				$author$project$Common$JournalTheme$themeValueDecoder,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'_id',
+					$author$project$Common$JournalEntry$idDecoder,
+					$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))))));
 var $author$project$Common$JournalEntry$journalEntriesListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$journalEntryDecoder);
 var $elm$http$Http$jsonBody = function (value) {
 	return A2(
@@ -11172,7 +11240,6 @@ var $author$project$Common$JournalTheme$JournalTheme = F6(
 	function (theme, name, oneLineDesc, detailedDesc, accentColor, data) {
 		return {accentColor: accentColor, data: data, detailedDesc: detailedDesc, name: name, oneLineDesc: oneLineDesc, theme: theme};
 	});
-var $author$project$Common$JournalTheme$None = {$: 'None'};
 var $author$project$Common$JournalThemeData$JournalThemeData = F3(
 	function (quote, ideaNudge, thoughtNudge) {
 		return {ideaNudge: ideaNudge, quote: quote, thoughtNudge: thoughtNudge};
@@ -11190,78 +11257,6 @@ var $author$project$Common$JournalThemeData$journalThemeDataDecoder = A3(
 			'quote',
 			$elm$json$Json$Decode$string,
 			$elm$json$Json$Decode$succeed($author$project$Common$JournalThemeData$JournalThemeData))));
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$null = _Json_decodeNull;
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
-	function (path, valDecoder, fallback) {
-		var nullOr = function (decoder) {
-			return $elm$json$Json$Decode$oneOf(
-				_List_fromArray(
-					[
-						decoder,
-						$elm$json$Json$Decode$null(fallback)
-					]));
-		};
-		var handleResult = function (input) {
-			var _v0 = A2(
-				$elm$json$Json$Decode$decodeValue,
-				A2($elm$json$Json$Decode$at, path, $elm$json$Json$Decode$value),
-				input);
-			if (_v0.$ === 'Ok') {
-				var rawValue = _v0.a;
-				var _v1 = A2(
-					$elm$json$Json$Decode$decodeValue,
-					nullOr(valDecoder),
-					rawValue);
-				if (_v1.$ === 'Ok') {
-					var finalResult = _v1.a;
-					return $elm$json$Json$Decode$succeed(finalResult);
-				} else {
-					return A2(
-						$elm$json$Json$Decode$at,
-						path,
-						nullOr(valDecoder));
-				}
-			} else {
-				return $elm$json$Json$Decode$succeed(fallback);
-			}
-		};
-		return A2($elm$json$Json$Decode$andThen, handleResult, $elm$json$Json$Decode$value);
-	});
-var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional = F4(
-	function (key, valDecoder, fallback, decoder) {
-		return A2(
-			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
-			A3(
-				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder,
-				_List_fromArray(
-					[key]),
-				valDecoder,
-				fallback),
-			decoder);
-	});
-var $author$project$Common$JournalTheme$AmorFati = {$: 'AmorFati'};
-var $author$project$Common$JournalTheme$PremeditatioMalorum = {$: 'PremeditatioMalorum'};
-var $elm$json$Json$Decode$fail = _Json_fail;
-var $elm$core$Debug$log = _Debug_log;
-var $elm$core$String$toUpper = _String_toUpper;
-var $author$project$Common$JournalTheme$themeValueFromString = function (theme) {
-	var _v0 = A2($elm$core$Debug$log, 'THEME', theme);
-	var _v1 = $elm$core$String$toUpper(theme);
-	switch (_v1) {
-		case 'AMOR_FATI':
-			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$AmorFati);
-		case 'PREMEDITATIO_MALORUM':
-			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$PremeditatioMalorum);
-		case '':
-			return $elm$json$Json$Decode$succeed($author$project$Common$JournalTheme$None);
-		default:
-			var _v2 = A2($elm$core$Debug$log, 'ERROR CASE', theme);
-			return $elm$json$Json$Decode$fail('invalid journal theme: ' + theme);
-	}
-};
-var $author$project$Common$JournalTheme$themeValueDecoder = A2($elm$json$Json$Decode$andThen, $author$project$Common$JournalTheme$themeValueFromString, $elm$json$Json$Decode$string);
 var $author$project$Common$JournalTheme$journalThemeDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 	'data',
@@ -11305,36 +11300,13 @@ var $author$project$Common$Toast$Model = F3(
 var $author$project$Common$Toast$None = {$: 'None'};
 var $author$project$Common$JournalEntry$emptyMorningJournal = function () {
 	var journalId = $author$project$Common$JournalEntry$JournalId('');
-	var createdAt = 0;
-	var content = {
-		amorFati: A2(
-			$author$project$Common$JournalSection$JournalSection,
-			'Amor Fati',
-			$elm$core$Dict$fromList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						'thank_you',
-						A2($author$project$Common$JournalField$JournalField, 'thank_you', '')),
-						_Utils_Tuple2(
-						'thoughts',
-						A2($author$project$Common$JournalField$JournalField, 'thoughts', ''))
-					]))),
-		premeditatioMalorum: A2(
-			$author$project$Common$JournalSection$JournalSection,
-			'Premeditatio Malorum',
-			$elm$core$Dict$fromList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						'vice',
-						A2($author$project$Common$JournalField$JournalField, 'vice', '')),
-						_Utils_Tuple2(
-						'strategy',
-						A2($author$project$Common$JournalField$JournalField, 'strategy', ''))
-					])))
-	};
-	return A3($author$project$Common$JournalEntry$JournalEntry, journalId, createdAt, content);
+	return A5(
+		$author$project$Common$JournalEntry$JournalEntry,
+		journalId,
+		$author$project$Common$JournalTheme$None,
+		A5($author$project$Common$JournalEntry$JournalContent, '', '', '', '', ''),
+		0,
+		0);
 }();
 var $author$project$Page$NewJournalEntry$initialModel = function (navKey) {
 	var toast = A3($author$project$Common$Toast$Model, $author$project$Common$Toast$HideToast, '', $author$project$Common$Toast$None);
@@ -11812,69 +11784,58 @@ var $author$project$Common$Toast$ShowToast = {$: 'ShowToast'};
 var $author$project$Page$NewJournalEntry$JournalEntryCreated = function (a) {
 	return {$: 'JournalEntryCreated', a: a};
 };
-var $elm$json$Json$Encode$dict = F3(
-	function (toKey, toValue, dictionary) {
-		return _Json_wrap(
-			A3(
-				$elm$core$Dict$foldl,
-				F3(
-					function (key, value, obj) {
-						return A3(
-							_Json_addField,
-							toKey(key),
-							toValue(value),
-							obj);
-					}),
-				_Json_emptyObject(_Utils_Tuple0),
-				dictionary));
-	});
-var $author$project$Common$JournalField$journalFieldEncoder = function (journalField) {
+var $author$project$Common$JournalEntry$journalContentEncoder = function (content) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'field',
-				$elm$json$Json$Encode$string(journalField.field)),
+				'quote',
+				$elm$json$Json$Encode$string(content.quote)),
 				_Utils_Tuple2(
-				'value',
-				$elm$json$Json$Encode$string(journalField.value))
+				'idea_nudge',
+				$elm$json$Json$Encode$string(content.idea_nudge)),
+				_Utils_Tuple2(
+				'idea',
+				$elm$json$Json$Encode$string(content.idea)),
+				_Utils_Tuple2(
+				'thought_nudge',
+				$elm$json$Json$Encode$string(content.thought_nudge)),
+				_Utils_Tuple2(
+				'thought',
+				$elm$json$Json$Encode$string(content.thought))
 			]));
 };
-var $author$project$Common$JournalSection$journalSectionEncoder = function (section) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'title',
-				$elm$json$Json$Encode$string(section.title)),
-				_Utils_Tuple2(
-				'fields',
-				A3($elm$json$Json$Encode$dict, $elm$core$Basics$identity, $author$project$Common$JournalField$journalFieldEncoder, section.fields))
-			]));
+var $author$project$Common$JournalTheme$themeValueToString = function (theme) {
+	switch (theme.$) {
+		case 'AmorFati':
+			return 'AMOR_FATI';
+		case 'PremeditatioMalorum':
+			return 'PREMEDITATIO_MALORUM';
+		default:
+			return '';
+	}
 };
-var $author$project$Common$JournalEntry$newMorningJournalEncoder = function (journal) {
+var $author$project$Common$JournalTheme$themeValueEncoder = function (theme) {
+	return $elm$json$Json$Encode$string(
+		$author$project$Common$JournalTheme$themeValueToString(theme));
+};
+var $author$project$Common$JournalEntry$journalEntryEncoder = function (journal) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
+				_Utils_Tuple2(
+				'theme',
+				$author$project$Common$JournalTheme$themeValueEncoder(journal.theme)),
 				_Utils_Tuple2(
 				'content',
-				$elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'amor_fati',
-							$author$project$Common$JournalSection$journalSectionEncoder(journal.content.amorFati)),
-							_Utils_Tuple2(
-							'premeditatio_malorum',
-							$author$project$Common$JournalSection$journalSectionEncoder(journal.content.premeditatioMalorum))
-						])))
+				$author$project$Common$JournalEntry$journalContentEncoder(journal.content))
 			]));
 };
 var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (journal) {
 	return $elm$http$Http$post(
 		{
 			body: $elm$http$Http$jsonBody(
-				$author$project$Common$JournalEntry$newMorningJournalEncoder(journal)),
+				$author$project$Common$JournalEntry$journalEntryEncoder(journal)),
 			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$journalEntryDecoder),
 			url: 'http://localhost:8080/journal/entry/create/'
 		});
@@ -11899,6 +11860,7 @@ var $author$project$Page$NewJournalEntry$delay = F3(
 			},
 			$elm$core$Process$sleep(interval));
 	});
+var $author$project$Common$JournalThemeData$emptyJournalThemeData = A3($author$project$Common$JournalThemeData$JournalThemeData, '', '', '');
 var $author$project$Error$errorFromHttpError = function (err) {
 	switch (err.$) {
 		case 'Timeout':
@@ -11948,110 +11910,46 @@ var $author$project$Logger$logMessage = F2(
 		var _v0 = A2($elm$core$Debug$log, levelValue, msg);
 		return $elm$core$Maybe$Nothing;
 	});
-var $author$project$Common$JournalTheme$themeValueToString = function (theme) {
-	switch (theme.$) {
-		case 'AmorFati':
-			return 'AMOR_FATI';
-		case 'PremeditatioMalorum':
-			return 'PREMEDITATIO_MALORUM';
-		default:
-			return '';
-	}
-};
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
+var $author$project$Common$JournalEntry$updateJournalIdea = F2(
+	function (entry, idea) {
+		var oldContent = entry.content;
+		var newContent = _Utils_update(
+			oldContent,
+			{idea: idea});
+		return _Utils_update(
+			entry,
+			{content: newContent});
 	});
-var $author$project$Common$JournalSection$setFieldValue = F3(
-	function (js, fieldName, fieldValue) {
-		var updatedField = function () {
-			var _v1 = A2($elm$core$Dict$get, fieldName, js.fields);
-			if (_v1.$ === 'Nothing') {
-				return A2($author$project$Common$JournalField$JournalField, '', '');
-			} else {
-				var field = _v1.a;
-				return _Utils_update(
-					field,
-					{value: fieldValue});
-			}
-		}();
-		var fieldsUpdated = A3(
-			$elm$core$Dict$update,
-			fieldName,
-			$elm$core$Maybe$map(
-				function (_v0) {
-					return updatedField;
-				}),
-			js.fields);
-		var newJS = _Utils_update(
-			js,
-			{fields: fieldsUpdated});
-		return newJS;
-	});
-var $author$project$Common$JournalEntry$updateJournalContent = F4(
-	function (journal, sectionName, fieldName, fieldValue) {
-		var oldContent = journal.content;
-		switch (sectionName) {
-			case 'amor_fati':
-				return _Utils_update(
-					journal,
-					{
-						content: _Utils_update(
-							oldContent,
-							{
-								amorFati: A3($author$project$Common$JournalSection$setFieldValue, journal.content.amorFati, fieldName, fieldValue)
-							})
-					});
-			case 'premeditatio_malorum':
-				return _Utils_update(
-					journal,
-					{
-						content: _Utils_update(
-							oldContent,
-							{
-								premeditatioMalorum: A3($author$project$Common$JournalSection$setFieldValue, journal.content.premeditatioMalorum, fieldName, fieldValue)
-							})
-					});
-			default:
-				return journal;
-		}
+var $author$project$Common$JournalEntry$updateJournalThought = F2(
+	function (entry, thought) {
+		var oldContent = entry.content;
+		var newContent = _Utils_update(
+			oldContent,
+			{thought: thought});
+		return _Utils_update(
+			entry,
+			{content: newContent});
 	});
 var $author$project$Page$NewJournalEntry$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'StoreAmorFatiThoughts':
+			case 'StoreJournalIdea':
+				var idea = msg.a;
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{
+							journal: A2($author$project$Common$JournalEntry$updateJournalIdea, model.journal, idea)
+						}),
+					$elm$core$Platform$Cmd$none,
+					$author$project$Page$NewJournalEntry$CloseModal);
+			case 'StoreJournalThought':
 				var thoughts = msg.a;
 				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{
-							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'amor_fati', 'thoughts', thoughts)
-						}),
-					$elm$core$Platform$Cmd$none,
-					$author$project$Page$NewJournalEntry$CloseModal);
-			case 'StorePremeditatioMalorumVice':
-				var vice = msg.a;
-				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'premeditatio_malorum', 'vice', vice)
-						}),
-					$elm$core$Platform$Cmd$none,
-					$author$project$Page$NewJournalEntry$CloseModal);
-			case 'StorePremeditatioMalorumStrategy':
-				var strategy = msg.a;
-				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							journal: A4($author$project$Common$JournalEntry$updateJournalContent, model.journal, 'premeditatio_malorum', 'strategy', strategy)
+							journal: A2($author$project$Common$JournalEntry$updateJournalThought, model.journal, thoughts)
 						}),
 					$elm$core$Platform$Cmd$none,
 					$author$project$Page$NewJournalEntry$CloseModal);
@@ -12103,14 +12001,16 @@ var $author$project$Page$NewJournalEntry$update = F2(
 			case 'JournalThemeSelected':
 				var theme = msg.a;
 				var themesList = function () {
-					var _v4 = model.journalThemesList;
-					if (_v4.$ === 'Success') {
-						var ts = _v4.a;
+					var _v3 = model.journalThemesList;
+					if (_v3.$ === 'Success') {
+						var ts = _v3.a;
 						return ts;
 					} else {
 						return _List_Nil;
 					}
 				}();
+				var oldJournal = model.journal;
+				var oldContent = oldJournal.content;
 				var isSelectedTheme = function (t) {
 					return _Utils_eq(
 						$author$project$Common$JournalTheme$themeValueToString(theme),
@@ -12118,12 +12018,24 @@ var $author$project$Page$NewJournalEntry$update = F2(
 				};
 				var selectedTheme = $elm$core$List$head(
 					A2($elm$core$List$filter, isSelectedTheme, themesList));
-				var _v2 = A2($elm$core$Debug$log, 'themes list', themesList);
-				var _v3 = A2($elm$core$Debug$log, 'selected theme', selectedTheme);
+				var themeData = function () {
+					if (selectedTheme.$ === 'Just') {
+						var v = selectedTheme.a;
+						return v.data;
+					} else {
+						return $author$project$Common$JournalThemeData$emptyJournalThemeData;
+					}
+				}();
+				var newContent = _Utils_update(
+					oldContent,
+					{idea_nudge: themeData.ideaNudge, quote: themeData.quote, thought_nudge: themeData.thoughtNudge});
+				var newJournal = _Utils_update(
+					oldJournal,
+					{content: newContent, theme: theme});
 				return _Utils_Tuple3(
 					_Utils_update(
 						model,
-						{selectedJournalTheme: selectedTheme}),
+						{journal: newJournal, selectedJournalTheme: selectedTheme}),
 					$elm$core$Platform$Cmd$none,
 					$author$project$Page$NewJournalEntry$OpenModal);
 			case 'CloseThemeSelectModal':
@@ -12274,7 +12186,6 @@ var $author$project$Page$ListJournalsEntries$viewModal = function (model) {
 	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $author$project$Common$JournalThemeData$emptyJournalThemeData = A3($author$project$Common$JournalThemeData$JournalThemeData, '', '', '');
 var $author$project$Common$JournalTheme$emptyJournalTheme = A6($author$project$Common$JournalTheme$JournalTheme, $author$project$Common$JournalTheme$None, '', '', '', '', $author$project$Common$JournalThemeData$emptyJournalThemeData);
 var $author$project$Page$NewJournalEntry$JournalThemeSelected = function (a) {
 	return {$: 'JournalThemeSelected', a: a};
@@ -13531,11 +13442,11 @@ var $author$project$Page$ListJournalsEntries$view = function (model) {
 	}
 };
 var $author$project$Page$NewJournalEntry$CreateMorningJournalEntry = {$: 'CreateMorningJournalEntry'};
-var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy = function (a) {
-	return {$: 'StorePremeditatioMalorumStrategy', a: a};
+var $author$project$Page$NewJournalEntry$StoreJournalIdea = function (a) {
+	return {$: 'StoreJournalIdea', a: a};
 };
-var $author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice = function (a) {
-	return {$: 'StorePremeditatioMalorumVice', a: a};
+var $author$project$Page$NewJournalEntry$StoreJournalThought = function (a) {
+	return {$: 'StoreJournalThought', a: a};
 };
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
@@ -13660,19 +13571,6 @@ var $elm$html$Html$Attributes$cols = function (n) {
 		'cols',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Common$JournalSection$getField = F2(
-	function (js, fieldName) {
-		var field = function () {
-			var _v0 = A2($elm$core$Dict$get, fieldName, js.fields);
-			if (_v0.$ === 'Nothing') {
-				return A2($author$project$Common$JournalField$JournalField, '', '');
-			} else {
-				var jf = _v0.a;
-				return jf;
-			}
-		}();
-		return field;
-	});
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
@@ -13684,8 +13582,6 @@ var $elm$html$Html$Attributes$rows = function (n) {
 };
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) {
-	var vice = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'vice');
-	var thoughts = A2($author$project$Common$JournalSection$getField, model.journal.content.amorFati, 'thoughts');
 	var selectedTheme = function () {
 		var _v0 = model.selectedJournalTheme;
 		if (_v0.$ === 'Just') {
@@ -13695,7 +13591,6 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 			return $author$project$Common$JournalTheme$emptyJournalTheme;
 		}
 	}();
-	var premeditatioMalorumStrategy = A2($author$project$Common$JournalSection$getField, model.journal.content.premeditatioMalorum, 'strategy');
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -13754,8 +13649,8 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$placeholder(''),
-										$elm$html$Html$Attributes$value(vice.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumVice)
+										$elm$html$Html$Attributes$value(model.journal.content.idea),
+										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StoreJournalIdea)
 									]),
 								_List_Nil)
 							])),
@@ -13785,8 +13680,8 @@ var $author$project$Page$NewJournalEntry$newJournalEntryForm = function (model) 
 										$elm$html$Html$Attributes$cols(100),
 										$elm$html$Html$Attributes$rows(10),
 										$elm$html$Html$Attributes$placeholder(''),
-										$elm$html$Html$Attributes$value(premeditatioMalorumStrategy.value),
-										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StorePremeditatioMalorumStrategy),
+										$elm$html$Html$Attributes$value(model.journal.content.thought),
+										$elm$html$Html$Events$onInput($author$project$Page$NewJournalEntry$StoreJournalThought),
 										A2($elm$html$Html$Attributes$style, 'width', '100%')
 									]),
 								_List_Nil)
@@ -13849,7 +13744,6 @@ var $author$project$Page$NewJournalEntry$view = function (model) {
 		_List_fromArray(
 			[formHtml]));
 };
-var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entry) {
 	return A2(
 		$elm$html$Html$div,
@@ -13948,101 +13842,7 @@ var $author$project$Page$ViewJournalEntry$buildJournalEntryHtml = function (entr
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text(
-												A2($author$project$Common$JournalSection$getField, entry.content.amorFati, 'thoughts').value)
-											]))
-									]))
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card'),
-								A2($elm$html$Html$Attributes$style, 'width', '100%')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('card-header')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Premeditatio Malorum')
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('card-body')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$div,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('row gy-1')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('card-text')
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$strong,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('What\'s a vice you think you might encounter today?')
-															]))
-													])),
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('card-text')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														A2($author$project$Common$JournalSection$getField, entry.content.premeditatioMalorum, 'vice').value)
-													])),
-												A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('card-text')
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$strong,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('How will you handle this vice?')
-															]))
-													])),
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('card-text')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														A2($author$project$Common$JournalSection$getField, entry.content.premeditatioMalorum, 'strategy').value)
-													]))
+												$elm$html$Html$text(entry.content.idea)
 											]))
 									]))
 							]))
@@ -14141,7 +13941,7 @@ var $author$project$Main$view = function (model) {
 				$author$project$Main$currentModal(model),
 				$author$project$Main$currentView(model)
 			]),
-		title: 'Pained Porch'
+		title: 'Painted Porch'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
@@ -14156,4 +13956,4 @@ var $author$project$Main$main = $elm$browser$Browser$application(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.Content":{"args":[],"type":"{ amorFati : Common.JournalSection.JournalSection, premeditatioMalorum : Common.JournalSection.JournalSection }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, createdAt : Basics.Int, content : Common.JournalEntry.Content }"},"Common.JournalField.JournalField":{"args":[],"type":"{ field : String.String, value : String.String }"},"Common.JournalSection.JournalSection":{"args":[],"type":"{ title : String.String, fields : Dict.Dict String.String Common.JournalField.JournalField }"},"Common.JournalTheme.JournalTheme":{"args":[],"type":"{ theme : Common.JournalTheme.ThemeValue, name : String.String, oneLineDesc : String.String, detailedDesc : String.String, accentColor : String.String, data : Common.JournalThemeData.JournalThemeData }"},"Common.JournalThemeData.JournalThemeData":{"args":[],"type":"{ quote : String.String, ideaNudge : String.String, thoughtNudge : String.String }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreAmorFatiThoughts":["String.String"],"StorePremeditatioMalorumVice":["String.String"],"StorePremeditatioMalorumStrategy":["String.String"],"FetchJournalThemes":[],"JournalThemesReceived":["RemoteData.WebData (List.List Common.JournalTheme.JournalTheme)"],"JournalThemeSelected":["Common.JournalTheme.ThemeValue"],"StartJournaling":[],"CloseThemeSelectModal":[],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"],"ToastVisibilityToggle":["Common.Toast.Msg"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.Toast.Msg":{"args":[],"tags":{"ShowToast":[],"HideToast":[]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Common.JournalTheme.ThemeValue":{"args":[],"tags":{"AmorFati":[],"PremeditatioMalorum":[],"None":[]}},"Dict.NColor":{"args":[],"tags":{"Red":[],"Black":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"},"Common.JournalEntry.JournalContent":{"args":[],"type":"{ quote : String.String, idea_nudge : String.String, thought_nudge : String.String, idea : String.String, thought : String.String }"},"Common.JournalEntry.JournalEntry":{"args":[],"type":"{ id : Common.JournalEntry.JournalId, theme : Common.JournalTheme.ThemeValue, content : Common.JournalEntry.JournalContent, createdAt : Basics.Int, updatedAt : Basics.Int }"},"Common.JournalTheme.JournalTheme":{"args":[],"type":"{ theme : Common.JournalTheme.ThemeValue, name : String.String, oneLineDesc : String.String, detailedDesc : String.String, accentColor : String.String, data : Common.JournalThemeData.JournalThemeData }"},"Common.JournalThemeData.JournalThemeData":{"args":[],"type":"{ quote : String.String, ideaNudge : String.String, thoughtNudge : String.String }"},"RemoteData.WebData":{"args":["a"],"type":"RemoteData.RemoteData Http.Error a"}},"unions":{"Main.Msg":{"args":[],"tags":{"ListJournalsMsg":["Page.ListJournalsEntries.Msg"],"NewJournalEntryMsg":["Page.NewJournalEntry.Msg"],"ViewJournalEntryMsg":["Page.ViewJournalEntry.Msg"],"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.ListJournalsEntries.Msg":{"args":[],"tags":{"FetchJournalEntries":[],"JournalEntriesReceived":["RemoteData.WebData (List.List Common.JournalEntry.JournalEntry)"]}},"Page.NewJournalEntry.Msg":{"args":[],"tags":{"StoreJournalIdea":["String.String"],"StoreJournalThought":["String.String"],"FetchJournalThemes":[],"JournalThemesReceived":["RemoteData.WebData (List.List Common.JournalTheme.JournalTheme)"],"JournalThemeSelected":["Common.JournalTheme.ThemeValue"],"StartJournaling":[],"CloseThemeSelectModal":[],"CreateMorningJournalEntry":[],"JournalEntryCreated":["Result.Result Http.Error Common.JournalEntry.JournalEntry"],"ToastVisibilityToggle":["Common.Toast.Msg"]}},"Page.ViewJournalEntry.Msg":{"args":[],"tags":{"JournalEntryReceived":["RemoteData.WebData Common.JournalEntry.JournalEntry"]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Common.JournalEntry.JournalId":{"args":[],"tags":{"JournalId":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Common.Toast.Msg":{"args":[],"tags":{"ShowToast":[],"HideToast":[]}},"RemoteData.RemoteData":{"args":["e","a"],"tags":{"NotAsked":[],"Loading":[],"Failure":["e"],"Success":["a"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Common.JournalTheme.ThemeValue":{"args":[],"tags":{"AmorFati":[],"PremeditatioMalorum":[],"None":[]}}}}})}});}(this));

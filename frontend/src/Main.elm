@@ -193,7 +193,7 @@ update msg model =
 
 view : Model -> Document Msg
 view model =
-    { title = "Pained Porch"
+    { title = "Painted Porch"
     , body =
         [ currentNavBar model
         , currentModal model

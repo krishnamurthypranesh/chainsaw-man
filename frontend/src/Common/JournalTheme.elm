@@ -1,6 +1,17 @@
-module Common.JournalTheme exposing (..)
+module Common.JournalTheme exposing
+    ( JournalTheme
+    , ThemeValue(..)
+    , emptyJournalTheme
+    , journalThemeDecoder
+    , journalThemeEncoder
+    , journalThemeListDecoder
+    , themeValueDecoder
+    , themeValueEncoder
+    , themeValueFromString
+    , themeValueToString
+    )
 
-import Common.JournalThemeData exposing (JournalThemeData, emptyJournalThemeData, journalThemeDataDecoder)
+import Common.JournalThemeData exposing (JournalThemeData, emptyJournalThemeData, journalThemeDataDecoder, journalThemeDataEncoder)
 import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode
@@ -78,6 +89,27 @@ journalThemeDecoder =
 journalThemeListDecoder : Decoder (List JournalTheme)
 journalThemeListDecoder =
     list journalThemeDecoder
+
+
+
+-- ENCODERS
+
+
+themeValueEncoder : ThemeValue -> Encode.Value
+themeValueEncoder theme =
+    Encode.string (themeValueToString theme)
+
+
+journalThemeEncoder : JournalTheme -> Encode.Value
+journalThemeEncoder theme =
+    Encode.object
+        [ ( "theme", themeValueEncoder theme.theme )
+        , ( "name", Encode.string theme.name )
+        , ( "oneLineDesc", Encode.string theme.oneLineDesc )
+        , ( "detailedDesc", Encode.string theme.detailedDesc )
+        , ( "accentColor", Encode.string theme.accentColor )
+        , ( "data", journalThemeDataEncoder theme.data )
+        ]
 
 
 emptyJournalTheme : JournalTheme

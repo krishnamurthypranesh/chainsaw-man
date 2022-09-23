@@ -1,9 +1,10 @@
 module Page.NewJournalEntry exposing (Modal(..), Model, Msg, OutMsg(..), buildNavBar, init, update, view, viewModal)
 
 import Browser.Navigation as Nav
-import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, newMorningJournalEncoder, updateJournalContent)
+import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, journalEntryEncoder, updateJournalIdea, updateJournalThought)
 import Common.JournalSection as JournalSection
 import Common.JournalTheme as JournalTheme
+import Common.JournalThemeData exposing (emptyJournalThemeData)
 import Common.Toast as Toast
 import Error exposing (errorFromHttpError)
 import Html exposing (..)
@@ -50,9 +51,8 @@ type alias ModalOptions =
 type
     Msg
     -- storing journal content
-    = StoreAmorFatiThoughts String
-    | StorePremeditatioMalorumVice String
-    | StorePremeditatioMalorumStrategy String
+    = StoreJournalIdea String
+    | StoreJournalThought String
       -- fetching and choosing journal themes
     | FetchJournalThemes
     | JournalThemesReceived (WebData (List JournalTheme.JournalTheme))
@@ -77,14 +77,11 @@ type Modal
 update : Msg -> Model -> ( Model, Cmd Msg, Modal -> OutMsg )
 update msg model =
     case msg of
-        StoreAmorFatiThoughts thoughts ->
-            ( { model | journal = updateJournalContent model.journal "amor_fati" "thoughts" thoughts }, Cmd.none, CloseModal )
+        StoreJournalIdea idea ->
+            ( { model | journal = updateJournalIdea model.journal idea }, Cmd.none, CloseModal )
 
-        StorePremeditatioMalorumVice vice ->
-            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "vice" vice }, Cmd.none, CloseModal )
-
-        StorePremeditatioMalorumStrategy strategy ->
-            ( { model | journal = updateJournalContent model.journal "premeditatio_malorum" "strategy" strategy }, Cmd.none, CloseModal )
+        StoreJournalThought thoughts ->
+            ( { model | journal = updateJournalThought model.journal thoughts }, Cmd.none, CloseModal )
 
         FetchJournalThemes ->
             ( { model | journalThemesList = RemoteData.Loading, isModalOpen = True }, fetchJournalThemes, OpenModal )
@@ -129,9 +126,6 @@ update msg model =
                         _ ->
                             []
 
-                _ =
-                    Debug.log "themes list" themesList
-
                 isSelectedTheme t =
                     if JournalTheme.themeValueToString theme == JournalTheme.themeValueToString t.theme then
                         True
@@ -143,10 +137,31 @@ update msg model =
                     List.filter isSelectedTheme themesList
                         |> List.head
 
-                _ =
-                    Debug.log "selected theme" selectedTheme
+                themeData =
+                    case selectedTheme of
+                        Just v ->
+                            v.data
+
+                        Nothing ->
+                            emptyJournalThemeData
+
+                oldJournal =
+                    model.journal
+
+                oldContent =
+                    oldJournal.content
+
+                newContent =
+                    { oldContent
+                        | quote = themeData.quote
+                        , idea_nudge = themeData.ideaNudge
+                        , thought_nudge = themeData.thoughtNudge
+                    }
+
+                newJournal =
+                    { oldJournal | theme = theme, content = newContent }
             in
-            ( { model | selectedJournalTheme = selectedTheme }, Cmd.none, OpenModal )
+            ( { model | selectedJournalTheme = selectedTheme, journal = newJournal }, Cmd.none, OpenModal )
 
         CloseThemeSelectModal ->
             ( { model | selectedJournalTheme = Nothing, isModalOpen = False }, Cmd.none, CloseModal )
@@ -167,7 +182,7 @@ createMorningJournalEntry : JournalEntry -> Cmd Msg
 createMorningJournalEntry journal =
     Http.post
         { url = "http://localhost:8080/journal/entry/create/"
-        , body = Http.jsonBody (newMorningJournalEncoder journal)
+        , body = Http.jsonBody (journalEntryEncoder journal)
         , expect = Http.expectJson JournalEntryCreated journalEntryDecoder
         }
 
@@ -226,16 +241,6 @@ newJournalEntryForm model =
 
                 Nothing ->
                     JournalTheme.emptyJournalTheme
-
-        thoughts =
-            JournalSection.getField model.journal.content.amorFati "thoughts"
-
-        -- premeditatio malorum
-        vice =
-            JournalSection.getField model.journal.content.premeditatioMalorum "vice"
-
-        premeditatioMalorumStrategy =
-            JournalSection.getField model.journal.content.premeditatioMalorum "strategy"
     in
     div
         []
@@ -247,13 +252,13 @@ newJournalEntryForm model =
                 [ text selectedTheme.data.ideaNudge ]
             , div
                 [ class "input-group mb-3" ]
-                [ input [ placeholder "", value vice.value, onInput StorePremeditatioMalorumVice ] []
+                [ input [ placeholder "", value model.journal.content.idea, onInput StoreJournalIdea ] []
                 ]
             , br [] []
             , label [ class "form-label" ]
                 [ text selectedTheme.data.thoughtNudge ]
             , div [ class "input-group mb-3" ]
-                [ textarea [ cols 100, rows 10, placeholder "", value premeditatioMalorumStrategy.value, onInput StorePremeditatioMalorumStrategy, style "width" "100%" ] []
+                [ textarea [ cols 100, rows 10, placeholder "", value model.journal.content.thought, onInput StoreJournalThought, style "width" "100%" ] []
                 ]
             ]
         , br [] []

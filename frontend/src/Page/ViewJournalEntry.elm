@@ -132,31 +132,7 @@ buildJournalEntryHtml entry =
                             ]
                         ]
                     , p [ class "card-text" ]
-                        [ text (getField entry.content.amorFati "thoughts").value
-                        ]
-                    ]
-                ]
-            , div [ class "card", style "width" "100%" ]
-                [ div [ class "card-header" ] [ text "Premeditatio Malorum" ]
-                , div [ class "card-body" ]
-                    [ div [ class "row gy-1" ]
-                        [ p [ class "card-text" ]
-                            [ strong []
-                                [ text "What's a vice you think you might encounter today?"
-                                ]
-                            ]
-                        , p [ class "card-text" ]
-                            [ text (getField entry.content.premeditatioMalorum "vice").value
-                            ]
-                        , hr [] []
-                        , p [ class "card-text" ]
-                            [ strong []
-                                [ text "How will you handle this vice?"
-                                ]
-                            ]
-                        , p [ class "card-text" ]
-                            [ text (getField entry.content.premeditatioMalorum "strategy").value
-                            ]
+                        [ text entry.content.idea
                         ]
                     ]
                 ]
