@@ -4,27 +4,28 @@ from bson import ObjectId
 from pydantic import BaseModel, Field
 
 from models.base import PyObjectId
-from models.journal_theme import JournalTheme
+from models.base import JournalThemeType
+
 
 class JournalThemeData(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: Union[PyObjectId, None] = Field(default_factory=PyObjectId, alias="_id")
     created_at: int = None
     updated_at: int = None
-    theme: str
+    theme: JournalThemeType
     quote: str
     idea_nudge: str
     thought_nudge: str
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
 
 class GetJournalThemeDataInput(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    theme: JournalTheme = None
+    theme: JournalThemeType = None
     get_random: bool = True
-
 
 
 class GetJournalThemeDataQuery(BaseModel):

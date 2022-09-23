@@ -1,3 +1,4 @@
+from enum import Enum
 from bson import ObjectId
 
 
@@ -15,3 +16,9 @@ class PyObjectId(ObjectId):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
+
+
+class JournalThemeType(str, Enum):
+    none = ""
+    amor_fati = "AMOR_FATI"
+    premeditatio_malorum = "PREMEDITATIO_MALORUM"

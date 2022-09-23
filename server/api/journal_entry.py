@@ -47,7 +47,6 @@ class JournalEntry:
         return JSONResponse(status_code=status.HTTP_200_OK, content=journal_entry)
 
     async def list_journals(self, input: entry_models.ListJournalEntryInput):
-        print(f"input: {input.journal_type}")
         entries = await self.journal_entries_repo.find()
 
         return JSONResponse(status_code=status.HTTP_200_OK, content=entries)

@@ -2,7 +2,7 @@ module Common.JournalEntry exposing
     ( JournalEntry
     , JournalId
     , ListJournalEntriesInput
-    , emptyMorningJournal
+    , emptyJournalEntry
     , idParser
     , idToString
     , journalEntriesListDecoder
@@ -22,7 +22,7 @@ import Url.Parser exposing (Parser, custom)
 
 type alias JournalEntry =
     { id : JournalId
-    , theme : ThemeValue
+    , theme : JournalTheme
     , content : JournalContent
     , createdAt : Int
     , updatedAt : Int
@@ -68,7 +68,7 @@ journalEntryDecoder : Decoder JournalEntry
 journalEntryDecoder =
     Decode.succeed JournalEntry
         |> required "_id" idDecoder
-        |> required "theme" themeValueDecoder
+        |> required "theme" journalThemeDecoder
         |> required "content" journalContentDecoder
         |> required "created_at" Decode.int
         |> optional "updated_at" Decode.int 0
@@ -96,7 +96,7 @@ journalContentDecoder =
 journalEntryEncoder : JournalEntry -> Encode.Value
 journalEntryEncoder journal =
     Encode.object
-        [ ( "theme", themeValueEncoder journal.theme )
+        [ ( "theme", journalThemeEncoder journal.theme )
         , ( "content", journalContentEncoder journal.content )
         ]
 
@@ -116,13 +116,13 @@ journalContentEncoder content =
 -- CONSTRUCTORS
 
 
-emptyMorningJournal : JournalEntry
-emptyMorningJournal =
+emptyJournalEntry : JournalEntry
+emptyJournalEntry =
     let
         journalId =
             JournalId ""
     in
-    JournalEntry journalId None (JournalContent "" "" "" "" "") 0 0
+    JournalEntry journalId emptyJournalTheme (JournalContent "" "" "" "" "") 0 0
 
 
 updateJournalIdea : JournalEntry -> String -> JournalEntry
@@ -156,7 +156,7 @@ updateJournalThought entry thought =
 type alias ListJournalEntriesInput =
     { createdAfter : Int
     , createdBefore : Int
-    , journalType : String
+    , theme : ThemeValue
     }
 
 
@@ -165,5 +165,5 @@ listJournalEntriesInputEncoder input =
     Encode.object
         [ ( "created_after", Encode.int input.createdAfter )
         , ( "created_before", Encode.int input.createdBefore )
-        , ( "journal_type", Encode.string input.journalType )
+        , ( "theme", themeValueEncoder input.theme )
         ]

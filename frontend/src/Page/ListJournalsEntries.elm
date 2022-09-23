@@ -1,11 +1,12 @@
 module Page.ListJournalsEntries exposing (..)
 
 import Common.JournalEntry exposing (JournalEntry, ListJournalEntriesInput, idToString, journalEntriesListDecoder, journalEntryDecoder, listJournalEntriesInputEncoder)
+import Common.JournalTheme exposing (ThemeValue(..), themeValueToFormattedString)
 import Error exposing (errorFromHttpError)
 import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, scope, type_)
-import Http exposing (get)
+import Http
 import RemoteData exposing (WebData)
 import Time exposing (millisToPosix)
 
@@ -34,7 +35,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         model =
-            { journalEntries = RemoteData.Loading, input = ListJournalEntriesInput 0 0 "" }
+            { journalEntries = RemoteData.Loading, input = ListJournalEntriesInput 0 0 None }
     in
     ( model, fetchJournalEntries model.input )
 
@@ -88,8 +89,8 @@ buildListTable journalEntries =
         tableHeaders =
             thead []
                 [ tr []
-                    [ th [ scope "col" ] [ text "ID" ]
-                    , th [ scope "col" ] [ text "Type" ]
+                    [ th [ scope "col" ] [ text "Idea" ]
+                    , th [ scope "col" ] [ text "Theme" ]
                     , th [ scope "col" ] [ text "Created At" ]
                     , th [ scope "col" ] [ text "" ]
                     ]
@@ -112,9 +113,9 @@ tableRowFromJournalEntry entry =
     in
     tr []
         [ th [ scope "row" ]
-            [ text (idToString entry.id)
+            [ text entry.content.idea
             ]
-        , td [] [ text "Morning Journal" ]
+        , td [] [ text (themeValueToFormattedString entry.theme.theme) ]
         , td [] [ text (dateTimeFromTs createdTS) ]
         , td []
             [ a [ href ("/journals/entries/" ++ idToString entry.id ++ "") ] [ text "View" ]

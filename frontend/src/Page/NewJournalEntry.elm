@@ -1,10 +1,8 @@
 module Page.NewJournalEntry exposing (Modal(..), Model, Msg, OutMsg(..), buildNavBar, init, update, view, viewModal)
 
 import Browser.Navigation as Nav
-import Common.JournalEntry exposing (JournalEntry, emptyMorningJournal, journalEntryDecoder, journalEntryEncoder, updateJournalIdea, updateJournalThought)
-import Common.JournalSection as JournalSection
+import Common.JournalEntry exposing (JournalEntry, emptyJournalEntry, journalEntryDecoder, journalEntryEncoder, updateJournalIdea, updateJournalThought)
 import Common.JournalTheme as JournalTheme
-import Common.JournalThemeData exposing (emptyJournalThemeData)
 import Common.Toast as Toast
 import Error exposing (errorFromHttpError)
 import Html exposing (..)
@@ -140,10 +138,10 @@ update msg model =
                 themeData =
                     case selectedTheme of
                         Just v ->
-                            v.data
+                            v
 
                         Nothing ->
-                            emptyJournalThemeData
+                            JournalTheme.emptyJournalTheme
 
                 oldJournal =
                     model.journal
@@ -153,13 +151,13 @@ update msg model =
 
                 newContent =
                     { oldContent
-                        | quote = themeData.quote
-                        , idea_nudge = themeData.ideaNudge
-                        , thought_nudge = themeData.thoughtNudge
+                        | quote = themeData.data.quote
+                        , idea_nudge = themeData.data.ideaNudge
+                        , thought_nudge = themeData.data.thoughtNudge
                     }
 
                 newJournal =
-                    { oldJournal | theme = theme, content = newContent }
+                    { oldJournal | theme = themeData, content = newContent }
             in
             ( { model | selectedJournalTheme = selectedTheme, journal = newJournal }, Cmd.none, OpenModal )
 
@@ -280,7 +278,7 @@ buildOptionFromJournalTheme theme =
     li
         []
         [ a [ class "dropdown-item", href "#", style "color" theme.accentColor, onClick (JournalThemeSelected theme.theme) ]
-            [ text (theme.name ++ " - " ++ theme.oneLineDesc)
+            [ text (theme.name ++ " - " ++ theme.shortDescription)
             ]
         ]
 
@@ -412,7 +410,7 @@ viewModalBody model =
                                 [ style "margin-top" "1rem"
                                 , style "margin-bottom" "2px"
                                 ]
-                                [ text selectedTheme.detailedDesc ]
+                                [ text selectedTheme.detailedDescription ]
                             ]
                         ]
 
@@ -488,7 +486,7 @@ getModalOpts theme =
                     "Choose your journal's theme"
 
                 _ ->
-                    theme.name ++ " - " ++ theme.oneLineDesc
+                    theme.name ++ " - " ++ theme.shortDescription
     in
     { options
         | hideValue = hideValue
@@ -535,18 +533,13 @@ viewModal model =
 buildNavBar : Model -> Html Msg
 buildNavBar model =
     let
+        -- TODO: Fix bug in navbar display when closing modal before theme list data is loaded
+        -- Closing the modal before the theme list data is loaded results in the modal popping up again once the data has been fetched
+        -- This is bad Ux. It's annoying. Fix this later
+        -- I have to maintain the following information: 1. Has the modal already been opened once before?
+        -- I think I'll pick this up later
         selectedTheme =
-            case model.selectedJournalTheme of
-                Just theme ->
-                    theme
-
-                -- TODO: Fix bug in navbar display when closing modal before theme list data is loaded
-                -- Closing the modal before the theme list data is loaded results in the modal popping up again once the data has been fetched
-                -- This is bad Ux. It's annoying. Fix this later
-                -- I have to maintain the following information: 1. Has the modal already been opened once before?
-                -- I think I'll pick this up later
-                Nothing ->
-                    JournalTheme.emptyJournalTheme
+            model.journal.theme
 
         ( styleFilter, styleFilterValue ) =
             if model.isModalOpen then
@@ -648,7 +641,7 @@ initialModel : Nav.Key -> Model
 initialModel navKey =
     let
         journal =
-            emptyMorningJournal
+            emptyJournalEntry
 
         toast =
             Toast.Model Toast.HideToast "" Toast.None

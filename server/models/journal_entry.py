@@ -3,8 +3,8 @@ from bson import ObjectId
 
 from pydantic import BaseModel, Field
 
-from models.base import PyObjectId
 from models.journal_theme import JournalTheme
+from models.base import JournalThemeType, PyObjectId
 
 
 class JournalEntryContent(BaseModel):
@@ -28,7 +28,21 @@ class JournalEntry(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "theme": JournalTheme.amor_fati,
+                "theme": {
+                    "theme": JournalThemeType.none,
+                    "name": "amor fati",
+                    "short_description": "",
+                    "detailed_description": "",
+                    "accent_color": "",
+                    "data": {
+                        "created_at": 0,
+                        "updated_at": 0,
+                        "theme": JournalThemeType.none,
+                        "quote": "",
+                        "idea_nudge": "",
+                        "thought_nudge": "",
+                    },
+                },
                 "created_at": 12345678,
                 "updated_at": 12345678,
                 "content": {
@@ -54,4 +68,4 @@ class GetJournalEntryInput(JournalEntry):
 class ListJournalEntryInput(BaseModel):
     created_after: int = None
     created_before: int = None
-    theme: JournalTheme
+    theme: Union[JournalThemeType, None]

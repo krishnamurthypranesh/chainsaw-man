@@ -8,10 +8,10 @@ module Common.JournalTheme exposing
     , themeValueDecoder
     , themeValueEncoder
     , themeValueFromString
+    , themeValueToFormattedString
     , themeValueToString
     )
 
-import Common.JournalThemeData exposing (JournalThemeData, emptyJournalThemeData, journalThemeDataDecoder, journalThemeDataEncoder)
 import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode
@@ -20,8 +20,8 @@ import Json.Encode as Encode
 type alias JournalTheme =
     { theme : ThemeValue
     , name : String
-    , oneLineDesc : String
-    , detailedDesc : String
+    , shortDescription : String
+    , detailedDescription : String
     , accentColor : String
     , data : JournalThemeData
     }
@@ -75,6 +75,19 @@ themeValueToString theme =
             ""
 
 
+themeValueToFormattedString : ThemeValue -> String
+themeValueToFormattedString theme =
+    case theme of
+        AmorFati ->
+            "Amor Fati"
+
+        PremeditatioMalorum ->
+            "Premeditatio Malorum"
+
+        None ->
+            ""
+
+
 journalThemeDecoder : Decoder JournalTheme
 journalThemeDecoder =
     Decode.succeed JournalTheme
@@ -105,9 +118,9 @@ journalThemeEncoder theme =
     Encode.object
         [ ( "theme", themeValueEncoder theme.theme )
         , ( "name", Encode.string theme.name )
-        , ( "oneLineDesc", Encode.string theme.oneLineDesc )
-        , ( "detailedDesc", Encode.string theme.detailedDesc )
-        , ( "accentColor", Encode.string theme.accentColor )
+        , ( "short_description", Encode.string theme.shortDescription )
+        , ( "detailed_description", Encode.string theme.detailedDescription )
+        , ( "accent_color", Encode.string theme.accentColor )
         , ( "data", journalThemeDataEncoder theme.data )
         ]
 
@@ -115,3 +128,35 @@ journalThemeEncoder theme =
 emptyJournalTheme : JournalTheme
 emptyJournalTheme =
     JournalTheme None "" "" "" "" emptyJournalThemeData
+
+
+type alias JournalThemeData =
+    { theme : ThemeValue
+    , quote : String
+    , ideaNudge : String
+    , thoughtNudge : String
+    }
+
+
+journalThemeDataDecoder : Decoder JournalThemeData
+journalThemeDataDecoder =
+    Decode.succeed JournalThemeData
+        |> required "theme" themeValueDecoder
+        |> required "quote" Decode.string
+        |> required "idea_nudge" Decode.string
+        |> required "thought_nudge" Decode.string
+
+
+journalThemeDataEncoder : JournalThemeData -> Encode.Value
+journalThemeDataEncoder data =
+    Encode.object
+        [ ( "theme", themeValueEncoder data.theme )
+        , ( "quote", Encode.string data.quote )
+        , ( "idea_nudge", Encode.string data.ideaNudge )
+        , ( "thought_nudge", Encode.string data.thoughtNudge )
+        ]
+
+
+emptyJournalThemeData : JournalThemeData
+emptyJournalThemeData =
+    JournalThemeData None "" "" ""
