@@ -3,8 +3,8 @@ from bson import ObjectId
 
 from pydantic import BaseModel
 
-from models.base import JournalThemeType
-from models.journal_theme_data import JournalThemeData
+from app.models.base import JournalThemeType
+from app.models.journal_theme_data import JournalThemeData
 
 
 class JournalTheme(BaseModel):

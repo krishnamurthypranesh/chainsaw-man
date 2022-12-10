@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from router import JOURNAL_ENTRY_ROUTER, JOURNAL_THEME_ROUTER, JOURNAL_THEME_DATA_ROUTER
+from app.router import JOURNAL_ENTRY_ROUTER, JOURNAL_THEME_ROUTER, JOURNAL_THEME_DATA_ROUTER
 
-from helpers.journal_entry import JournalEntryHelper
+from app.helpers.journal_entry import JournalEntryHelper
 
 app = FastAPI()
 

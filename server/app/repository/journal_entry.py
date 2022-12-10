@@ -1,8 +1,8 @@
 from fastapi import Depends
 
-from constants import error
-from models import journal_entry as entry_models
-from connections.database import get_journal_entries_collection
+from app.constants import error
+from app.models import journal_entry as entry_models
+from app.connections.database import get_journal_entries_collection
 
 
 class JournalEntryRepo:

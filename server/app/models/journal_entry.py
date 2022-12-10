@@ -3,8 +3,8 @@ from bson import ObjectId
 
 from pydantic import BaseModel, Field
 
-from models.journal_theme import JournalTheme
-from models.base import JournalThemeType, PyObjectId
+from app.models.journal_theme import JournalTheme
+from app.models.base import JournalThemeType, PyObjectId
 
 
 class JournalEntryContent(BaseModel):
@@ -54,18 +54,3 @@ class JournalEntry(BaseModel):
                 },
             }
         }
-
-
-class CreateJournalEntryInput(BaseModel):
-    theme: JournalTheme
-    content: JournalEntryContent
-
-
-class GetJournalEntryInput(JournalEntry):
-    pass
-
-
-class ListJournalEntryInput(BaseModel):
-    created_after: int = None
-    created_before: int = None
-    theme: Union[JournalThemeType, None]

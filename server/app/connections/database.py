@@ -4,8 +4,8 @@ from typing import Any
 
 from motor import motor_asyncio
 
-from constants import collection
-from helpers.db_logger import CommandLogger
+from app.constants import collection
+from app.helpers.db_logger import CommandLogger
 
 
 def _get_client() -> Any:

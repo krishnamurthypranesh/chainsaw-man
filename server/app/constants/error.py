@@ -1,4 +1,4 @@
-from constants.error_messages import INVALID_RESOURCE_ID
+from app.constants.error_messages import INVALID_RESOURCE_ID
 
 
 class InvalidResourceID(Exception):

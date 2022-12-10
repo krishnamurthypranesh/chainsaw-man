@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from connections.database import get_journal_themes_data_collection
+from app.connections.database import get_journal_themes_data_collection
 
 
 class JournalThemeDataRepo:

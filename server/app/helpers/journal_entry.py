@@ -1,13 +1,17 @@
 from typing import List
 
-from models.journal_entry import JournalEntryContent
+from app.models.journal_entry import JournalEntryContent
 
 
 class JournalEntryHelper:
     def __init__(self):
+        """Empty because this does not need intialization
+        """
         pass
 
-    def validate_journal_content(self, content: JournalEntryContent) -> bool:
+    
+    @staticmethod
+    def validate_journal_content(content: JournalEntryContent) -> bool:
         """
         checks the content of the journal received to see if the content
         provided by the user is valid.
@@ -19,10 +23,10 @@ class JournalEntryHelper:
                 False
         """
 
-        isContentValid: bool = True
+        is_content_valid: bool = True
         # TODO: implement validation logic
-        return isContentValid
+        return is_content_valid
 
 
-def get_helper():
+def get_journal_entry_helper():
     yield JournalEntryHelper()

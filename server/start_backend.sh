@@ -1,5 +1,7 @@
 #!/bin/bash
 
-pip install --no-cache-dir --upgrade -r /code/requirements.txt
+pipenv install
 
-uvicorn main:app --host 0.0.0.0 --port 80 --reload
+pipenv shell
+
+pipenv run uvicorn main:app --host 0.0.0.0 --port 80 --reload
