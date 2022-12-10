@@ -2,12 +2,11 @@
 """
 
 from typing import Union
-from bson import ObjectId
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.models.journal_theme import JournalTheme
-from app.models.base import JournalThemeType, PyObjectId
+from app.models.base import JournalThemeType
 from app.models.journal_entry import JournalEntry, JournalEntryContent
 
 
@@ -24,3 +23,11 @@ class ListJournalEntryInput(BaseModel):
     created_after: int = 0
     created_before: int = 0
     theme: Union[JournalThemeType, None]
+
+
+class JournalOut(BaseModel):
+    pass
+
+
+class ListJournalsOut(BaseModel):
+    pass

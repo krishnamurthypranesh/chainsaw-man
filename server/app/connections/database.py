@@ -16,7 +16,6 @@ def _get_client() -> Any:
     conn_str: str = (
         f"mongodb://{uname}:{passwd}@{url}:27017/?retryWrites=true&w=majority"
     )
-    print(conn_str)
 
     client = motor_asyncio.AsyncIOMotorClient(
         conn_str, event_listeners=[CommandLogger()]

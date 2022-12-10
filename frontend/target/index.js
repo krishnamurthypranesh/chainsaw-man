@@ -10892,6 +10892,161 @@ var $krisajenkins$remotedata$RemoteData$fromResult = function (result) {
 		return $krisajenkins$remotedata$RemoteData$Success(x);
 	}
 };
+var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $elm$http$Http$Request = function (a) {
+	return {$: 'Request', a: a};
+};
+var $elm$http$Http$State = F2(
+	function (reqs, subs) {
+		return {reqs: reqs, subs: subs};
+	});
+var $elm$http$Http$init = $elm$core$Task$succeed(
+	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$http$Http$updateReqs = F3(
+	function (router, cmds, reqs) {
+		updateReqs:
+		while (true) {
+			if (!cmds.b) {
+				return $elm$core$Task$succeed(reqs);
+			} else {
+				var cmd = cmds.a;
+				var otherCmds = cmds.b;
+				if (cmd.$ === 'Cancel') {
+					var tracker = cmd.a;
+					var _v2 = A2($elm$core$Dict$get, tracker, reqs);
+					if (_v2.$ === 'Nothing') {
+						var $temp$router = router,
+							$temp$cmds = otherCmds,
+							$temp$reqs = reqs;
+						router = $temp$router;
+						cmds = $temp$cmds;
+						reqs = $temp$reqs;
+						continue updateReqs;
+					} else {
+						var pid = _v2.a;
+						return A2(
+							$elm$core$Task$andThen,
+							function (_v3) {
+								return A3(
+									$elm$http$Http$updateReqs,
+									router,
+									otherCmds,
+									A2($elm$core$Dict$remove, tracker, reqs));
+							},
+							$elm$core$Process$kill(pid));
+					}
+				} else {
+					var req = cmd.a;
+					return A2(
+						$elm$core$Task$andThen,
+						function (pid) {
+							var _v4 = req.tracker;
+							if (_v4.$ === 'Nothing') {
+								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
+							} else {
+								var tracker = _v4.a;
+								return A3(
+									$elm$http$Http$updateReqs,
+									router,
+									otherCmds,
+									A3($elm$core$Dict$insert, tracker, pid, reqs));
+							}
+						},
+						$elm$core$Process$spawn(
+							A3(
+								_Http_toTask,
+								router,
+								$elm$core$Platform$sendToApp(router),
+								req)));
+				}
+			}
+		}
+	});
+var $elm$http$Http$onEffects = F4(
+	function (router, cmds, subs, state) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (reqs) {
+				return $elm$core$Task$succeed(
+					A2($elm$http$Http$State, reqs, subs));
+			},
+			A3($elm$http$Http$updateReqs, router, cmds, state.reqs));
+	});
+var $elm$http$Http$maybeSend = F4(
+	function (router, desiredTracker, progress, _v0) {
+		var actualTracker = _v0.a;
+		var toMsg = _v0.b;
+		return _Utils_eq(desiredTracker, actualTracker) ? $elm$core$Maybe$Just(
+			A2(
+				$elm$core$Platform$sendToApp,
+				router,
+				toMsg(progress))) : $elm$core$Maybe$Nothing;
+	});
+var $elm$http$Http$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var tracker = _v0.a;
+		var progress = _v0.b;
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$filterMap,
+					A3($elm$http$Http$maybeSend, router, tracker, progress),
+					state.subs)));
+	});
+var $elm$http$Http$Cancel = function (a) {
+	return {$: 'Cancel', a: a};
+};
+var $elm$http$Http$cmdMap = F2(
+	function (func, cmd) {
+		if (cmd.$ === 'Cancel') {
+			var tracker = cmd.a;
+			return $elm$http$Http$Cancel(tracker);
+		} else {
+			var r = cmd.a;
+			return $elm$http$Http$Request(
+				{
+					allowCookiesFromOtherDomains: r.allowCookiesFromOtherDomains,
+					body: r.body,
+					expect: A2(_Http_mapExpect, func, r.expect),
+					headers: r.headers,
+					method: r.method,
+					timeout: r.timeout,
+					tracker: r.tracker,
+					url: r.url
+				});
+		}
+	});
+var $elm$http$Http$MySub = F2(
+	function (a, b) {
+		return {$: 'MySub', a: a, b: b};
+	});
+var $elm$http$Http$subMap = F2(
+	function (func, _v0) {
+		var tracker = _v0.a;
+		var toMsg = _v0.b;
+		return A2(
+			$elm$http$Http$MySub,
+			tracker,
+			A2($elm$core$Basics$composeR, toMsg, func));
+	});
+_Platform_effectManagers['Http'] = _Platform_createManager($elm$http$Http$init, $elm$http$Http$onEffects, $elm$http$Http$onSelfMsg, $elm$http$Http$cmdMap, $elm$http$Http$subMap);
+var $elm$http$Http$command = _Platform_leaf('Http');
+var $elm$http$Http$subscription = _Platform_leaf('Http');
+var $elm$http$Http$request = function (r) {
+	return $elm$http$Http$command(
+		$elm$http$Http$Request(
+			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
+};
+var $elm$http$Http$get = function (r) {
+	return $elm$http$Http$request(
+		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
 var $author$project$Common$JournalEntry$JournalEntry = F5(
 	function (id, theme, content, createdAt, updatedAt) {
 		return {content: content, createdAt: createdAt, id: id, theme: theme, updatedAt: updatedAt};
@@ -11079,206 +11234,14 @@ var $author$project$Common$JournalEntry$journalEntryDecoder = A4(
 					$author$project$Common$JournalEntry$idDecoder,
 					$elm$json$Json$Decode$succeed($author$project$Common$JournalEntry$JournalEntry))))));
 var $author$project$Common$JournalEntry$journalEntriesListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalEntry$journalEntryDecoder);
-var $elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2($elm$json$Json$Encode$encode, 0, value));
-};
-var $elm$json$Json$Encode$int = _Json_wrap;
-var $author$project$Common$JournalTheme$themeValueToString = function (theme) {
-	switch (theme.$) {
-		case 'AmorFati':
-			return 'AMOR_FATI';
-		case 'PremeditatioMalorum':
-			return 'PREMEDITATIO_MALORUM';
-		default:
-			return '';
-	}
-};
-var $author$project$Common$JournalTheme$themeValueEncoder = function (theme) {
-	return $elm$json$Json$Encode$string(
-		$author$project$Common$JournalTheme$themeValueToString(theme));
-};
-var $author$project$Common$JournalEntry$listJournalEntriesInputEncoder = function (input) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'created_after',
-				$elm$json$Json$Encode$int(input.createdAfter)),
-				_Utils_Tuple2(
-				'created_before',
-				$elm$json$Json$Encode$int(input.createdBefore)),
-				_Utils_Tuple2(
-				'theme',
-				$author$project$Common$JournalTheme$themeValueEncoder(input.theme))
-			]));
-};
-var $elm$http$Http$Request = function (a) {
-	return {$: 'Request', a: a};
-};
-var $elm$http$Http$State = F2(
-	function (reqs, subs) {
-		return {reqs: reqs, subs: subs};
-	});
-var $elm$http$Http$init = $elm$core$Task$succeed(
-	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$http$Http$updateReqs = F3(
-	function (router, cmds, reqs) {
-		updateReqs:
-		while (true) {
-			if (!cmds.b) {
-				return $elm$core$Task$succeed(reqs);
-			} else {
-				var cmd = cmds.a;
-				var otherCmds = cmds.b;
-				if (cmd.$ === 'Cancel') {
-					var tracker = cmd.a;
-					var _v2 = A2($elm$core$Dict$get, tracker, reqs);
-					if (_v2.$ === 'Nothing') {
-						var $temp$router = router,
-							$temp$cmds = otherCmds,
-							$temp$reqs = reqs;
-						router = $temp$router;
-						cmds = $temp$cmds;
-						reqs = $temp$reqs;
-						continue updateReqs;
-					} else {
-						var pid = _v2.a;
-						return A2(
-							$elm$core$Task$andThen,
-							function (_v3) {
-								return A3(
-									$elm$http$Http$updateReqs,
-									router,
-									otherCmds,
-									A2($elm$core$Dict$remove, tracker, reqs));
-							},
-							$elm$core$Process$kill(pid));
-					}
-				} else {
-					var req = cmd.a;
-					return A2(
-						$elm$core$Task$andThen,
-						function (pid) {
-							var _v4 = req.tracker;
-							if (_v4.$ === 'Nothing') {
-								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
-							} else {
-								var tracker = _v4.a;
-								return A3(
-									$elm$http$Http$updateReqs,
-									router,
-									otherCmds,
-									A3($elm$core$Dict$insert, tracker, pid, reqs));
-							}
-						},
-						$elm$core$Process$spawn(
-							A3(
-								_Http_toTask,
-								router,
-								$elm$core$Platform$sendToApp(router),
-								req)));
-				}
-			}
-		}
-	});
-var $elm$http$Http$onEffects = F4(
-	function (router, cmds, subs, state) {
-		return A2(
-			$elm$core$Task$andThen,
-			function (reqs) {
-				return $elm$core$Task$succeed(
-					A2($elm$http$Http$State, reqs, subs));
-			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.reqs));
-	});
-var $elm$http$Http$maybeSend = F4(
-	function (router, desiredTracker, progress, _v0) {
-		var actualTracker = _v0.a;
-		var toMsg = _v0.b;
-		return _Utils_eq(desiredTracker, actualTracker) ? $elm$core$Maybe$Just(
-			A2(
-				$elm$core$Platform$sendToApp,
-				router,
-				toMsg(progress))) : $elm$core$Maybe$Nothing;
-	});
-var $elm$http$Http$onSelfMsg = F3(
-	function (router, _v0, state) {
-		var tracker = _v0.a;
-		var progress = _v0.b;
-		return A2(
-			$elm$core$Task$andThen,
-			function (_v1) {
-				return $elm$core$Task$succeed(state);
-			},
-			$elm$core$Task$sequence(
-				A2(
-					$elm$core$List$filterMap,
-					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.subs)));
-	});
-var $elm$http$Http$Cancel = function (a) {
-	return {$: 'Cancel', a: a};
-};
-var $elm$http$Http$cmdMap = F2(
-	function (func, cmd) {
-		if (cmd.$ === 'Cancel') {
-			var tracker = cmd.a;
-			return $elm$http$Http$Cancel(tracker);
-		} else {
-			var r = cmd.a;
-			return $elm$http$Http$Request(
-				{
-					allowCookiesFromOtherDomains: r.allowCookiesFromOtherDomains,
-					body: r.body,
-					expect: A2(_Http_mapExpect, func, r.expect),
-					headers: r.headers,
-					method: r.method,
-					timeout: r.timeout,
-					tracker: r.tracker,
-					url: r.url
-				});
-		}
-	});
-var $elm$http$Http$MySub = F2(
-	function (a, b) {
-		return {$: 'MySub', a: a, b: b};
-	});
-var $elm$http$Http$subMap = F2(
-	function (func, _v0) {
-		var tracker = _v0.a;
-		var toMsg = _v0.b;
-		return A2(
-			$elm$http$Http$MySub,
-			tracker,
-			A2($elm$core$Basics$composeR, toMsg, func));
-	});
-_Platform_effectManagers['Http'] = _Platform_createManager($elm$http$Http$init, $elm$http$Http$onEffects, $elm$http$Http$onSelfMsg, $elm$http$Http$cmdMap, $elm$http$Http$subMap);
-var $elm$http$Http$command = _Platform_leaf('Http');
-var $elm$http$Http$subscription = _Platform_leaf('Http');
-var $elm$http$Http$request = function (r) {
-	return $elm$http$Http$command(
-		$elm$http$Http$Request(
-			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
-};
-var $elm$http$Http$post = function (r) {
-	return $elm$http$Http$request(
-		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
-};
 var $author$project$Page$ListJournalsEntries$fetchJournalEntries = function (input) {
-	return $elm$http$Http$post(
+	return $elm$http$Http$get(
 		{
-			body: $elm$http$Http$jsonBody(
-				$author$project$Common$JournalEntry$listJournalEntriesInputEncoder(input)),
 			expect: A2(
 				$elm$http$Http$expectJson,
 				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListJournalsEntries$JournalEntriesReceived),
 				$author$project$Common$JournalEntry$journalEntriesListDecoder),
-			url: 'http://localhost:8080/journals/entries/'
+			url: 'http://localhost:8080/v1/journals'
 		});
 };
 var $author$project$Page$ListJournalsEntries$init = function () {
@@ -11296,11 +11259,6 @@ var $author$project$Page$NewJournalEntry$OpenModal = function (a) {
 var $author$project$Page$NewJournalEntry$JournalThemesReceived = function (a) {
 	return {$: 'JournalThemesReceived', a: a};
 };
-var $elm$http$Http$emptyBody = _Http_emptyBody;
-var $elm$http$Http$get = function (r) {
-	return $elm$http$Http$request(
-		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
-};
 var $author$project$Common$JournalTheme$journalThemeListDecoder = $elm$json$Json$Decode$list($author$project$Common$JournalTheme$journalThemeDecoder);
 var $author$project$Page$NewJournalEntry$fetchJournalThemes = $elm$http$Http$get(
 	{
@@ -11308,7 +11266,7 @@ var $author$project$Page$NewJournalEntry$fetchJournalThemes = $elm$http$Http$get
 			$elm$http$Http$expectJson,
 			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$NewJournalEntry$JournalThemesReceived),
 			$author$project$Common$JournalTheme$journalThemeListDecoder),
-		url: 'http://localhost:8080/journals/themes/'
+		url: 'http://localhost:8080/v1/themes'
 	});
 var $author$project$Common$Toast$HideToast = {$: 'HideToast'};
 var $author$project$Common$Toast$Model = F3(
@@ -11354,7 +11312,7 @@ var $author$project$Page$ViewJournalEntry$fetchJournalEntry = function (journalI
 				$elm$http$Http$expectJson,
 				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ViewJournalEntry$JournalEntryReceived),
 				$author$project$Common$JournalEntry$journalEntryDecoder),
-			url: 'http://localhost:8080/journal/entries/' + $author$project$Common$JournalEntry$idToString(journalId)
+			url: 'http://localhost:8080/v1/journals/' + $author$project$Common$JournalEntry$idToString(journalId)
 		});
 };
 var $author$project$Page$ViewJournalEntry$initialModel = function (navKey) {
@@ -11825,6 +11783,20 @@ var $author$project$Common$JournalEntry$journalContentEncoder = function (conten
 				$elm$json$Json$Encode$string(content.thought))
 			]));
 };
+var $author$project$Common$JournalTheme$themeValueToString = function (theme) {
+	switch (theme.$) {
+		case 'AmorFati':
+			return 'AMOR_FATI';
+		case 'PremeditatioMalorum':
+			return 'PREMEDITATIO_MALORUM';
+		default:
+			return '';
+	}
+};
+var $author$project$Common$JournalTheme$themeValueEncoder = function (theme) {
+	return $elm$json$Json$Encode$string(
+		$author$project$Common$JournalTheme$themeValueToString(theme));
+};
 var $author$project$Common$JournalTheme$journalThemeDataEncoder = function (data) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -11879,13 +11851,23 @@ var $author$project$Common$JournalEntry$journalEntryEncoder = function (journal)
 				$author$project$Common$JournalEntry$journalContentEncoder(journal.content))
 			]));
 };
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $elm$http$Http$post = function (r) {
+	return $elm$http$Http$request(
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
 var $author$project$Page$NewJournalEntry$createMorningJournalEntry = function (journal) {
 	return $elm$http$Http$post(
 		{
 			body: $elm$http$Http$jsonBody(
 				$author$project$Common$JournalEntry$journalEntryEncoder(journal)),
 			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewJournalEntry$JournalEntryCreated, $author$project$Common$JournalEntry$journalEntryDecoder),
-			url: 'http://localhost:8080/journal/entry/create/'
+			url: 'http://localhost:8080/v1/journals'
 		});
 };
 var $author$project$Page$NewJournalEntry$ToastVisibilityToggle = function (a) {

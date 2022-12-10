@@ -179,7 +179,7 @@ update msg model =
 createMorningJournalEntry : JournalEntry -> Cmd Msg
 createMorningJournalEntry journal =
     Http.post
-        { url = "http://localhost:8080/journal/entry/create/"
+        { url = "http://localhost:8080/v1/journals"
         , body = Http.jsonBody (journalEntryEncoder journal)
         , expect = Http.expectJson JournalEntryCreated journalEntryDecoder
         }
@@ -188,7 +188,7 @@ createMorningJournalEntry journal =
 fetchJournalThemes : Cmd Msg
 fetchJournalThemes =
     Http.get
-        { url = "http://localhost:8080/journals/themes/"
+        { url = "http://localhost:8080/v1/themes"
         , expect =
             JournalTheme.journalThemeListDecoder
                 |> Http.expectJson (RemoteData.fromResult >> JournalThemesReceived)

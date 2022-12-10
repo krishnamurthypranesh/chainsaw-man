@@ -58,7 +58,7 @@ update msg model =
 fetchJournalEntry : JournalId -> Cmd Msg
 fetchJournalEntry journalId =
     Http.get
-        { url = "http://localhost:8080/journal/entries/" ++ idToString journalId
+        { url = "http://localhost:8080/v1/journals/" ++ idToString journalId
         , expect =
             journalEntryDecoder
                 |> Http.expectJson (RemoteData.fromResult >> JournalEntryReceived)

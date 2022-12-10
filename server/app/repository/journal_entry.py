@@ -34,4 +34,4 @@ class JournalEntryRepo:
 
 
 async def get_journal_entry_repo(db=Depends(get_journal_entries_collection)):
-    yield JournalEntryRepo(db)
+    return JournalEntryRepo(db)

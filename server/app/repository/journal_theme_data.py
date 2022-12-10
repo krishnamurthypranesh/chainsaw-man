@@ -1,6 +1,8 @@
 from fastapi import Depends
 
 from app.connections.database import get_journal_themes_data_collection
+from app.models.journal_theme_data import JournalThemeData
+from app.constants.error import InvalidResourceID
 
 
 class JournalThemeDataRepo:
@@ -33,6 +35,17 @@ class JournalThemeDataRepo:
 
         return entries
 
+    async def find_one(self, entry_id: str):
+        if entry_id == "" or entry_id is None:
+            raise InvalidResourceID()
+        theme_data = await self.db.find_one({"_id": entry_id})
+        return theme_data
+
+    async def insert_one(self, data: JournalThemeData):
+        new = await self.db.insert_one(data)
+        theme_data = await self.find_one(new.inserted_id)
+        return theme_data
+
 
 async def get_journal_theme_data_repo(db=Depends(get_journal_themes_data_collection)):
-    yield JournalThemeDataRepo(db)
+    return JournalThemeDataRepo(db)

@@ -42,9 +42,8 @@ init =
 
 fetchJournalEntries : ListJournalEntriesInput -> Cmd Msg
 fetchJournalEntries input =
-    Http.post
-        { url = "http://localhost:8080/journals/entries/"
-        , body = Http.jsonBody (listJournalEntriesInputEncoder input)
+    Http.get
+        { url = "http://localhost:8080/v1/journals"
         , expect =
             journalEntriesListDecoder |> Http.expectJson (RemoteData.fromResult >> JournalEntriesReceived)
         }
