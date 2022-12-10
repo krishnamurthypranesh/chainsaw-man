@@ -1,8 +1,8 @@
 module Page.ViewJournalEntry exposing (..)
 
 import Browser.Navigation as Nav
-import Common.JournalEntry exposing (JournalEntry, JournalId, idToString, journalEntryDecoder)
-import Common.JournalSection exposing (getField)
+import Common.JournalEntry exposing (JournalEntry, JournalId, emptyJournalEntry, idToString, journalEntryDecoder)
+import Common.JournalTheme as JournalTheme exposing (themeValueToFormattedString)
 import Error exposing (errorFromHttpError)
 import Helpers exposing (dateTimeFromTs)
 import Html exposing (..)
@@ -39,17 +39,26 @@ type Msg
     = JournalEntryReceived (WebData JournalEntry)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+type OutMsg
+    = OpenModal Modal
+    | CloseModal
+
+
+type Modal
+    = DummyModal
+
+
+update : Msg -> Model -> ( Model, Cmd Msg, OutMsg )
 update msg model =
     case msg of
         JournalEntryReceived journalEntry ->
-            ( { model | journalEntry = journalEntry }, Cmd.none )
+            ( { model | journalEntry = journalEntry }, Cmd.none, CloseModal )
 
 
 fetchJournalEntry : JournalId -> Cmd Msg
 fetchJournalEntry journalId =
     Http.get
-        { url = "http://localhost:8080/journal/entries/" ++ idToString journalId
+        { url = "http://localhost:8080/v1/journals/" ++ idToString journalId
         , expect =
             journalEntryDecoder
                 |> Http.expectJson (RemoteData.fromResult >> JournalEntryReceived)
@@ -115,39 +124,92 @@ buildJournalEntryHtml entry =
             ]
         , div [ class "row", class "gy-2" ]
             [ div [ class "card", style "width" "100%" ]
-                [ div [ class "card-header" ] [ text "Amor Fati" ]
+                [ div [ class "card-header", class "text-center" ] [ text (themeValueToFormattedString entry.theme.theme) ]
                 , div [ class "card-body" ]
                     [ p [ class "card-text" ]
-                        [ strong []
-                            [ text "What is something that you're glad happened to you in the last 6 months? It can be something you learnt, someone you met, a situation, etc. But, it should be something that you ddin't expect to happen"
+                        [ blockquote [ class "blockquote" ]
+                            [ p []
+                                [ text entry.content.quote
+                                ]
                             ]
+                        ]
+                    , p
+                        [ class "card-text"
+                        ]
+                        [ strong [] [ text entry.content.idea_nudge ]
                         ]
                     , p [ class "card-text" ]
-                        [ text (getField entry.content.amorFati "thoughts").value
+                        [ text entry.content.idea
                         ]
+                    , hr [] []
+                    , p [ class "card-text" ]
+                        [ strong []
+                            [ text entry.content.thought_nudge
+                            ]
+                        ]
+                    , p [ class "card-text" ] [ text entry.content.thought ]
                     ]
                 ]
-            , div [ class "card", style "width" "100%" ]
-                [ div [ class "card-header" ] [ text "Premeditatio Malorum" ]
-                , div [ class "card-body" ]
-                    [ div [ class "row gy-1" ]
-                        [ p [ class "card-text" ]
-                            [ strong []
-                                [ text "What's a vice you think you might encounter today?"
-                                ]
-                            ]
-                        , p [ class "card-text" ]
-                            [ text (getField entry.content.premeditatioMalorum "vice").value
-                            ]
-                        , hr [] []
-                        , p [ class "card-text" ]
-                            [ strong []
-                                [ text "How will you handle this vice?"
-                                ]
-                            ]
-                        , p [ class "card-text" ]
-                            [ text (getField entry.content.premeditatioMalorum "strategy").value
-                            ]
+            ]
+        ]
+
+
+viewModal : Model -> Html Msg
+viewModal model =
+    div [] []
+
+
+
+-- TODO: The colour of the nav bar has to be changed according to the theme chosen, to implement this the theme data will be required as part of the journal entry
+
+
+buildNavBar : Model -> Html Msg
+buildNavBar model =
+    let
+        journalEntry =
+            case model.journalEntry of
+                RemoteData.Success journal ->
+                    journal
+
+                _ ->
+                    emptyJournalEntry
+
+        ( colorAttr, navBarTextColor ) =
+            case journalEntry.theme.theme of
+                JournalTheme.None ->
+                    ( class "bg-light", "black" )
+
+                _ ->
+                    ( style "background-color" journalEntry.theme.accentColor, "white" )
+    in
+    nav
+        [ class "navbar navbar-expand-lg sticky-top"
+        , colorAttr
+        ]
+        [ div [ class "container-fluid" ]
+            [ a [ href "/", class "navbar-brand", style "color" navBarTextColor ]
+                [ text "Painted Porch" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarNav"
+                , attribute "aria-controls" "navbarNav"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span [ class "navbar-toggler-icon" ] []
+                ]
+            , div [ class "collapse navbar-collapse", id "navbarNav" ]
+                [ ul [ class "navbar-nav" ]
+                    [ li [ class "nav-item" ]
+                        [ a [ class "nav-link", attribute "aria-current" "page", href "/", style "color" navBarTextColor ] [ text "Home" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/new", style "color" navBarTextColor ] [ text "New Journal Entry" ]
+                        ]
+                    , li [ class "nav-item" ]
+                        [ a [ class "nav-link", href "/journals/entries", style "color" navBarTextColor ] [ text "List Journal Entries" ]
                         ]
                     ]
                 ]

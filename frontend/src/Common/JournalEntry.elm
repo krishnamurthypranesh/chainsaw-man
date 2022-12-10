@@ -2,30 +2,30 @@ module Common.JournalEntry exposing
     ( JournalEntry
     , JournalId
     , ListJournalEntriesInput
-    , emptyMorningJournal
+    , emptyJournalEntry
     , idParser
     , idToString
     , journalEntriesListDecoder
     , journalEntryDecoder
+    , journalEntryEncoder
     , listJournalEntriesInputEncoder
-    , newMorningJournalEncoder
-    , updateJournalContent
+    , updateJournalIdea
+    , updateJournalThought
     )
 
-import Common.JournalField exposing (JournalField)
-import Common.JournalSection exposing (JournalSection, journalSectionDecoder, journalSectionEncoder, setFieldValue)
-import Dict exposing (Dict, fromList)
-import Html exposing (a)
-import Json.Decode as Decode exposing (Decoder, dict, field, int, list, string)
-import Json.Decode.Pipeline exposing (required)
+import Common.JournalTheme exposing (JournalTheme, ThemeValue(..), emptyJournalTheme, journalThemeDecoder, journalThemeEncoder, themeValueDecoder, themeValueEncoder)
+import Json.Decode as Decode exposing (Decoder, list)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode
 import Url.Parser exposing (Parser, custom)
 
 
 type alias JournalEntry =
     { id : JournalId
+    , theme : JournalTheme
+    , content : JournalContent
     , createdAt : Int
-    , content : Content
+    , updatedAt : Int
     }
 
 
@@ -33,9 +33,12 @@ type JournalId
     = JournalId String
 
 
-type alias Content =
-    { amorFati : JournalSection
-    , premeditatioMalorum : JournalSection
+type alias JournalContent =
+    { quote : String
+    , idea_nudge : String
+    , thought_nudge : String
+    , idea : String
+    , thought : String
     }
 
 
@@ -61,19 +64,14 @@ idToString jId =
             id
 
 
-contentDecoder : Decoder Content
-contentDecoder =
-    Decode.succeed Content
-        |> required "amor_fati" journalSectionDecoder
-        |> required "premeditatio_malorum" journalSectionDecoder
-
-
 journalEntryDecoder : Decoder JournalEntry
 journalEntryDecoder =
     Decode.succeed JournalEntry
         |> required "_id" idDecoder
+        |> required "theme" journalThemeDecoder
+        |> required "content" journalContentDecoder
         |> required "created_at" Decode.int
-        |> required "content" contentDecoder
+        |> optional "updated_at" Decode.int 0
 
 
 journalEntriesListDecoder : Decoder (List JournalEntry)
@@ -81,27 +79,36 @@ journalEntriesListDecoder =
     list journalEntryDecoder
 
 
+journalContentDecoder : Decoder JournalContent
+journalContentDecoder =
+    Decode.succeed JournalContent
+        |> required "quote" Decode.string
+        |> required "idea_nudge" Decode.string
+        |> required "thought_nudge" Decode.string
+        |> required "idea" Decode.string
+        |> required "thought" Decode.string
+
+
 
 -- ENCODERS
 
 
-contentEncoder : Content -> Encode.Value
-contentEncoder c =
+journalEntryEncoder : JournalEntry -> Encode.Value
+journalEntryEncoder journal =
     Encode.object
-        [ ( "amor_fati", journalSectionEncoder c.amorFati )
-        , ( "premeditatio_malorum", journalSectionEncoder c.premeditatioMalorum )
+        [ ( "theme", journalThemeEncoder journal.theme )
+        , ( "content", journalContentEncoder journal.content )
         ]
 
 
-newMorningJournalEncoder : JournalEntry -> Encode.Value
-newMorningJournalEncoder journal =
+journalContentEncoder : JournalContent -> Encode.Value
+journalContentEncoder content =
     Encode.object
-        [ ( "content"
-          , Encode.object
-                [ ( "amor_fati", journalSectionEncoder journal.content.amorFati )
-                , ( "premeditatio_malorum", journalSectionEncoder journal.content.premeditatioMalorum )
-                ]
-          )
+        [ ( "quote", Encode.string content.quote )
+        , ( "idea_nudge", Encode.string content.idea_nudge )
+        , ( "idea", Encode.string content.idea )
+        , ( "thought_nudge", Encode.string content.thought_nudge )
+        , ( "thought", Encode.string content.thought )
         ]
 
 
@@ -109,44 +116,37 @@ newMorningJournalEncoder journal =
 -- CONSTRUCTORS
 
 
-emptyMorningJournal : JournalEntry
-emptyMorningJournal =
+emptyJournalEntry : JournalEntry
+emptyJournalEntry =
     let
-        content =
-            { amorFati =
-                JournalSection
-                    "Amor Fati"
-                    (Dict.fromList [ ( "thank_you", JournalField "thank_you" "" ), ( "thoughts", JournalField "thoughts" "" ) ])
-            , premeditatioMalorum =
-                JournalSection
-                    "Premeditatio Malorum"
-                    (Dict.fromList [ ( "vice", JournalField "vice" "" ), ( "strategy", JournalField "strategy" "" ) ])
-            }
-
         journalId =
             JournalId ""
-
-        createdAt =
-            0
     in
-    JournalEntry journalId createdAt content
+    JournalEntry journalId emptyJournalTheme (JournalContent "" "" "" "" "") 0 0
 
 
-updateJournalContent : JournalEntry -> String -> String -> String -> JournalEntry
-updateJournalContent journal sectionName fieldName fieldValue =
+updateJournalIdea : JournalEntry -> String -> JournalEntry
+updateJournalIdea entry idea =
     let
         oldContent =
-            journal.content
+            entry.content
+
+        newContent =
+            { oldContent | idea = idea }
     in
-    case sectionName of
-        "amor_fati" ->
-            { journal | content = { oldContent | amorFati = setFieldValue journal.content.amorFati fieldName fieldValue } }
+    { entry | content = newContent }
 
-        "premeditatio_malorum" ->
-            { journal | content = { oldContent | premeditatioMalorum = setFieldValue journal.content.premeditatioMalorum fieldName fieldValue } }
 
-        _ ->
-            journal
+updateJournalThought : JournalEntry -> String -> JournalEntry
+updateJournalThought entry thought =
+    let
+        oldContent =
+            entry.content
+
+        newContent =
+            { oldContent | thought = thought }
+    in
+    { entry | content = newContent }
 
 
 
@@ -156,7 +156,7 @@ updateJournalContent journal sectionName fieldName fieldValue =
 type alias ListJournalEntriesInput =
     { createdAfter : Int
     , createdBefore : Int
-    , journalType : String
+    , theme : ThemeValue
     }
 
 
@@ -165,5 +165,5 @@ listJournalEntriesInputEncoder input =
     Encode.object
         [ ( "created_after", Encode.int input.createdAfter )
         , ( "created_before", Encode.int input.createdBefore )
-        , ( "journal_type", Encode.string input.journalType )
+        , ( "theme", themeValueEncoder input.theme )
         ]

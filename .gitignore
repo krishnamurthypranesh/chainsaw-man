@@ -12,3 +12,7 @@ elm-stuff/
 
 # scratch files
 scratch*
+
+# vscode files
+.vscode/*
+*.code-workspace

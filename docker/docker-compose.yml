@@ -1,13 +1,13 @@
 version: "3"
 services:
 
-  everyday-stoic-frontend:
+  painted-porch-frontend:
     networks:
-      - everyday-stoic
+      - painted-porch
     build:
       context: .
       dockerfile: frontend.Dockerfile
-    container_name: everyday-stoic-frontend
+    container_name: painted-porch-frontend
     security_opt:
       - seccomp:unconfined
     env_file: .env
@@ -16,15 +16,15 @@ services:
     volumes:
       - "../frontend:/code/"
     depends_on:
-      - everyday-stoic-backend
+      - painted-porch-backend
 
-  everyday-stoic-backend:
+  painted-porch-backend:
     networks: 
-      - everyday-stoic
+      - painted-porch
     build:
       context: .
       dockerfile: backend.Dockerfile
-    container_name: everyday-stoic-backend
+    container_name: painted-porch-backend
     security_opt:
       - seccomp:unconfined
     env_file: .env
@@ -33,20 +33,21 @@ services:
     volumes:
       - "../server:/code/"
     depends_on:
-      - everyday-stoic-db
+      - painted-porch-db
 
-  everyday-stoic-db:
+  painted-porch-db:
     networks:
-      - everyday-stoic
-    container_name: everyday-stoic-db
+      - painted-porch
+    container_name: painted-porch-db
     image: mongo
     ports:
       - "27017:27017"
     volumes:
-      - mongo-everyday-stoic:/data/db
+      - mongo-painted-porch:/data/db
     env_file: .env
+    command: mongod --quiet
 
 volumes:
-  mongo-everyday-stoic:
+  mongo-painted-porch:
 networks:
-  everyday-stoic:
+  painted-porch:
