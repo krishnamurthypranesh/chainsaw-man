@@ -135,22 +135,6 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
     type = "N"
   }
 
-  attribute {
-    name = "user_id"
-    type = "S"
-  }
-
-  attribute {
-    name = "word_count"
-    type = "N"
-  }
-
-  attribute {
-    name = "content"
-    type = "M"
-  }
-
-
   tags = {
     Name        = "painted_porch_db"
     Environment = "prod"
