@@ -33,10 +33,9 @@ resource "aws_iam_role" "iam_for_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-data "archive_file" "lambda" {
-  type        = "zip"
-  source_file = "lambda.js"
-  output_path = "lambda_function_payload.zip"
+data "aws_ecr_image" "lambda_image_latest" {
+  repository_name = split("/", var.ecr_repo_url)[1]
+  image_tag       = "latest"
 }
 
 resource "aws_lambda_function" "painted_porch_backend" {
