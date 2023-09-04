@@ -141,14 +141,15 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
   }
 
   attribute {
+    name = "word_count"
+    type = "N"
+  }
+
+  attribute {
     name = "content"
     type = "M"
   }
 
-  attribute {
-    name = "word_count"
-    type = "N"
-  }
 
   tags = {
     Name        = "painted_porch_db"
