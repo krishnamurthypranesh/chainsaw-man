@@ -154,7 +154,7 @@ data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
       "sts:AssumeRole"
     ]
 
-    principal = {
+    principals {
       type = "Service"
       identifiers = ["codedeploy.amazonaws.com"]
     }
@@ -246,8 +246,8 @@ data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
     ]
 
     resources = [
-      aws_s3_bucket.aws_s3_bucket.painted_porch_deployment.arn,
-      "${aws_s3_bucket.aws_s3_bucket.painted_porch_deployment.arn}/*"
+      aws_s3_bucket.painted_porch_deployment.arn,
+      "${aws_s3_bucket.painted_porch_deployment.arn}/*"
     ]
   }
 
