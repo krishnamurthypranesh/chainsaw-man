@@ -191,7 +191,8 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   app_name = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
   deployment_group_name = "painted_porch_lambda_deploy_group"
   service_role_arn = aws_iam_role.painted_porch_codedeploy_service_role.arn
-  deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.name
+
+  deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.id
 
   auto_rollback_configuration {
     enabled = true
