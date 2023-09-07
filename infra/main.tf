@@ -15,7 +15,7 @@ resource "aws_subnet" "private" {
 
 
 # s3 bucket
-resource "aws_s3_bucket" "painted-porch-deployment" {
+resource "aws_s3_bucket" "painted_porch_deployment" {
   bucket = "painted-porch-deployment"
   acl = "private"
 }
@@ -146,3 +146,198 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
 }
 
 # create the codepipeline: source (github), codebuild, codedeploy
+data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
+  statement = {
+    sid = "1"
+
+    actions = [
+      "sts:AssumeRole"
+    ]
+
+    principal = {
+      type = "Service"
+      identifiers = ["codedeploy.amazonaws.com"]
+    }
+
+  }
+}
+
+resource "aws_iam_role" "painted_porch_codedeploy_service_role" {
+  name = "painted_porch_codedeploy_service_role"
+
+  role_policy = data.aws_iam_policy_document.painted_porch_codedeploy_service_role_doc.json
+}
+
+resource "aws_iam_role_policy_attacment" "painted_porch_codedeploy_service_role_atch" {
+  role = aws_iam_role.painted_porch_codedeploy_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+}
+
+resource "aws_codedeploy_app" "painted_porch_lambda_deploy_app" {
+  compute_platform = "Lambda"
+  name = "painted-porch-lambda-deploy"
+}
+
+resource "aws_codedeploy_deployment_config" "painted_porch_lambda_deploy_config" {
+  deployment_config_name = "painted_porch_lambda_deploy_config"
+  compute_platform = "Lambda"
+
+  traffic_routing_config {
+    type = "AllAtOnce"
+  }
+}
+
+resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
+  app_name = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
+  deployment_group_name = "painted_porch_lambda_deploy_group"
+  service_role_arn = aws_iam_role.painted_porch_deploy_service_role.arn
+  deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.name
+
+  auto_rollback_configuration {
+    enabled = true
+    events = ["DEPLOYMENT_STOP_ON_ALARM"]
+  }
+
+  alarm_configuraion {
+    alarms = ["painted-porch-deploy-alarm"]
+    enabled = true
+  }
+}
+
+resource "aws_codestarconnections_host" "github_chainsawman_host" {
+  name = "github_chainsawman"
+  provider_endpoint = "https://github.com/krishnamurthypranesh"
+  provider_type = "GitHub"
+}
+
+resource "aws_codestarconnections_connection" "github_chainsawman_connection" {
+  name = "github_chainsawman_connection"
+  host_arn = aws_codestartconnections_host.github_chainsawman_host.arn
+}
+
+data "aws_iam_policy_document" "painted_porch_depl_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "painted_porch_backend_depl_role" {
+  name               = "painted_porch_backend_depl_role"
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_depl_assume_role.json
+}
+
+data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketVersioning",
+      "s3:PutObjectAcl",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.aws_s3_bucket.painted_porch_deployment.arn,
+      "${aws_s3_bucket.aws_s3_bucket.painted_porch_deployment.arn}/*"
+    ]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["codestar-connections:UseConnection"]
+    resources = [aws_codestarconnections_connection.github_chainsawman_connection.arn]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "codebuild:BatchGetBuilds",
+      "codebuild:StartBuild",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "codepipeline_policy" {
+  name   = "codepipeline_policy"
+  role   = aws_iam_role.codepipeline_role.id
+  policy = data.aws_iam_policy_document.codepipeline_policy.json
+}
+
+resource "aws_codepipeline" "painted_porch_backend" {
+  name = "painted-porch-backend"
+  role_arn = aws_iam_role.painted_porch_backend_depl_role.arn
+
+  artifact_store {
+    location = aws_s3_bucket.painted_porch_deployment.bucket
+    type = "S3"
+  }
+
+  stage {
+    name = "Source"
+
+    action {
+      name = "Source"
+      category = "Source"
+      owner = "AWS"
+      provider = "CodeStarSourceConnection"
+      version = "1"
+      output_artifacts = ["source_output"]
+
+      configuration = {
+        ConnectionArn = aws_codestarconnections_connection.github_chainsawman_connection.arn
+        FullRepositoryId = "krishnamurthypranesh/chainsaw-man"
+        BranchName = "main"
+      }
+    }
+  }
+
+  stage {
+    name = "Build"
+
+    action {
+      name = "Build"
+      category = "Build"
+      owner = "AWS"
+      provider = "CodeBuild"
+      input_artifacts =  ["source_output"]
+      output_artifacts = ["build_output"]
+      version = "1"
+
+      configuration =  {
+        ProjectName = "painted-porch-backend"
+      }
+    }
+  }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      name = "Deploy"
+      category = "Deploy"
+      owner = "AWS"
+      provider = "CodeDeploy"
+      input_artifacts = ["build_output"]
+      version = "1"
+
+      configuration = {
+        ApplicationName = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
+        DeploymentGroupName = aws_codedeploy_deployment_group.painted_porch_lambda_deploy_group.id
+      }
+
+      region = var.aws_region
+    }
+  }
+}
