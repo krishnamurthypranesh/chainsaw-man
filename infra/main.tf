@@ -14,6 +14,13 @@ resource "aws_subnet" "private" {
 }
 
 
+# s3 bucket
+resource "aws_s3_bucket" "painted-porch-deployment" {
+  bucket = "painted-porch-deployment"
+  acl = "private"
+}
+
+
 # create lambda and associated resources: ecr
 data "aws_iam_policy_document" "assume_role" {
   statement {
@@ -33,19 +40,12 @@ resource "aws_iam_role" "iam_for_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-data "aws_ecr_image" "lambda_image_latest" {
-  repository_name = split("/", var.ecr_repo_url)[1]
-  image_tag       = "latest"
-}
-
 resource "aws_lambda_function" "painted_porch_backend" {
   function_name = "painted_porch_backend"
   role          = aws_iam_role.iam_for_lambda.arn
 
-  package_type = "Image"
-  image_uri = "${var.ecr_repo_url}:latest"
-
-  source_code_hash = data.aws_ecr_image.lambda_image_latest.id
+  s3_bucket = aws_s3_bucket.painted-porch-deployment.bucket
+  s3_key = "painted_porch_payload.zip"
 
   environment {
     variables = {
