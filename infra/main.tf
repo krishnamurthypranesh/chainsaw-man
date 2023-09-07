@@ -44,7 +44,7 @@ resource "aws_lambda_function" "painted_porch_backend" {
   function_name = "painted_porch_backend"
   role          = aws_iam_role.iam_for_lambda.arn
 
-  s3_bucket = aws_s3_bucket.painted-porch-deployment.bucket
+  s3_bucket = aws_s3_bucket.painted_porch_deployment.bucket
   s3_key = "painted_porch_payload.zip"
 
   package_type = "Zip"
@@ -147,7 +147,7 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
 
 # create the codepipeline: source (github), codebuild, codedeploy
 data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
-  statement = {
+  statement {
     sid = "1"
 
     actions = [
@@ -165,11 +165,11 @@ data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
 resource "aws_iam_role" "painted_porch_codedeploy_service_role" {
   name = "painted_porch_codedeploy_service_role"
 
-  role_policy = data.aws_iam_policy_document.painted_porch_codedeploy_service_role_doc.json
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_codedeploy_service_role_doc.json
 }
 
-resource "aws_iam_role_policy_attacment" "painted_porch_codedeploy_service_role_atch" {
-  role = aws_iam_role.painted_porch_codedeploy_service_role.name
+resource "aws_iam_role_policy_attachment" "painted_porch_codedeploy_service_role_atch" {
+  role = aws_iam_role.painted_porch_codedeploy_service_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
 }
 
@@ -190,7 +190,7 @@ resource "aws_codedeploy_deployment_config" "painted_porch_lambda_deploy_config"
 resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   app_name = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
   deployment_group_name = "painted_porch_lambda_deploy_group"
-  service_role_arn = aws_iam_role.painted_porch_deploy_service_role.arn
+  service_role_arn = aws_iam_role.painted_porch_codedeploy_service_role.arn
   deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.name
 
   auto_rollback_configuration {
@@ -212,7 +212,7 @@ resource "aws_codestarconnections_host" "github_chainsawman_host" {
 
 resource "aws_codestarconnections_connection" "github_chainsawman_connection" {
   name = "github_chainsawman_connection"
-  host_arn = aws_codestartconnections_host.github_chainsawman_host.arn
+  host_arn = aws_codestarconnections_host.github_chainsawman_host.arn
 }
 
 data "aws_iam_policy_document" "painted_porch_depl_assume_role" {
@@ -269,10 +269,10 @@ data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "codepipeline_policy" {
-  name   = "codepipeline_policy"
-  role   = aws_iam_role.codepipeline_role.id
-  policy = data.aws_iam_policy_document.codepipeline_policy.json
+resource "aws_iam_role_policy" "painted_porch_backend_depl_policy" {
+  name   = "painted_porch_backend_depl_policy"
+  role   = aws_iam_role.painted_porch_backend_depl_role.id
+  policy = data.aws_iam_policy_document.painted_porch_backend_depl_policy.json
 }
 
 resource "aws_codepipeline" "painted_porch_backend" {
