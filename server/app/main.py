@@ -24,3 +24,6 @@ app.include_router(JOURNAL_ENTRY_ROUTER)
 app.include_router(JOURNAL_THEME_ROUTER)
 
 app.include_router(JOURNAL_THEME_DATA_ROUTER)
+
+def lambda_handler(event, context):
+    pass
