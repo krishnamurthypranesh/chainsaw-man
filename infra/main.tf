@@ -199,7 +199,7 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
     events = ["DEPLOYMENT_STOP_ON_ALARM"]
   }
 
-  alarm_configuraion {
+  alarm_configuration {
     alarms = ["painted-porch-deploy-alarm"]
     enabled = true
   }
