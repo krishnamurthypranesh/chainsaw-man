@@ -47,6 +47,11 @@ resource "aws_lambda_function" "painted_porch_backend" {
   s3_bucket = aws_s3_bucket.painted-porch-deployment.bucket
   s3_key = "painted_porch_payload.zip"
 
+  package_type = "Zip"
+
+  handler = "app.main.handler"
+  runtime = "python3.10"
+
   environment {
     variables = {
         Environment = "prod"
