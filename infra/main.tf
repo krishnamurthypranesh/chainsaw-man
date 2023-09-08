@@ -183,7 +183,12 @@ resource "aws_codedeploy_deployment_config" "painted_porch_lambda_deploy_config"
   compute_platform = "Lambda"
 
   traffic_routing_config {
-    type = "AllAtOnce"
+    type = "TimeBasedLinear"
+
+    time_based_linear {
+      interval = 10
+      percentage = 10
+    }
   }
 }
 
