@@ -207,7 +207,6 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
 
 resource "aws_codestarconnections_host" "github_chainsawman_host" {
   name = "github_chainsawman"
-  provider_endpoint = "https://github.com/krishnamurthypranesh"
   provider_type = "GitHub"
 }
 
