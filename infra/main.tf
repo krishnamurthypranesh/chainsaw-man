@@ -205,14 +205,15 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   }
 }
 
-resource "aws_codestarconnections_host" "github_chainsawman_host" {
-  name = "github_chainsawman"
-  provider_type = "GitHub"
-}
+# resource "aws_codestarconnections_host" "github_chainsawman_host" {
+#   name = "github_chainsawman"
+#   provider_type = "GitHub"
+# }
 
-resource "aws_codestarconnections_connection" "github_chainsawman_connection" {
-  name = "github_chainsawman_connection"
-  host_arn = aws_codestarconnections_host.github_chainsawman_host.arn
+resource "aws_codestarconnections_connection" "chainsawman" {
+  name = "chainsawman"
+  # host_arn = aws_codestarconnections_host.github_chainsawman_host.arn
+  provider_type = "GitHub"
 }
 
 data "aws_iam_policy_document" "painted_porch_depl_assume_role" {
