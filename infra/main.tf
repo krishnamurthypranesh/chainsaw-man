@@ -255,7 +255,7 @@ data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
   statement {
     effect    = "Allow"
     actions   = ["codestar-connections:UseConnection"]
-    resources = [aws_codestarconnections_connection.github_chainsawman_connection.arn]
+    resources = [aws_codestarconnections_connection.chainsawman.arn]
   }
 
   statement {
@@ -297,7 +297,7 @@ resource "aws_codepipeline" "painted_porch_backend" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn = aws_codestarconnections_connection.github_chainsawman_connection.arn
+        ConnectionArn = aws_codestarconnections_connection.chainsawman.arn
         FullRepositoryId = "krishnamurthypranesh/chainsaw-man"
         BranchName = "main"
       }
