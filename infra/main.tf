@@ -199,6 +199,11 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
 
   deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.id
 
+  deployment_style {
+    deployment_type = "BLUE_GREEN"
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+  }
+
   auto_rollback_configuration {
     enabled = true
     events = ["DEPLOYMENT_STOP_ON_ALARM"]
