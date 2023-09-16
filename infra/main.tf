@@ -148,7 +148,7 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
 # create the codepipeline: source (github), codebuild, codedeploy
 
 #################### DEPLOYMENT ROLE ##################
-data "aws_iam_policy_document" "painted_porch_deployment_role_doc" {
+data "aws_iam_policy_document" "painted_porch_backend_deployment_role" {
   statement {
     sid = "1"
 
@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "painted_porch_deployment_role_doc" {
 resource "aws_iam_role" "painted_porch_deployment_role" {
   name = "painted_porch_deployment_service_role"
 
-  assume_role_policy = data.aws_iam_policy_document.painted_porch_deployment_role_doc.json
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_backend_deployment_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "painted_porch_deployment_role_atch" {
