@@ -1,17 +1,17 @@
 # create vpc
-resource "aws_vpc" "main" {
-    cidr_block = "10.0.0.0/24"
-}
-
-resource "aws_subnet" "private" {
-    vpc_id = aws_vpc.main.id
-
-    cidr_block = "10.0.0.0/24"
-
-    tags = {
-        Vpc = "main"
-    }
-}
+# resource "aws_vpc" "main" {
+#     cidr_block = "10.0.0.0/24"
+# }
+#
+# resource "aws_subnet" "private" {
+#     vpc_id = aws_vpc.main.id
+#
+#     cidr_block = "10.0.0.0/24"
+#
+#     tags = {
+#         Vpc = "main"
+#     }
+# }
 
 
 # s3 bucket
@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "painted_porch_deployment" {
 }
 
 
-# create lambda and associated resources: ecr
+# create lambda
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -146,7 +146,9 @@ resource "aws_dynamodb_table" "painted_porch_entries" {
 }
 
 # create the codepipeline: source (github), codebuild, codedeploy
-data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
+
+#################### DEPLOYMENT ROLE ##################
+data "aws_iam_policy_document" "painted_porch_deployment_role_doc" {
   statement {
     sid = "1"
 
@@ -156,23 +158,35 @@ data "aws_iam_policy_document" "painted_porch_codedeploy_service_role_doc" {
 
     principals {
       type = "Service"
-      identifiers = ["codedeploy.amazonaws.com"]
+      identifiers = [
+        "codedeploy.amazonaws.com",
+        "codebuild.amazonaws.com",
+        "codepipeline.amazonaws.com",
+      ]
     }
 
   }
 }
 
-resource "aws_iam_role" "painted_porch_codedeploy_service_role" {
-  name = "painted_porch_codedeploy_service_role"
+resource "aws_iam_role" "painted_porch_deployment_role" {
+  name = "painted_porch_deployment_service_role"
 
-  assume_role_policy = data.aws_iam_policy_document.painted_porch_codedeploy_service_role_doc.json
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_deployment_service_role_doc.json
 }
 
-resource "aws_iam_role_policy_attachment" "painted_porch_codedeploy_service_role_atch" {
-  role = aws_iam_role.painted_porch_codedeploy_service_role.id
+resource "aws_iam_role_policy_attachment" "painted_porch_deployment_role_atch" {
+  role = aws_iam_role.painted_porch_deployment_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
 }
 
+#################### CODESTAR CONNECTION #####################################
+resource "aws_codestarconnections_connection" "chainsawman" {
+  name = "chainsawman"
+  # host_arn = aws_codestarconnections_host.github_chainsawman_host.arn
+  provider_type = "GitHub"
+}
+
+################### CODE DEPLOY ########################################
 resource "aws_codedeploy_app" "painted_porch_lambda_deploy_app" {
   compute_platform = "Lambda"
   name = "painted-porch-lambda-deploy"
@@ -215,36 +229,26 @@ resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   }
 }
 
-# resource "aws_codestarconnections_host" "github_chainsawman_host" {
-#   name = "github_chainsawman"
-#   provider_type = "GitHub"
+########################### CODEPIPELINE #######################################
+# data "aws_iam_policy_document" "painted_porch_depl_assume_role" {
+#   statement {
+#     effect = "Allow"
+#
+#     principals {
+#       type        = "Service"
+#       identifiers = ["codepipeline.amazonaws.com"]
+#     }
+#
+#     actions = ["sts:AssumeRole"]
+#   }
 # }
-
-resource "aws_codestarconnections_connection" "chainsawman" {
-  name = "chainsawman"
-  # host_arn = aws_codestarconnections_host.github_chainsawman_host.arn
-  provider_type = "GitHub"
-}
-
-data "aws_iam_policy_document" "painted_porch_depl_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["codepipeline.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "painted_porch_backend_depl_role" {
-  name               = "painted_porch_backend_depl_role"
-  assume_role_policy = data.aws_iam_policy_document.painted_porch_depl_assume_role.json
-}
-
-data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
+#
+# resource "aws_iam_role" "painted_porch_backend_depl_role" {
+#   name               = "painted_porch_backend_depl_role"
+#   assume_role_policy = data.aws_iam_policy_document.painted_porch_depl_assume_role.json
+# }
+#
+data "aws_iam_policy_document" "painted_porch_backend_deployment_extras_policy" {
   statement {
     effect = "Allow"
 
@@ -276,14 +280,14 @@ data "aws_iam_policy_document" "painted_porch_backend_depl_policy" {
       "codebuild:StartBuild",
     ]
 
-    resources = ["*"]
+    resources = [aws_codebuild_project.painted_porch_backend.arn]
   }
 }
 
 resource "aws_iam_role_policy" "painted_porch_backend_depl_policy" {
   name   = "painted_porch_backend_depl_policy"
-  role   = aws_iam_role.painted_porch_backend_depl_role.id
-  policy = data.aws_iam_policy_document.painted_porch_backend_depl_policy.json
+  role   = aws_iam_role.painted_porch_backend_deployment_role.id
+  policy = data.aws_iam_policy_document.painted_porch_backend_deployment_extras_policy_policy.json
 }
 
 resource "aws_codepipeline" "painted_porch_backend" {
