@@ -1,21 +1,21 @@
 import boto3
-from boto3.resources import ServiceResource
 
 from app.config import get_db_config
 
-def __get_db() -> ServiceResource:
+def __get_db():
     ddb = boto3.resource('dynamodb',
-                         region_name=get_db_config().DB_REGION_NAME,
-                         aws_access_key_id=get_db_config().DB_ACCESS_KEY_ID,
-                         aws_secret_access_key=get_db_config().DB_SECRET_ACCESS_KEY)
+                         region_name=get_db_config().region,
+                         aws_access_key_id=get_db_config().access_key_id,
+                         aws_secret_access_key=get_db_config().secret_access_key)
 
     return ddb
 
 
-def __get_cognito_client() -> ServiceResource:
+def __get_cognito_connection():
     """ Returns the AWS cognito client
     """
     pass
 
-DB = __get_db()
-COGNITO_CLIENT = __get_cognito_client()
+
+DB_CONNECTION = __get_db()
+COGNITO_CONNECTION = __get_cognito_connection()

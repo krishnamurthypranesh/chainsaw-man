@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 
-from app.connections import DB
+from app.connections import DB_CONNECTION
 
 router = APIRouter(prefix="/v1/entry")
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("")
 def create() -> List:
-    pass
+    return {"created": True}
 
 
 @router.get("")
@@ -22,7 +22,7 @@ def list_items() -> List:
 
 @router.get("/{entry_id}")
 def get():
-    pass
+    return None
 
 
 @router.get("/{entry_id}")
@@ -32,4 +32,4 @@ def patch():
 
 @router.delete("/{entry_id}")
 def delete():
-    pass
+    return {"deleted": True}

@@ -9,16 +9,15 @@ import yaml
 
 from app import constants
 
-yml_conf = os.environ.get("APP_CONFIG_YAML", "./config.yml")
+# yml_conf = os.environ.get("APP_CONFIG_YAML", "./config.yml")
 env_file = os.environ.get("ENV_FILE", ".env")
 
-ROOTCONFIG = envyaml.EnvYAML(yml_conf)
+# ROOTCONFIG = envyaml.EnvYAML(yml_conf)
 
 
 # APPLICATION CONFIG
 class AppConfig(BaseSettings):
     environment: str
-    httpbin_url: str
 
     class Config:
         env_file = env_file
@@ -37,7 +36,7 @@ class DatabaseConfig(BaseSettings):
     # connection related settings
     region: str
     access_key_id: str
-    access_secret: str
+    secret_access_key: str
 
     class Config:
         env_file = env_file
