@@ -9,3 +9,13 @@ from app.services import UsersService
 router = APIRouter(prefix="/v1/users")
 
 logger = logging.getLogger(__name__)
+
+
+@router.post("/sign-up")
+def sign_up():
+    pass
+
+
+@router.post("/login")
+def login():
+    pass
