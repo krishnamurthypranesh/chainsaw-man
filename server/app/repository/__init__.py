@@ -1,2 +1,0 @@
-from .journal_entry import get_journal_entry_repo
-from .journal_theme_data import get_journal_theme_data_repo
