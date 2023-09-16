@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "painted_porch_deployment_role_doc" {
 resource "aws_iam_role" "painted_porch_deployment_role" {
   name = "painted_porch_deployment_service_role"
 
-  assume_role_policy = data.aws_iam_policy_document.painted_porch_deployment_service_role_doc.json
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_deployment_role_doc.json
 }
 
 resource "aws_iam_role_policy_attachment" "painted_porch_deployment_role_atch" {
@@ -231,7 +231,7 @@ resource "aws_codedeploy_deployment_config" "painted_porch_lambda_deploy_config"
 resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   app_name = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
   deployment_group_name = "painted_porch_lambda_deploy_group"
-  service_role_arn = aws_iam_role.painted_porch_codedeploy_service_role.arn
+  service_role_arn = aws_iam_role.painted_porch_deployment_role.arn
 
   deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.id
 
@@ -309,12 +309,12 @@ data "aws_iam_policy_document" "painted_porch_backend_deployment_extras_policy" 
 resource "aws_iam_role_policy" "painted_porch_backend_depl_policy" {
   name   = "painted_porch_backend_depl_policy"
   role   = aws_iam_role.painted_porch_backend_deployment_role.id
-  policy = data.aws_iam_policy_document.painted_porch_backend_deployment_extras_policy_policy.json
+  policy = data.aws_iam_policy_document.painted_porch_backend_deployment_extras_policy.json
 }
 
 resource "aws_codepipeline" "painted_porch_backend" {
   name = "painted-porch-backend"
-  role_arn = aws_iam_role.painted_porch_backend_depl_role.arn
+  role_arn = aws_iam_role.painted_porch_backend_deployment_role.arn
 
   artifact_store {
     location = aws_s3_bucket.painted_porch_deployment.bucket
