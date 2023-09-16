@@ -3,6 +3,15 @@ variable "aws_region" {
     type = string
 }
 
+variable "tags" {
+    type = map(string)
+
+    default = {
+        env = "prod",
+        app = "painted-porch"
+    }
+}
+
 variable "ecr_repo_url" {
     type = string
 }
