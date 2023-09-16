@@ -168,14 +168,14 @@ data "aws_iam_policy_document" "painted_porch_backend_deployment_role" {
   }
 }
 
-resource "aws_iam_role" "painted_porch_deployment_role" {
+resource "aws_iam_role" "painted_porch_backend_deployment_role" {
   name = "painted_porch_deployment_service_role"
 
   assume_role_policy = data.aws_iam_policy_document.painted_porch_backend_deployment_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "painted_porch_deployment_role_atch" {
-  role = aws_iam_role.painted_porch_deployment_role.id
+resource "aws_iam_role_policy_attachment" "painted_porch_backend_deployment_role_atch" {
+  role = aws_iam_role.painted_porch_backend_deployment_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
 }
 
