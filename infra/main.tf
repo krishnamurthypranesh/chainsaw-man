@@ -20,9 +20,33 @@ resource "aws_s3_bucket" "painted_porch_deployment" {
   acl = "private"
 }
 
+# create dynamodb
+resource "aws_dynamodb_table" "painted_porch" {
+  name           = "painted_porch"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 5
+  write_capacity = 5
+  hash_key       = "primary_key"
+  range_key      = "secondary_key"
+
+  attribute {
+    name = "primary_key"
+    type = "S"
+  }
+
+  attribute {
+    name = "secondary_key"
+    type = "S"
+  }
+
+  tags = {
+    Name        = "painted_porch_db"
+    Environment = "prod"
+  }
+}
 
 # create lambda
-data "aws_iam_policy_document" "assume_role" {
+data "aws_iam_policy_document" "painted_porch_lambda_service_role_doc" {
   statement {
     effect = "Allow"
 
@@ -35,14 +59,43 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "iam_for_lambda" {
+resource "aws_iam_role" "painted_porch_lambda_service_role" {
   name               = "iam_for_lambda"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.painted_porch_lambda_service_role_doc.json
+}
+
+data "aws_iam_policy_document" "painted_porch_ddb_lambda_access_policy_doc" {
+  statement {
+    sid = "ReadWriteTable"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem"
+    ]
+
+    resource = aws_dynamodb_table.painted_porch.arn
+  }
+}
+
+resource "aws_iam_role_policy" "painted_porch_ddb_lambda_access_policy" {
+  name = "painted_porch_ddb_lambda_access_policy"
+  policy = data.aws_iam_policy_document.painted_porch_ddb_lambda_access_policy_doc.json
+}
+
+resource "aws_iam_role_policy_attachment" "painted_porch_backend_deployment_role_atch" {
+  role = aws_iam_role.painted_porch_lambda_service_role.id
+  policy_arn = aws_iam_policy.painted_porch_ddb_lambda_access_policy.arn
 }
 
 resource "aws_lambda_function" "painted_porch_backend" {
   function_name = "painted_porch_backend"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.painted_porch_lambda_service_role.arn
 
   s3_bucket = aws_s3_bucket.painted_porch_deployment.bucket
   s3_key = "painted_porch_payload.zip"
@@ -118,31 +171,6 @@ resource "aws_lambda_permission" "painted_porch_api_gw" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.painted_porch.execution_arn}/*/*"
-}
-
-# create dynamodb
-resource "aws_dynamodb_table" "painted_porch_entries" {
-  name           = "PaintedPorchEntries"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 5
-  write_capacity = 5
-  hash_key       = "journal_id"
-  range_key      = "created_at"
-
-  attribute {
-    name = "journal_id"
-    type = "S"
-  }
-
-  attribute {
-    name = "created_at"
-    type = "N"
-  }
-
-  tags = {
-    Name        = "painted_porch_db"
-    Environment = "prod"
-  }
 }
 
 # create the codepipeline: source (github), codebuild, codedeploy
