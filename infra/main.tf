@@ -186,7 +186,29 @@ resource "aws_codestarconnections_connection" "chainsawman" {
   provider_type = "GitHub"
 }
 
-################### CODE DEPLOY ########################################
+################### CODEBUILD ########################################
+resource "aws_codebuild_project" "painted_porch_backend" {
+  name         = "painted_porch_backend"
+  service_role = aws_iam_role.painted_porch_deployment_role.arn
+  tags = var.tags
+
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+
+  environment {
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image = "aws/codebuild/standard:5.0"
+    type = "LINUX_CONTAINER"
+  }
+
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = "buildspec.yml"
+  }
+}
+
+################### CODEDEPLOY ########################################
 resource "aws_codedeploy_app" "painted_porch_lambda_deploy_app" {
   compute_platform = "Lambda"
   name = "painted-porch-lambda-deploy"
@@ -331,7 +353,7 @@ resource "aws_codepipeline" "painted_porch_backend" {
       version = "1"
 
       configuration =  {
-        ProjectName = "painted-porch-backend"
+        ProjectName = aws_codebuild_project.painted_porch_backend.name
       }
     }
   }
