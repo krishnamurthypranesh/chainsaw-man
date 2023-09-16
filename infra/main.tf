@@ -189,7 +189,7 @@ resource "aws_codestarconnections_connection" "chainsawman" {
 ################### CODEBUILD ########################################
 resource "aws_codebuild_project" "painted_porch_backend" {
   name         = "painted_porch_backend"
-  service_role = aws_iam_role.painted_porch_deployment_role.arn
+  service_role = aws_iam_role.painted_porch_backend_deployment_role.arn
   tags = var.tags
 
   artifacts {
@@ -231,7 +231,7 @@ resource "aws_codedeploy_deployment_config" "painted_porch_lambda_deploy_config"
 resource "aws_codedeploy_deployment_group" "painted_porch_lambda_deploy_group" {
   app_name = aws_codedeploy_app.painted_porch_lambda_deploy_app.name
   deployment_group_name = "painted_porch_lambda_deploy_group"
-  service_role_arn = aws_iam_role.painted_porch_deployment_role.arn
+  service_role_arn = aws_iam_role.painted_porch_backend_deployment_role.arn
 
   deployment_config_name = aws_codedeploy_deployment_config.painted_porch_lambda_deploy_config.id
 
