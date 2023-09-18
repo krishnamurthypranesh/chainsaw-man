@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 
-from app.connections import DB_CONNECTION
 
 router = APIRouter(prefix="/v1/users")
 

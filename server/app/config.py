@@ -1,18 +1,14 @@
 from datetime import timedelta
 import logging.config
 import os
-from typing import List
+from typing import Optional
 
-import envyaml
 from pydantic import BaseSettings
-import yaml
 
 from app import constants
 
-# yml_conf = os.environ.get("APP_CONFIG_YAML", "./config.yml")
-env_file = os.environ.get("ENV_FILE", ".env")
 
-# ROOTCONFIG = envyaml.EnvYAML(yml_conf)
+env_file = os.environ.get("ENV_FILE", ".env")
 
 
 # APPLICATION CONFIG
@@ -33,10 +29,11 @@ def get_app_config():
 
 
 class DatabaseConfig(BaseSettings):
-    # connection related settings
+
     region: str
     access_key_id: str
     secret_access_key: str
+    endpoint_url: Optional[str]
 
     class Config:
         env_file = env_file

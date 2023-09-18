@@ -1,6 +1,8 @@
 version: "3"
-services:
 
+name: "painted-porch"
+
+services:
   painted-porch-frontend:
     networks:
       - painted-porch
@@ -33,21 +35,15 @@ services:
     volumes:
       - "../server:/code/"
     depends_on:
-      - painted-porch-db
+      - painted-porch-localstack
 
-  painted-porch-db:
+  painted-porch-localstack:
     networks:
       - painted-porch
-    container_name: painted-porch-db
-    image: mongo
+    image: "localstack/localstack:latest"
+    container_name: painted-porch-localstack
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo-painted-porch:/data/db
-    env_file: .env
-    command: mongod --quiet
+      - "4566:4566"
 
-volumes:
-  mongo-painted-porch:
 networks:
   painted-porch:

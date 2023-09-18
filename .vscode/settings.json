@@ -1,3 +1,13 @@
 {
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "none",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.envFile": "${workspaceFolder}/server/.env",
+    "python.testing.pytestArgs": [
+        "server"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.cwd": "./",
 }
