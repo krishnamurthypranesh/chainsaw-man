@@ -44,8 +44,9 @@ app.include_router(users_router)
 
 def exception_response_builder(exc):
     response = {"details": exc.error_message}
-    for key, value in exc.extra.items():
-        response[key] = value
+    if hasattr(exc, "extras"):
+        for key, value in exc.extra.items():
+            response[key] = value
 
     return JSONResponse(status_code=exc.status_code, content=response)
 

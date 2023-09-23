@@ -36,6 +36,7 @@ services:
       - "../server:/code/"
     depends_on:
       - painted-porch-localstack
+      - painted-porch-cognito
 
   painted-porch-localstack:
     networks:
@@ -44,6 +45,15 @@ services:
     container_name: painted-porch-localstack
     ports:
       - "4566:4566"
+
+  painted-porch-cognito:
+    networks:
+      - painted-porch
+    image: jagregory/cognito-local:latest
+    container_name: "painted-porch-cognito"
+    ports:
+      - "4567:9229"
+  
 
 networks:
   painted-porch:

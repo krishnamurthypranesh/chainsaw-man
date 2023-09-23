@@ -2,6 +2,8 @@ import os
 import tempfile
 from unittest import mock
 
+import boto3
+from moto import mock_cognitoidp
 import pytest
 
 
@@ -22,3 +24,12 @@ def setup_aws_credentials():
         "AWS_DEFAULT_REGION": "ap-south-1",
     }):
         yield
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_cognito_resources(request):
+    with mock_cognitoidp as mock_idp:
+        cognito = boto3.client("cognito-idp", region_name="ap-south-1")
+
+        user_pool_id = cognito.create_user_pool(PoolName="")["UserPool"]["Id"]
+        user_pool_client = cognito.create_user_pool_client(UserPoolId=user_pool_id, ClientName="painted-porch-backend")
+    

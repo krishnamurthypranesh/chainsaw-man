@@ -14,6 +14,8 @@ env_file = os.environ.get("ENV_FILE", ".env")
 # APPLICATION CONFIG
 class AppConfig(BaseSettings):
     environment: str
+    user_pool_id: str
+    user_pool_client_id: str
 
     class Config:
         env_file = env_file

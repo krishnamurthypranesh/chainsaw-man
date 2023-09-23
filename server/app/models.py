@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -23,11 +23,17 @@ class User(Base):
     published_entries_count: int
 
 
+class CollectionTemplate(Base):
+    fields: List
+
+
 class Collection(Base):
     user_id: str = Field(alias="primary_key")
     collection_id: str = Field(alias="secondary_key")
     name: str
-    template: Dict
+    # this is a good candidate for FormIO
+    # TODO: replace dictionary with a type that can be serialized to FormIO when returning the response
+    template: CollectionTemplate 
     active: bool
     published_entries_count: int
     created_at: datetime

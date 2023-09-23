@@ -9,6 +9,6 @@ class BaseAppException(Exception):
 class ObjectAlreadyExists(BaseAppException):
     pass
 
-class ObjctNotFound(BaseAppException):
+class ObjectNotFound(BaseAppException):
     def __init__(self, obj: str):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, error_message=f"{obj} not found")

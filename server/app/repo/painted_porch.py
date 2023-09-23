@@ -15,4 +15,4 @@ class PaintedPorchRepo(BaseRepo):
         if len(rec["Items"]) == 0:
             raise ObjectNotFound(obj="user")
 
-        return models.User(**rec)
+        return models.User(**rec["Items"][0])

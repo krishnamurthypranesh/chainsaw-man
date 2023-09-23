@@ -14,6 +14,7 @@ pydantic = {version = "==1.10.0", extras = ["dotenv"]}
 
 [dev-packages]
 black = "*"
+moto = "*"
 
 [requires]
 python_version = "3.10"
