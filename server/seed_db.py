@@ -89,7 +89,6 @@ idp = boto3.client("cognito-idp", endpoint_url="http://localhost:4567", region_n
 user_pool = idp.create_user_pool(PoolName="painted_porch")["UserPool"]
 user_pool_client = idp.create_user_pool_client(UserPoolId=user_pool["Id"], ClientName="painted_porch_backend")["UserPoolClient"]
 
-breakpoint()
 idp.sign_up(
     ClientId=user_pool_client["ClientId"],
     Username="test_user",
