@@ -30,6 +30,13 @@ def setup_cognito_resources(request):
     with mock_cognitoidp as mock_idp:
         cognito = boto3.client("cognito-idp", region_name="ap-south-1")
 
+        # create a user pool
         user_pool_id = cognito.create_user_pool(PoolName="")["UserPool"]["Id"]
+
+        # create a user pool client
         user_pool_client = cognito.create_user_pool_client(UserPoolId=user_pool_id, ClientName="painted-porch-backend")
+
+        # sigup and verify user
+
+        # create a user in dynamo db
     

@@ -14,8 +14,10 @@ env_file = os.environ.get("ENV_FILE", ".env")
 # APPLICATION CONFIG
 class AppConfig(BaseSettings):
     environment: str
-    user_pool_id: str
-    user_pool_client_id: str
+
+    cognito_user_pool_id: str
+    cognito_user_pool_client_id: str
+    cognito_user_pool_region: str
 
     class Config:
         env_file = env_file
@@ -31,7 +33,6 @@ def get_app_config():
 
 
 class DatabaseConfig(BaseSettings):
-
     region: str
     access_key_id: str
     secret_access_key: str

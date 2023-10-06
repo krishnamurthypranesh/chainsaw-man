@@ -17,26 +17,26 @@ services:
       - "8000:8000"
     volumes:
       - "../frontend:/code/"
-    depends_on:
-      - painted-porch-backend
+    # depends_on:
+    #   - painted-porch-backend
 
-  painted-porch-backend:
-    networks: 
-      - painted-porch
-    build:
-      context: .
-      dockerfile: backend.Dockerfile
-    container_name: painted-porch-backend
-    security_opt:
-      - seccomp:unconfined
-    env_file: .env
-    ports:
-      - "8080:80"
-    volumes:
-      - "../server:/code/"
-    depends_on:
-      - painted-porch-localstack
-      - painted-porch-cognito
+  # painted-porch-backend:
+  #   networks: 
+  #     - painted-porch
+  #   build:
+  #     context: .
+  #     dockerfile: backend.Dockerfile
+  #   container_name: painted-porch-backend
+  #   security_opt:
+  #     - seccomp:unconfined
+  #   env_file: .env
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - "../server:/code/"
+  #   depends_on:
+  #     - painted-porch-localstack
+  #     - painted-porch-cognito
 
   painted-porch-localstack:
     networks:
@@ -46,13 +46,13 @@ services:
     ports:
       - "4566:4566"
 
-  painted-porch-cognito:
-    networks:
-      - painted-porch
-    image: jagregory/cognito-local:latest
-    container_name: "painted-porch-cognito"
-    ports:
-      - "4567:9229"
+  # painted-porch-cognito:
+  #   networks:
+  #     - painted-porch
+  #   image: jagregory/cognito-local:latest
+  #   container_name: "painted-porch-cognito"
+  #   ports:
+  #     - "4567:9229"
   
 
 networks:

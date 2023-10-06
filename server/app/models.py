@@ -15,6 +15,7 @@ class Base(BaseModel):
 class User(Base):
     user_id: str = Field(alias="primary_key")
     secondary_key: str
+    public_id: str
     name: str
     email: str = Field()
     created_at: datetime
@@ -23,8 +24,13 @@ class User(Base):
     published_entries_count: int
 
 
+class CollectionTemplateField(Base):
+    key: str
+    display_name: str
+
+
 class CollectionTemplate(Base):
-    fields: List
+    fields: List[CollectionTemplateField]
 
 
 class Collection(Base):

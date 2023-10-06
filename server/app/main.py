@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request, status
+from fastapi import Depends, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 
+from app.config import get_app_config, get_db_config
 from app.connections import (
     DB_CONNECTION,
     COGNITO_CONNECTION,
@@ -29,12 +30,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 collections_controller = CollectionsController(
+    cognito_client=None,
     painted_porch_repo=PaintedPorchRepo(
         db=DB_CONNECTION,
-        table_name="painted_porch", # move to constants
     ),
-    cognito_client=None,
 )
 
 app.include_router(collections_controller.get_router())

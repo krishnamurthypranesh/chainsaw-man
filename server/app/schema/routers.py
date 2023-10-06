@@ -1,30 +1,31 @@
 from datetime import datetime
 import json
-from typing import Dict
+from typing import List
 
 from pydantic import validator
 
 from app.schema.base import CustomBase
 
 
+
+class CollectionTemplateField(CustomBase):
+    key: str
+    display_name: str
+
+
+class CollectionTemplate(CustomBase):
+    fields: List[CollectionTemplateField]
+
+
 class CreateCollectionRequest(CustomBase):
     name: str    
-    template: Dict
+    template: CollectionTemplate
     active: bool = True
-
-    @validator("template", pre=True, always=True)
-    def validate_template(v):
-        """Check if template is a valid json
-        """
-        try:
-            return json.loads(v)
-        except:
-            raise ValueError("template is not a valid json")
 
 
 class CreateCollectionResponse(CustomBase):
     collection_id: str
     name: str
-    template: str
+    template: CollectionTemplate
     active: bool
     created_at: datetime

@@ -11,11 +11,11 @@ svix-ksuid = "*"
 uvicorn = "*"
 httpx = "*"
 pydantic = {version = "==1.10.0", extras = ["dotenv"]}
+python-jose = "*"
 
 [dev-packages]
 black = "*"
 moto = "*"
-python-jose = "*"
 
 [requires]
 python_version = "3.10"
