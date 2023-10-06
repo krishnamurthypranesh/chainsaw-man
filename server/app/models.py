@@ -11,6 +11,14 @@ class Base(BaseModel):
                 _d[k] = int(_d[k].timestamp())
         return _d
 
+    def to_output(self):
+        _d = self.dict(by_alias=False)
+        for k in ["created_at", "updated_at"]:
+            if k in _d and isinstance(_d[k], datetime):
+                _d[k] = _d[k].isoformat()
+        return _d
+
+
 
 class User(Base):
     user_id: str = Field(alias="primary_key")

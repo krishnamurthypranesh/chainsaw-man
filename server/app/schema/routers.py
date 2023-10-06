@@ -1,6 +1,5 @@
 from datetime import datetime
-import json
-from typing import List
+from typing import List, Optional
 
 from pydantic import validator
 
@@ -29,3 +28,18 @@ class CreateCollectionResponse(CustomBase):
     template: CollectionTemplate
     active: bool
     created_at: datetime
+
+
+class CollectionOut(CustomBase):
+    collection_id: str
+    name: str
+    template: CollectionTemplate
+    active: bool
+    created_at: datetime
+
+
+class ListCollectionResponse(CustomBase):
+    next_cursor: Optional[str]
+    prev_cursor: Optional[str]
+    limit: int
+    records: List[CollectionOut]

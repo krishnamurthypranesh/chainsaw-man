@@ -9,6 +9,12 @@ class BaseAppException(Exception):
 class ObjectAlreadyExists(BaseAppException):
     pass
 
+
 class ObjectNotFound(BaseAppException):
     def __init__(self, obj: str):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, error_message=f"{obj} not found")
+
+
+class BadPaginationParameter(BaseAppException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, error_message=f"invalid pagination parameter supplied")

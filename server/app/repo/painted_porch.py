@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import List, Optional
 
 from boto3.dynamodb.conditions import Key, Attr
 
 from app import models
+from app import constants
 from app.exceptions import ObjectNotFound
 from app.repo.base import BaseRepo
 
@@ -45,3 +46,38 @@ class PaintedPorchRepo(BaseRepo):
         )
 
         return response["Attributes"]
+
+    def get_collection_by_id(self, user_id: str, collection_id: str) -> models.Collection:
+        rec = self.table.query(
+            KeyConditionExpression=Key("primary_key").eq(user_id) & Key("secondary_key").eq(collection_id)
+        )
+
+        if len(rec["Items"]) == 0:
+            raise ObjectNotFound(obj="collection")
+
+        return models.Collection(**rec["Items"][0])
+
+    def get_all_collections_by_params(self, user_id: str, cursor: str, limit: int, scan_forward: bool = True) -> List[models.Collection]:
+        key_condition_expression = "primary_key = :primaryKeyValue and begins_with(secondary_key, :collectionIdPrefix)"
+        expression_values = {
+            ":primaryKeyValue": user_id,
+            ":collectionIdPrefix": constants.COLLECTION_PREFIX,
+        }
+
+        if len(cursor) > 0:
+            op = ">"
+            if not scan_forward:
+                op = "<"
+            key_condition_expression += f" and secondary_key {op} :secondaryKeyValue"
+            expression_values[":secondaryKeyValue"] = cursor
+
+
+        records = self.table.query(
+            Select="ALL_ATTRIBUTES",
+            ScanIndexForward=scan_forward,
+            KeyConditionExpression=key_condition_expression,
+            ExpressionAttributeValues=expression_values,
+            Limit=limit,
+        )
+
+        return [models.Collection(**rec) for rec in records["Items"]], records["LastEvaluatedKey"]["secondary_key"]
