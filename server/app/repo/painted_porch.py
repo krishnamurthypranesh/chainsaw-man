@@ -80,4 +80,6 @@ class PaintedPorchRepo(BaseRepo):
             Limit=limit,
         )
 
-        return [models.Collection(**rec) for rec in records["Items"]], records["LastEvaluatedKey"]["secondary_key"]
+        secondary_key = records.get("LastEvaluatedKey", {}).get("secondary_key")
+
+        return [models.Collection(**rec) for rec in records["Items"]], secondary_key

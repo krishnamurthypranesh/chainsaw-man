@@ -8,7 +8,7 @@ class TestCollectionCreate:
     url = "/v1/collections"
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup(self):
+    def setup(self, request):
         pass
 
     def test_returns_400_if_template_is_invalid_json(self):
